@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config/site';
+---
+
+<Base title="お仕事依頼" description={`${site.name}へのお仕事のご依頼について。`}>
+  <h1>お仕事のご依頼</h1>
+
+  <h2>お受けできる内容</h2>
+  <p class="placeholder-note">
+    ここに対応可能なお仕事の種類（案件配信・ボイス出演・イラスト利用許諾など）と実績が入ります。
+    お問い合わせフォームとメディアキットはPhase 3で設置します。
+  </p>
+
+  <h2>ご連絡方法</h2>
+  <p class="placeholder-note">
+    お問い合わせフォーム設置までは、<a href={site.links.x} rel="me noopener" target="_blank">X</a> のDMにてご連絡ください。
+  </p>
+</Base>

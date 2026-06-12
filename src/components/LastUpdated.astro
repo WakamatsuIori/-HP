@@ -1,0 +1,26 @@
+---
+// ビルドした時刻を埋め込み、表示時にブラウザ側で「◯分前」に変換する。
+// JSが無効でも日本時間の絶対時刻が表示される。
+const builtAt = new Date();
+const jst = new Intl.DateTimeFormat('ja-JP', {
+  timeZone: 'Asia/Tokyo',
+  month: 'numeric',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+}).format(builtAt);
+---
+
+<p class="last-updated">
+  最終更新: <time datetime={builtAt.toISOString()} data-built-at={builtAt.getTime()}>{jst}</time>
+</p>
+
+<script>
+  const el = document.querySelector<HTMLTimeElement>('.last-updated time');
+  const builtAt = Number(el?.dataset.builtAt);
+  if (el && Number.isFinite(builtAt)) {
+    const min = Math.max(0, Math.floor((Date.now() - builtAt) / 60000));
+    el.textContent =
+      min < 1 ? 'たった今' : min < 60 ? `${min}分前` : min < 1440 ? `${Math.floor(min / 60)}時間前` : `${Math.floor(min / 1440)}日前`;
+  }
+</script>

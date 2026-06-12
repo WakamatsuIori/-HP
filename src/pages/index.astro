@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import ScheduleList from '../components/ScheduleList.astro';
+import { site } from '../config/site';
+import { loadSchedule } from '../lib/loadSchedule';
+
+const events = await loadSchedule();
+const next3 = events.slice(0, 3);
+---
+
+<Base>
+  <h1>{site.name}</h1>
+  <p>{site.description}</p>
+
+  <h2>次の配信</h2>
+  <ScheduleList events={next3} />
+  <p><a href="/schedule">スケジュールをすべて見る →</a></p>
+
+  <h2>最新動画</h2>
+  <p class="placeholder-note">最新動画の自動表示は準備中です（Phase 2で実装）。</p>
+</Base>

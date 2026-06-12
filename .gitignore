@@ -1,0 +1,13 @@
+# 秘密情報（絶対にコミットしない）
+.env
+.env.*
+!.env.example
+
+# 依存・ビルド成果物
+node_modules/
+dist/
+.astro/
+
+# OS・エディタ
+Thumbs.db
+.DS_Store

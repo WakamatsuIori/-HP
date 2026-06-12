@@ -1,0 +1,131 @@
+---
+import { site } from '../config/site';
+import LastUpdated from '../components/LastUpdated.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = site.description } = Astro.props;
+const pageTitle = title ? `${title} | ${site.name}` : site.name;
+
+const nav = [
+  { href: '/', label: 'トップ' },
+  { href: '/schedule', label: 'スケジュール' },
+  { href: '/videos', label: '動画' },
+  { href: '/goods', label: 'グッズ' },
+  { href: '/about', label: 'About' },
+  { href: '/work', label: 'お仕事依頼' },
+];
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">{site.name}</a>
+      <nav>
+        <ul>
+          {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <p class="official-links">
+        公式リンク：
+        <a href={site.links.youtube} rel="me noopener" target="_blank">YouTube</a>
+        <a href={site.links.x} rel="me noopener" target="_blank">X</a>
+        <a href={site.links.booth} rel="me noopener" target="_blank">BOOTH</a>
+      </p>
+      <p class="footer-nav">
+        <a href="/guidelines">ガイドライン</a>
+        <a href="/privacy">プライバシーポリシー</a>
+      </p>
+      <LastUpdated />
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #fbfbfd;
+    --text: #23232b;
+    --muted: #6b6b76;
+    --accent: #3f6fde;
+    --line: #e4e4ec;
+    --card: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    margin: 0;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+  a { color: var(--accent); }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1rem 1rem 3rem;
+  }
+  h1 { font-size: 1.4rem; }
+  h2 { font-size: 1.15rem; margin-top: 2rem; }
+
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--card);
+  }
+  .site-header .brand {
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .site-header nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .site-header nav a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .site-footer {
+    border-top: 1px solid var(--line);
+    padding: 1.5rem 1rem 2.5rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .site-footer a { margin: 0 0.4rem; }
+
+  .placeholder-note {
+    background: var(--card);
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--muted);
+  }
+</style>

@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import ScheduleList from '../components/ScheduleList.astro';
+import { loadSchedule, SCHEDULE_DAYS } from '../lib/loadSchedule';
+
+const events = await loadSchedule();
+---
+
+<Base title="スケジュール" description="配信予定スケジュール。カレンダーから自動で更新されます。">
+  <h1>スケジュール</h1>
+  <p>今後{SCHEDULE_DAYS}日間の配信予定です（日本時間）。カレンダーの内容から自動で更新されます。</p>
+  <ScheduleList events={events} />
+</Base>

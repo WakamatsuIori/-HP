@@ -1,0 +1,62 @@
+---
+import type { StreamEvent } from '../lib/ics';
+import { groupByJstDay, jstTime } from '../lib/schedule';
+
+interface Props {
+  events: StreamEvent[];
+}
+const { events } = Astro.props;
+const days = groupByJstDay(events);
+---
+
+{
+  days.length === 0 ? (
+    <p class="placeholder-note">直近の配信予定はまだありません。カレンダーに予定が入ると自動で表示されます。</p>
+  ) : (
+    <div class="schedule">
+      {days.map((day) => (
+        <section class="schedule-day">
+          <h3>{day.label}</h3>
+          <ul>
+            {day.events.map((ev) => (
+              <li>
+                <span class="time">{jstTime(ev.start)}</span>
+                <span class="title">{ev.title}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .schedule-day {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .schedule-day h3 {
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+  }
+  .schedule-day ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .schedule-day li {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.25rem 0;
+  }
+  .schedule-day .time {
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+</style>

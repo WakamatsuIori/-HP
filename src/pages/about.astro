@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config/site';
+---
+
+<Base title="About" description={`${site.name}のプロフィール・設定・自己紹介。`}>
+  <h1>About</h1>
+
+  <h2>プロフィール</h2>
+  <p class="placeholder-note">
+    ここに本人のプロフィール（名前の読み・誕生日・好きなもの・配信ジャンルなど）が入ります。
+    内容が確定したらこのページを書き換えます。
+  </p>
+
+  <h2>世界観・設定</h2>
+  <p class="placeholder-note">ここにキャラクター設定・世界観の紹介が入ります。</p>
+
+  <h2>リンク</h2>
+  <ul>
+    <li><a href={site.links.youtube} rel="me noopener" target="_blank">YouTube</a></li>
+    <li><a href={site.links.x} rel="me noopener" target="_blank">X</a></li>
+    <li><a href={site.links.booth} rel="me noopener" target="_blank">BOOTH</a></li>
+  </ul>
+</Base>
