@@ -1,0 +1,70 @@
+# 土台の定期ビルド（構成図 §0）:
+# 15分ごとにカレンダー等の最新データでサイトを再生成し、Cloudflare Pagesへ公開する。
+# 失敗時はDiscordへ通知。ビルドが失敗しても前回の正常なデプロイがそのまま残る。
+name: build-and-deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # 手動実行も可能にしておく（動作確認用）
+
+# 同時に2つ走らないようにする（追い越しによる古いデータの上書き防止）
+concurrency:
+  group: build-and-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read # 失敗通知で「直前の実行も失敗していたか」を確認するため
+
+env:
+  PAGES_PROJECT_NAME: vtuber-hp
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: 依存関係をインストール
+        run: npm ci
+
+      - name: テスト
+        run: npm test
+
+      - name: ビルド（カレンダー取得失敗時はここで止まり、前回デプロイが残る）
+        run: npm run build
+        env:
+          ICS_URL: ${{ secrets.ICS_URL }}
+
+      - name: Cloudflare Pagesへデプロイ
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=${{ env.PAGES_PROJECT_NAME }} --branch=main
+
+      - name: 失敗をDiscordへ通知（連続失敗はメンション付き）
+        if: failure()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # 直前の完了済み実行も失敗していたら「連続失敗」として@everyoneを付ける
+          prev=$(gh api "repos/${{ github.repository }}/actions/workflows/build.yml/runs?status=completed&per_page=1" \
+            --jq '.workflow_runs[0].conclusion' 2>/dev/null || echo "unknown")
+          mention=""
+          if [ "$prev" = "failure" ]; then
+            mention="@everyone 【連続失敗・要確認】 "
+          fi
+          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          jq -n --arg content "${mention}⚠️ HPの自動ビルドが失敗しました。前回の正常版を表示し続けています。詳細: ${run_url}" \
+            '{content: $content}' \
+            | curl -sS -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK_URL"
