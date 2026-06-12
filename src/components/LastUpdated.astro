@@ -16,11 +16,11 @@ const jst = new Intl.DateTimeFormat('ja-JP', {
 </p>
 
 <script>
+  import { relativeTimeJa } from '../lib/schedule';
+
   const el = document.querySelector<HTMLTimeElement>('.last-updated time');
   const builtAt = Number(el?.dataset.builtAt);
   if (el && Number.isFinite(builtAt)) {
-    const min = Math.max(0, Math.floor((Date.now() - builtAt) / 60000));
-    el.textContent =
-      min < 1 ? 'たった今' : min < 60 ? `${min}分前` : min < 1440 ? `${Math.floor(min / 60)}時間前` : `${Math.floor(min / 1440)}日前`;
+    el.textContent = relativeTimeJa(new Date(builtAt), new Date());
   }
 </script>

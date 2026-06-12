@@ -46,6 +46,23 @@ describe('parseIcsEvents', () => {
     expect(occ!.end!.getTime() - occ!.start.getTime()).toBe(90 * 60 * 1000);
   });
 
+  it('JST深夜開始の繰り返し予定でも、この回だけの時間変更（override）が反映される', () => {
+    // 毎週火曜 01:00 JST（UTCでは月曜16:00 = UTC日付がJSTと1日ずれるケース）
+    // 6/23の回だけ 02:00 JST に変更されている
+    const changed = events.find((e) => e.title === '深夜雑談（時間変更）');
+    expect(changed).toBeDefined();
+    // 6/23 02:00 JST = 6/22 17:00 UTC
+    expect(changed!.start.toISOString()).toBe('2026-06-22T17:00:00.000Z');
+    // 変更前の時刻（6/23 01:00 JST = 6/22 16:00 UTC）の回は残っていない
+    expect(
+      events.find((e) => e.title === '深夜雑談' && e.start.toISOString() === '2026-06-22T16:00:00.000Z'),
+    ).toBeUndefined();
+    // 変更されていない週（6/16）は元の時刻のまま
+    expect(
+      events.find((e) => e.title === '深夜雑談' && e.start.toISOString() === '2026-06-15T16:00:00.000Z'),
+    ).toBeDefined();
+  });
+
   it('開始時刻の昇順に並んでいる', () => {
     const times = events.map((e) => e.start.getTime());
     expect(times).toEqual([...times].sort((a, b) => a - b));

@@ -42,6 +42,19 @@ function isExcluded(ev: VEvent, occurrence: Date): boolean {
 }
 
 /**
+ * この回だけ時間変更された予定（RECURRENCE-ID override）を探す。
+ * node-icalのrecurrencesはキーの日付形式がタイムゾーン依存のため、
+ * キーではなく recurrenceid（元の開始時刻）の一致で照合する
+ * （UTC日付キーで引くと、JST深夜開始の予定で日付がずれて取りこぼす）。
+ */
+function findOverride(ev: VEvent, occurrence: Date): VEvent | undefined {
+  if (!ev.recurrences) return undefined;
+  return Object.values(ev.recurrences).find(
+    (r) => r.recurrenceid instanceof Date && Math.abs(r.recurrenceid.getTime() - occurrence.getTime()) < 1000,
+  );
+}
+
+/**
  * .icsテキストをパースし、[windowStart, windowEnd] に重なる予定を展開して返す。
  * 同じ入力に対して常に同じ結果を返す純関数（通信しない）。
  */
@@ -61,10 +74,9 @@ export function parseIcsEvents(icsText: string, windowStart: Date, windowEnd: Da
       for (const occ of occurrences) {
         if (isExcluded(ev, occ)) continue;
         // 個別に時間変更された回（recurrence override）があればそちらを優先
-        const overrideKey = occ.toISOString().slice(0, 10);
-        const override = ev.recurrences?.[overrideKey];
+        const override = findOverride(ev, occ);
         if (override?.start) {
-          result.push(toStreamEvent(ev, override.start, override.end ?? null));
+          result.push(toStreamEvent(override, override.start, override.end ?? null));
         } else {
           result.push(toStreamEvent(ev, occ, dur > 0 ? new Date(occ.getTime() + dur) : null));
         }
