@@ -13,15 +13,20 @@ const next3 = events.slice(0, 3);
 
 <Base>
   <section class="hero">
-    <Image
-      class="hero-art"
-      src={heroArt}
-      width={520}
-      alt={`${site.name}の立ち絵`}
-      loading="eager"
-    />
+    <div class="hero-art-wrap">
+      <Image
+        class="hero-art"
+        src={heroArt}
+        widths={[300, 460, 680]}
+        sizes="(min-width: 640px) 340px, 78vw"
+        alt={`${site.name}の立ち絵`}
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
     <div class="hero-info">
       <p class="hero-name">{site.name}</p>
+      <p class="hero-romaji">WAKAMATSU IORI</p>
       {
         next ? (
           <div class="countdown" data-start={next.start.toISOString()}>
@@ -52,9 +57,32 @@ const next3 = events.slice(0, 3);
     gap: 1rem;
     text-align: center;
     padding: 1rem 0 1.5rem;
+    overflow-x: clip; /* 背後グローの横滲みでページが横スクロールしないように（縦は通常表示） */
+  }
+  .hero-art-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+  /* 立ち絵の背後にやわらかな光だまり（静止＝prefers-reduced-motionでも安全）。
+     透過PNGの周囲ににじむ金の光で、主役感と奥行きを出す。 */
+  .hero-art-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -6% -10% 2%;
+    z-index: 0;
+    background: radial-gradient(
+      ellipse 58% 46% at 50% 36%,
+      rgba(156, 143, 107, 0.22) 0%,
+      rgba(156, 143, 107, 0.09) 40%,
+      transparent 72%
+    );
+    pointer-events: none;
   }
   .hero-art {
-    width: min(72%, 300px);
+    position: relative;
+    z-index: 1;
+    width: min(76%, 300px);
     height: auto;
   }
   .hero-info {
@@ -62,17 +90,27 @@ const next3 = events.slice(0, 3);
   }
   .hero-name {
     font-family: var(--font-serif);
-    font-size: 1.45rem;
+    font-size: 1.5rem;
     font-weight: 500;
-    letter-spacing: 0.1em;
-    margin: 0 0 0.85rem;
+    letter-spacing: 0.12em;
+    margin: 0 0 0.15rem;
+  }
+  .hero-romaji {
+    margin: 0 0 1rem;
+    font-family: var(--font-serif);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.36em;
+    text-indent: 0.36em; /* 字間ぶんの右寄りを視覚的に中央へ補正 */
+    color: var(--muted);
   }
   .countdown {
     display: inline-block;
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 0.8rem 1.6rem;
+    border-radius: 8px;
+    padding: 0.9rem 1.7rem;
+    box-shadow: 0 1px 4px rgba(66, 63, 56, 0.04);
   }
   .cd-label {
     margin: 0;
@@ -101,10 +139,16 @@ const next3 = events.slice(0, 3);
       justify-content: center;
       align-items: center;
       text-align: left;
-      gap: 2rem;
+      gap: 2.5rem;
     }
     .hero-info {
       width: auto;
+    }
+    .hero-art {
+      width: min(40vw, 340px);
+    }
+    .hero-romaji {
+      text-indent: 0; /* 左寄せ時はインデント不要 */
     }
   }
 </style>
