@@ -18,13 +18,14 @@ const currentPath = Astro.url.pathname;
 const isActiveNav = (href: string) =>
   href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 
+// トップは1ページ縦スクロールのLP。ナビは画面内アンカーへ（他ページからはトップの該当位置へ戻る）。
 const nav = [
   { href: '/', label: 'トップ' },
-  { href: '/schedule', label: 'スケジュール' },
-  { href: '/videos', label: '動画' },
-  { href: '/goods', label: 'グッズ' },
-  { href: '/about', label: 'About' },
-  { href: '/work', label: 'お仕事依頼' },
+  { href: '/#about', label: 'About' },
+  { href: '/#schedule', label: 'スケジュール' },
+  { href: '/#videos', label: '動画' },
+  { href: '/#goods', label: 'グッズ' },
+  { href: '/#work', label: 'お仕事依頼' },
 ];
 ---
 
@@ -120,6 +121,10 @@ const nav = [
   }
   * { box-sizing: border-box; }
   html { color-scheme: light; overflow-x: clip; } /* 100vwのフルブリードで横スクロールを出さない（縦は保持） */
+  /* LPの画面内アンカー移動をなめらかに（動きが苦手な設定の人には無効） */
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
   body {
     margin: 0;
     font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', system-ui, sans-serif;

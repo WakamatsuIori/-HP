@@ -30,7 +30,7 @@ try {
 
 <Base>
   {/* ===== ヒーロー：キービジュアルを主役にしたシネマティックな第一印象 ===== */}
-  <section class="hero2">
+  <section class="hero2" id="top">
     <Image
       class="hero2__bg"
       src={keyVisual}
@@ -70,7 +70,7 @@ try {
   </section>
 
   {/* ===== ようこそ（ABOUT）：誰が・何をしている人かを最初に伝える ===== */}
-  <section class="welcome">
+  <section class="welcome lp-section" id="about">
     <div class="welcome__art">
       <Image
         src={heroArt}
@@ -101,21 +101,50 @@ try {
     </div>
   </section>
 
-  <h2>次の配信</h2>
-  <ScheduleList events={next3} />
-  <p class="more-link"><a href="/schedule">スケジュールをすべて見る →</a></p>
+  <section class="lp-section" id="schedule">
+    <h2>次の配信</h2>
+    <ScheduleList events={next3} />
+    <p class="more-link"><a href="/schedule">スケジュールをすべて見る →</a></p>
+  </section>
 
-  <h2>最新動画</h2>
-  {
-    latestTop.length > 0 ? (
-      <>
-        <VideoList videos={latestTop} />
-        <p class="more-link"><a href="/videos">動画をすべて見る →</a></p>
-      </>
-    ) : (
-      <p class="placeholder-note">最新動画はまもなく表示されます。</p>
-    )
-  }
+  <section class="lp-section" id="videos">
+    <h2>最新動画</h2>
+    {
+      latestTop.length > 0 ? (
+        <>
+          <VideoList videos={latestTop} />
+          <p class="more-link"><a href="/videos">動画をすべて見る →</a></p>
+        </>
+      ) : (
+        <p class="placeholder-note">最新動画はまもなく表示されます。</p>
+      )
+    }
+  </section>
+
+  <section class="lp-section" id="goods">
+    <h2>グッズ</h2>
+    <p>オリジナルグッズは BOOTH にて販売中です。（自動掲載は準備中）</p>
+    <div class="sec-cta">
+      <a class="btn btn-gold sm" href={site.links.booth} rel="me noopener" target="_blank">BOOTHで見る</a>
+    </div>
+  </section>
+
+  <section class="lp-section" id="follow">
+    <h2>フォロー</h2>
+    <p>配信のお知らせや日常は各SNSで。チャンネル登録・フォローで応援よろしくお願いします。</p>
+    <div class="sec-cta">
+      <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">YouTube</a>
+      <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">X (Twitter)</a>
+    </div>
+  </section>
+
+  <section class="lp-section" id="work">
+    <h2>お仕事のご依頼</h2>
+    <p>コラボ・企業案件などのご相談を受け付けています。詳細・ご連絡方法はこちらから。</p>
+    <div class="sec-cta">
+      <a class="btn btn-ghost-dark sm" href="/work">依頼内容・ご連絡方法 →</a>
+    </div>
+  </section>
 </Base>
 
 <style>
@@ -263,6 +292,10 @@ try {
   .welcome__cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; }
 
   .more-link { text-align: right; }
+
+  /* LP（1ページ縦スクロール）の各セクション。アンカー移動時に上が詰まりすぎないよう余白。 */
+  .lp-section { scroll-margin-top: 2rem; }
+  .sec-cta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 0.6rem; }
 
   @media (min-width: 720px) {
     .welcome {
