@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "id": "vid_live",
+      "snippet": {
+        "title": "【LIVE】朝活雑談",
+        "liveBroadcastContent": "live",
+        "publishedAt": "2026-06-13T23:00:00Z",
+        "thumbnails": { "high": { "url": "https://i.ytimg.com/vi/vid_live/hqdefault.jpg" } }
+      }
+    },
+    {
+      "id": "vid_new",
+      "snippet": {
+        "title": "最新ゲーム実況 #5",
+        "liveBroadcastContent": "none"
+      }
+    }
+  ]
+}

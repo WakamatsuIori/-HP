@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "id": "PL_game", "snippet": { "title": "ゲーム実況" } },
+    { "id": "PL_song", "snippet": { "title": "歌枠アーカイブ" } },
+    { "id": "PL_empty", "snippet": { "title": "" } }
+  ]
+}

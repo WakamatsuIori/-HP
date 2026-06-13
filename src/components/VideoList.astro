@@ -1,0 +1,69 @@
+---
+import type { Video } from '../lib/youtube';
+
+interface Props {
+  videos: Video[];
+}
+const { videos } = Astro.props;
+---
+
+{
+  videos.length === 0 ? (
+    <p class="placeholder-note">動画がまだありません。YouTubeに投稿されると自動で表示されます。</p>
+  ) : (
+    <ul class="video-grid">
+      {videos.map((v) => (
+        <li class="video-card">
+          <a href={v.url} rel="noopener" target="_blank">
+            <span class="video-thumb">
+              <img src={v.thumbnailUrl} alt="" loading="lazy" decoding="async" />
+            </span>
+            <span class="video-title">{v.title}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .video-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .video-card a {
+    display: block;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .video-thumb {
+    display: block;
+    aspect-ratio: 16 / 9;
+    background: var(--bg);
+  }
+  .video-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .video-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    padding: 0.5rem 0.6rem 0.7rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+</style>

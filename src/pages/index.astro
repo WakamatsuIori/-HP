@@ -4,11 +4,16 @@ import { Image } from 'astro:assets';
 import ScheduleList from '../components/ScheduleList.astro';
 import { site } from '../config/site';
 import { loadSchedule } from '../lib/loadSchedule';
+import { loadVideos } from '../lib/loadVideos';
+import VideoList from '../components/VideoList.astro';
+import LiveBadge from '../components/LiveBadge.astro';
 import heroArt from '../assets/Wakamatsu_full_size.png';
 
 const events = await loadSchedule();
 const next = events[0] ?? null;
 const next3 = events.slice(0, 3);
+const { latest, live } = await loadVideos();
+const latestTop = latest.slice(0, 6);
 ---
 
 <Base>
@@ -27,6 +32,7 @@ const next3 = events.slice(0, 3);
     <div class="hero-info">
       <p class="hero-name">{site.name}</p>
       <p class="hero-romaji">WAKAMATSU IORI</p>
+      <LiveBadge live={live} />
       {
         next ? (
           <div class="countdown" data-start={next.start.toISOString()}>
@@ -46,7 +52,8 @@ const next3 = events.slice(0, 3);
   <p class="more-link"><a href="/schedule">スケジュールをすべて見る →</a></p>
 
   <h2>最新動画</h2>
-  <p class="placeholder-note">最新動画の自動表示は準備中です（Phase 2で実装）。</p>
+  <VideoList videos={latestTop} />
+  <p class="more-link"><a href="/videos">動画をすべて見る →</a></p>
 </Base>
 
 <style>

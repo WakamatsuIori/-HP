@@ -1,0 +1,75 @@
+---
+import type { LiveStatus } from '../lib/youtube';
+
+interface Props {
+  live: LiveStatus;
+}
+const { live } = Astro.props;
+---
+
+{
+  live.isLive && live.liveVideo && (
+    <a class="live-badge" href={live.liveVideo.url} rel="noopener" target="_blank">
+      <span class="live-dot" aria-hidden="true" />
+      <span class="live-now">配信中</span>
+      <span class="live-title">{live.liveVideo.title}</span>
+    </a>
+  )
+}
+
+<style>
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.4rem 0.95rem;
+    background: var(--card);
+    border: 1px solid #e0b6b6;
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.9rem;
+    box-shadow: 0 1px 4px rgba(66, 63, 56, 0.06);
+  }
+  .live-dot {
+    flex-shrink: 0;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: #e23b3b;
+    box-shadow: 0 0 0 0 rgba(226, 59, 59, 0.55);
+    animation: live-pulse 1.8s ease-out infinite;
+  }
+  .live-now {
+    flex-shrink: 0;
+    color: #c0392b;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .live-title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  @keyframes live-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(226, 59, 59, 0.5);
+    }
+    70% {
+      box-shadow: 0 0 0 0.5rem rgba(226, 59, 59, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(226, 59, 59, 0);
+    }
+  }
+  /* リッチ演出はトップの1箇所のみ＋reduced-motion尊重（CLAUDE.md §6） */
+  @media (prefers-reduced-motion: reduce) {
+    .live-dot {
+      animation: none;
+    }
+  }
+</style>

@@ -39,10 +39,11 @@ jobs:
       - name: テスト
         run: npm test
 
-      - name: ビルド（カレンダー取得失敗時はここで止まり、前回デプロイが残る）
+      - name: ビルド（外部データ取得失敗時はここで止まり、前回デプロイが残る）
         run: npm run build
         env:
           ICS_URL: ${{ secrets.ICS_URL }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
 
       - name: Cloudflare Pagesプロジェクトを用意（初回のみ作成・既存ならスキップ）
         run: npx wrangler@3 pages project create ${{ env.PAGES_PROJECT_NAME }} --production-branch=main || echo "プロジェクトは既に存在します（スキップ）"

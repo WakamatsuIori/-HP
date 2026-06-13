@@ -1,13 +1,41 @@
 ---
 import Base from '../layouts/Base.astro';
 import { site } from '../config/site';
+
+// グッズ方針は「保留」（ユーザー選択 2026-06-13）。
+// BOOTHはRSS提供を停止しており（実ブラウザでも items.rss が HTTP 406）、外部サイト向けの
+// 公式埋め込みウィジェットも無いため「自動掲載」は不可能。当面はショップへのリンク表示にする。
+// ※将来 (a)手動カード掲載 or (b)リンクのみ確定 を決める。BOOTH取得コードは休眠保存（docs/progress.md）。
 ---
 
-<Base title="グッズ" description="グッズ一覧。購入はBOOTHにて。">
+<Base title="グッズ" description="グッズはBOOTHショップにて公開中です。">
   <h1>グッズ</h1>
-  <p class="placeholder-note">
-    グッズの自動掲載は準備中です（Phase 2で実装）。
-    それまでは <a href={site.links.booth} rel="me noopener" target="_blank">BOOTH</a> をご覧ください。
+  <p>
+    グッズはBOOTHショップで公開しています。最新のラインナップの確認・購入は下記からどうぞ。
+    （当サイトでの直接販売は行っていません）
   </p>
-  <p>※グッズの購入はすべてBOOTHで行えます。当サイトでの直接販売は行っていません。</p>
+  <p class="booth-cta">
+    <a class="booth-btn" href={site.links.booth} rel="me noopener" target="_blank">BOOTHショップを見る →</a>
+  </p>
 </Base>
+
+<style>
+  .booth-cta {
+    margin-top: 1.75rem;
+    text-align: center;
+  }
+  .booth-btn {
+    display: inline-block;
+    padding: 0.7rem 1.7rem;
+    background: var(--card);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    color: var(--accent-strong);
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .booth-btn:hover {
+    background: var(--bg);
+  }
+</style>

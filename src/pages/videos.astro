@@ -1,12 +1,35 @@
 ---
 import Base from '../layouts/Base.astro';
+import VideoList from '../components/VideoList.astro';
 import { site } from '../config/site';
+import { loadVideos } from '../lib/loadVideos';
+
+const { latest, playlists } = await loadVideos();
 ---
 
-<Base title="動画" description="動画一覧。">
+<Base title="動画" description="最新動画と再生リスト別のまとめ。">
   <h1>動画</h1>
-  <p class="placeholder-note">
-    動画の自動掲載（ゲーム／歌／雑談などの自動仕分け）は準備中です（Phase 2で実装）。
-    それまでは <a href={site.links.youtube} rel="me noopener" target="_blank">YouTubeチャンネル</a> をご覧ください。
+
+  <h2>最新動画</h2>
+  <VideoList videos={latest} />
+
+  {
+    playlists.map((pl) => (
+      <Fragment>
+        <h2>{pl.title}</h2>
+        <VideoList videos={pl.videos} />
+      </Fragment>
+    ))
+  }
+
+  <p class="more-link">
+    <a href={site.links.youtube} rel="me noopener" target="_blank">YouTubeチャンネルを見る →</a>
   </p>
 </Base>
+
+<style>
+  .more-link {
+    text-align: right;
+    margin-top: 1.25rem;
+  }
+</style>

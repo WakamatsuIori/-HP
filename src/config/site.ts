@@ -9,8 +9,18 @@ export const site = {
   description: 'VTuber・和香松庵の公式サイト。配信予定・動画・グッズ・お仕事のご依頼はこちらから。',
   /** 公式リンク（なりすまし対策として全ページから参照する） */
   links: {
-    youtube: 'https://www.youtube.com/@example-channel',
-    x: 'https://x.com/example',
-    booth: 'https://example.booth.pm/',
+    youtube: 'https://www.youtube.com/channel/UC_7ehPcs0J67P-5k-qJmjmA',
+    x: 'https://x.com/Wakamatsu_VT',
+    booth: 'https://wakamatsu-iori.booth.pm/',
+  },
+  /**
+   * 自動掲載のデータ取得元（いずれも公開情報。APIキー等の秘密は .env / GitHub Secrets で管理）。
+   * 本人の値が決まったらここに設定する。空のままだと該当機能のビルドが失敗する（設定漏れに気づける）。
+   */
+  sources: {
+    /** YouTubeチャンネルID（UCで始まる24文字）。動画一覧・ライブ検知に使用。取得: docs/setup/05-youtube-api.md */
+    youtubeChannelId: 'UC_7ehPcs0J67P-5k-qJmjmA',
+    /** BOOTHショップのRSSフィードURL（例: https://〇〇.booth.pm/items.rss）。取得: docs/setup/06-booth-feed.md */
+    boothFeedUrl: 'https://wakamatsu-iori.booth.pm/items.rss',
   },
 } as const;
