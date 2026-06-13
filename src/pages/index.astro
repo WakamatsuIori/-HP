@@ -86,8 +86,8 @@ try {
       <div class="welcome__art">
         <Image
           src={heroArt}
-          widths={[400, 560, 760, 1040]}
-          sizes="(min-width: 720px) 520px, 72vw"
+          widths={[440, 640, 900, 1200]}
+          sizes="(min-width: 900px) 600px, 80vw"
           alt={`${site.name}の立ち絵`}
           loading="lazy"
         />
@@ -298,26 +298,26 @@ try {
     gap: 1.25rem;
     text-align: center;
   }
-  .welcome__art { width: min(74%, 320px); }
+  .welcome__art { width: min(80%, 400px); }
   .welcome__art :global(img) { width: 100%; height: auto; }
   .kicker--dark { color: var(--accent-strong); text-shadow: none; }
-  .welcome__lead { margin: 0.4rem 0 1.2rem; line-height: 1.95; font-size: 1.12rem; }
+  .welcome__lead { margin: 0.5rem 0 1.4rem; line-height: 2; font-size: 1.2rem; }
 
   /* プロフィール項目（VTuber定番・値は仮） */
   .profile-list { margin: 0 0 1.3rem; padding: 0; text-align: left; }
   .profile-row {
     display: grid;
-    grid-template-columns: 6.5rem 1fr;
+    grid-template-columns: 7.5rem 1fr;
     gap: 0.3rem 1rem;
-    padding: 0.5rem 0;
+    padding: 0.7rem 0;
     border-bottom: 1px solid var(--line);
   }
   .profile-row dt {
     margin: 0;
     position: relative;
-    padding-left: 1.1rem;
+    padding-left: 1.2rem;
     color: var(--muted);
-    font-size: 0.95rem;
+    font-size: 1.04rem;
   }
   .profile-row dt::before {
     content: '◆';
@@ -327,7 +327,7 @@ try {
     color: var(--accent);
     font-size: 0.66rem;
   }
-  .profile-row dd { margin: 0; font-size: 1rem; }
+  .profile-row dd { margin: 0; font-size: 1.06rem; }
   .welcome__lead strong { font-weight: 600; }
   .chips {
     display: flex;
@@ -427,22 +427,22 @@ try {
     margin: 0.4rem 0 1rem;
     padding: 0;
     border-bottom: none;
-    font-size: 1.7rem;
+    font-size: 1.9rem;
   }
   .welcome__body h2::after { content: none; }
 
   .sec-lead { text-align: center; margin: 0 auto 1.1rem; max-width: 34rem; }
   .sec-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; }
 
-  @media (min-width: 720px) {
+  @media (min-width: 900px) {
     .welcome {
       flex-direction: row;
       align-items: center;
       text-align: left;
-      gap: 2.5rem;
+      gap: 3rem;
+      max-width: 1200px;
     }
-    .welcome { max-width: 1140px; }
-    .welcome__art { flex-shrink: 0; width: min(46%, 520px); }
+    .welcome__art { flex-shrink: 0; width: min(50%, 600px); }
     .chips, .welcome__cta { justify-content: flex-start; }
   }
 
