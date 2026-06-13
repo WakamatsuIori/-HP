@@ -29,10 +29,14 @@ export async function loadScheduleWith(fetcher: TextFetcher, now: Date): Promise
   return upcomingEvents(events, now, SCHEDULE_DAYS);
 }
 
-// ビルド中はトップとスケジュールページの両方から呼ばれるため、結果を使い回す（取得は1回だけ）
+// 本番ビルドではトップとスケジュールの両方から呼ばれるため、結果を使い回す（取得は1回だけ）。
+// dev中はキャッシュせず毎回取得する（カレンダーを編集→リロードで即反映を確認できるように）。
 let cache: Promise<StreamEvent[]> | null = null;
 
 export function loadSchedule(): Promise<StreamEvent[]> {
-  cache ??= loadScheduleWith(fetchText, new Date());
-  return cache;
+  if (import.meta.env.PROD) {
+    cache ??= loadScheduleWith(fetchText, new Date());
+    return cache;
+  }
+  return loadScheduleWith(fetchText, new Date());
 }
