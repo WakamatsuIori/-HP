@@ -44,6 +44,12 @@ jobs:
         env:
           ICS_URL: ${{ secrets.ICS_URL }}
 
+      - name: Cloudflare Pagesプロジェクトを用意（初回のみ作成・既存ならスキップ）
+        run: npx wrangler@3 pages project create ${{ env.PAGES_PROJECT_NAME }} --production-branch=main || echo "プロジェクトは既に存在します（スキップ）"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Cloudflare Pagesへデプロイ
         uses: cloudflare/wrangler-action@v3
         with:
