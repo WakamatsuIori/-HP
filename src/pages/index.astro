@@ -86,8 +86,8 @@ try {
       <div class="welcome__art">
         <Image
           src={heroArt}
-          widths={[280, 420, 560]}
-          sizes="(min-width: 720px) 280px, 55vw"
+          widths={[280, 420, 560, 680]}
+          sizes="(min-width: 720px) 340px, 64vw"
           alt={`${site.name}の立ち絵`}
           loading="lazy"
         />
@@ -193,7 +193,7 @@ try {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 62% center;
+    object-position: 52% 18%; /* 顔（上部中央）が切れないよう上寄せ */
     z-index: 0;
   }
   .hero2__scrim {
@@ -289,7 +289,7 @@ try {
     gap: 1.25rem;
     text-align: center;
   }
-  .welcome__art { width: min(58%, 230px); }
+  .welcome__art { width: min(64%, 260px); }
   .welcome__art :global(img) { width: 100%; height: auto; }
   .kicker--dark { color: var(--accent-strong); text-shadow: none; }
   .welcome__lead { margin: 0.4rem 0 1.1rem; line-height: 1.95; }
@@ -372,7 +372,8 @@ try {
       text-align: left;
       gap: 2.5rem;
     }
-    .welcome__art { flex-shrink: 0; }
+    .welcome { max-width: 880px; }
+    .welcome__art { flex-shrink: 0; width: min(40%, 340px); }
     .chips, .welcome__cta { justify-content: flex-start; }
   }
 
