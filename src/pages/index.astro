@@ -86,8 +86,8 @@ try {
       <div class="welcome__art">
         <Image
           src={heroArt}
-          widths={[440, 640, 900, 1200]}
-          sizes="(min-width: 900px) 600px, 80vw"
+          widths={[480, 720, 960, 1320]}
+          sizes="(min-width: 900px) 660px, 82vw"
           alt={`${site.name}の立ち絵`}
           loading="lazy"
         />
@@ -282,7 +282,7 @@ try {
     text-decoration: none;
     transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
   }
-  .btn.sm { padding: 0.62rem 1.3rem; font-size: 0.95rem; }
+  .btn.sm { padding: 0.7rem 1.5rem; font-size: 1.05rem; }
   .btn-gold { background: #6f6444; color: #faf9f6; }
   .btn-gold:hover { background: #847650; transform: translateY(-1px); }
   .btn-ghost { border: 1px solid rgba(122, 108, 69, 0.55); color: var(--h-gold); background: rgba(255, 255, 255, 0.55); }
@@ -301,23 +301,23 @@ try {
   .welcome__art { width: min(80%, 400px); }
   .welcome__art :global(img) { width: 100%; height: auto; }
   .kicker--dark { color: var(--accent-strong); text-shadow: none; }
-  .welcome__lead { margin: 0.6rem 0 1.6rem; line-height: 2.05; font-size: 1.32rem; }
+  .welcome__lead { margin: 0.7rem 0 1.8rem; line-height: 2.05; font-size: 1.46rem; }
 
   /* プロフィール項目（VTuber定番・値は仮） */
   .profile-list { margin: 0 0 1.3rem; padding: 0; text-align: left; }
   .profile-row {
     display: grid;
     grid-template-columns: 9rem 1fr;
-    gap: 0.3rem 1.2rem;
-    padding: 0.95rem 0;
+    gap: 0.3rem 1.4rem;
+    padding: 1.1rem 0;
     border-bottom: 1px solid var(--line);
   }
   .profile-row dt {
     margin: 0;
     position: relative;
-    padding-left: 1.3rem;
+    padding-left: 1.4rem;
     color: var(--muted);
-    font-size: 1.1rem;
+    font-size: 1.18rem;
     white-space: nowrap;
   }
   .profile-row dt::before {
@@ -328,7 +328,7 @@ try {
     color: var(--accent);
     font-size: 0.66rem;
   }
-  .profile-row dd { margin: 0; font-size: 1.16rem; }
+  .profile-row dd { margin: 0; font-size: 1.26rem; }
   .welcome__lead strong { font-weight: 600; }
   .chips {
     display: flex;
@@ -340,10 +340,10 @@ try {
     list-style: none;
   }
   .chips li {
-    padding: 0.45rem 1.3rem;
+    padding: 0.5rem 1.45rem;
     border: 1px solid var(--accent);
     border-radius: 999px;
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: var(--accent-strong);
     background: rgba(156, 143, 107, 0.06);
   }
@@ -428,7 +428,7 @@ try {
     margin: 0.4rem 0 1rem;
     padding: 0;
     border-bottom: none;
-    font-size: 2.2rem;
+    font-size: 2.5rem;
   }
   .welcome__body h2::after { content: none; }
 
@@ -438,12 +438,13 @@ try {
   @media (min-width: 900px) {
     .welcome {
       flex-direction: row;
-      align-items: flex-start; /* 上揃え＝立ち絵の頭のラインからプロフィールを始める */
+      align-items: flex-start;
       text-align: left;
       gap: 3.5rem;
-      max-width: 1320px;
+      max-width: 1360px;
     }
-    .welcome__art { flex-shrink: 0; width: min(46%, 600px); }
+    .welcome__art { flex-shrink: 0; width: min(48%, 660px); }
+    .welcome__body { margin-top: 2.5rem; } /* 頭のラインから少しだけ下げる */
     .chips, .welcome__cta { justify-content: flex-start; }
   }
 
