@@ -13,6 +13,11 @@ const pageTitle = title ? `${title} | ${site.name}` : site.name;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageURL = new URL('/og.jpg', Astro.site); // SNSシェアカードの画像（横長キービジュアル）
 
+// ナビの現在地判定（現在ページのリンクに下線を付ける）
+const currentPath = Astro.url.pathname;
+const isActiveNav = (href: string) =>
+  href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+
 const nav = [
   { href: '/', label: 'トップ' },
   { href: '/schedule', label: 'スケジュール' },
@@ -62,7 +67,13 @@ const nav = [
       <a class="brand" href="/">{site.name}</a>
       <nav>
         <ul>
-          {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+          {nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isActiveNav(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))}
         </ul>
       </nav>
     </header>
@@ -101,7 +112,8 @@ const nav = [
     --bg: #faf9f6;
     --text: #423f38;
     --muted: #8a8474;
-    --accent: #9c8f6b;
+    --accent: #9c8f6b;        /* くすみ金：見出し装飾・大きいアクセント用 */
+    --accent-strong: #6f6444; /* 濃い金：本文リンク等の小さい文字用（白背景でAAコントラスト確保） */
     --line: #e7e3d9;
     --card: #ffffff;
     --font-serif: 'Zen Old Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
@@ -116,23 +128,35 @@ const nav = [
     line-height: 1.8;
     letter-spacing: 0.02em;
   }
-  a { color: var(--accent); }
+  a { color: var(--accent-strong); }
   main {
     max-width: 720px;
     margin: 0 auto;
-    padding: 1.5rem 1.25rem 3rem;
+    padding: 1.75rem 1.25rem 3.5rem;
   }
   h1, h2, h3 {
     font-family: var(--font-serif);
     font-weight: 500;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
+    line-height: 1.5;
   }
-  h1 { font-size: 1.5rem; }
+  h1 { font-size: 1.55rem; }
+  /* h2：上品な金のアクセント（細い全幅ライン＋見出し先頭の金タブ） */
   h2 {
+    position: relative;
     font-size: 1.2rem;
-    margin-top: 2.5rem;
-    padding-bottom: 0.4rem;
+    margin-top: 2.75rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--line);
+  }
+  h2::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 2.5rem;
+    height: 2px;
+    background: var(--accent);
   }
 
   .site-header {
@@ -146,8 +170,9 @@ const nav = [
   }
   .site-header .brand {
     font-family: var(--font-serif);
+    font-size: 1.15rem;
     font-weight: 500;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-decoration: none;
     color: var(--text);
   }
@@ -163,6 +188,16 @@ const nav = [
     text-decoration: none;
     color: var(--muted);
     font-size: 0.9rem;
+    padding-bottom: 2px;
+    border-bottom: 1.5px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .site-header nav a:hover {
+    color: var(--text);
+  }
+  .site-header nav a[aria-current='page'] {
+    color: var(--text);
+    border-bottom-color: var(--accent);
   }
 
   .site-footer {
