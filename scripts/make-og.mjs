@@ -20,12 +20,12 @@ const OUT = 'public/og.jpg';
 const W = 1200;
 const H = 630;
 
-// 元画像の角の色を取得し、レターボックス帯の色に使う（帯を背景に溶け込ませる）。
-const corner = await sharp(SRC)
-  .extract({ left: 0, top: 0, width: 4, height: 4 })
-  .raw()
-  .toBuffer({ resolveWithObject: true });
-const background = { r: corner.data[0], g: corner.data[1], b: corner.data[2] };
+// レターボックス帯＆透過部の塗り色 = 元画像の「支配色（最頻色）」。
+// 角ピクセルを直接読む方式は、四隅が透過の画像（IMG_5834 等）だと alpha を無視して
+// rgb(0,0,0) を拾うなど誤検出しうる。ヒストグラムから地色を決める stats().dominant なら
+// 黒地KVは黒・灰地KVは灰が安定して得られ、SRC を差し替えても安全。
+const { dominant } = await sharp(SRC).stats();
+const background = { r: dominant.r, g: dominant.g, b: dominant.b };
 
 const info = await sharp(SRC)
   .resize(W, H, { fit: 'contain', background })
@@ -36,4 +36,4 @@ const info = await sharp(SRC)
 const kb = info.size / 1024;
 console.log(`元: ${SRC}`);
 console.log(`出力: ${OUT}  ${info.width}x${info.height}  ${kb.toFixed(1)} KB`);
-console.log(`帯の色(角): rgb(${background.r}, ${background.g}, ${background.b})`);
+console.log(`帯・地の色(支配色): rgb(${background.r}, ${background.g}, ${background.b})`);
