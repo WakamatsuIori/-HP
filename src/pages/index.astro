@@ -324,7 +324,13 @@ try {
     padding-block: clamp(2.75rem, 6vw, 4.5rem);
     scroll-margin-top: 1rem;
   }
-  .lp-section--tint { background: #f3f0e7; }
+  /* 帯セクション：淡い色＋琥珀色の灯りボケ（バーの照明感） */
+  .lp-section--tint {
+    background:
+      radial-gradient(42% 55% at 14% 18%, rgba(201, 168, 105, 0.1), transparent 62%),
+      radial-gradient(38% 50% at 86% 82%, rgba(201, 168, 105, 0.08), transparent 60%),
+      #f3f0e7;
+  }
   .lp-inner {
     max-width: 760px;
     margin-inline: auto;
@@ -332,7 +338,35 @@ try {
   }
 
   /* セクション見出し：大きな英字のウォーターマーク＋日本語サブ（参考サイトの手法を金で翻訳） */
-  .section-head { text-align: center; margin: 0 auto 2rem; line-height: 1; }
+  .section-head {
+    position: relative;
+    text-align: center;
+    margin: 0 auto 1.7rem;
+    padding-bottom: 1.3rem;
+    line-height: 1;
+  }
+  /* アールデコ調の区切り（金の細線＋中央のひし形） */
+  .section-head::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0.5rem;
+    transform: translateX(-50%);
+    width: 76px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent) 50%, transparent);
+  }
+  .section-head::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: calc(0.5rem - 3.5px);
+    transform: translateX(-50%) rotate(45deg);
+    width: 7px;
+    height: 7px;
+    background: var(--accent);
+    z-index: 1;
+  }
   .section-kicker {
     margin: 0;
     font-family: var(--font-serif);
