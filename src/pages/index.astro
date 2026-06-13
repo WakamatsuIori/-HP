@@ -70,79 +70,91 @@ try {
   </section>
 
   {/* ===== ようこそ（ABOUT）：誰が・何をしている人かを最初に伝える ===== */}
-  <section class="welcome lp-section" id="about">
-    <div class="welcome__art">
-      <Image
-        src={heroArt}
-        widths={[280, 420, 560]}
-        sizes="(min-width: 720px) 280px, 55vw"
-        alt={`${site.name}の立ち絵`}
-        loading="lazy"
-      />
-    </div>
-    <div class="welcome__body">
-      <p class="kicker kicker--dark">ABOUT</p>
-      <h2>ようこそ、和香松庵へ</h2>
-      <p class="welcome__lead">
-        皆さん、初めまして！　カフェ＆バーの店長、個人勢VTuberの<strong>和香松 庵</strong>です。
-        雑談やゲーム配信をメインに、いろいろなことに挑戦しながら、楽しさ・面白さを共有していきます。
-        グラス片手に、ゆるりとお立ち寄りください。
-      </p>
-      <ul class="chips">
-        <li>雑談</li>
-        <li>ゲーム実況</li>
-        <li>いろいろ挑戦</li>
-      </ul>
-      <div class="welcome__cta">
-        <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">チャンネル登録</a>
-        <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">Xをフォロー</a>
-        <a class="btn btn-ghost-dark sm" href="/about">プロフィール</a>
+  <section class="lp-section" id="about">
+    <div class="lp-inner welcome">
+      <div class="welcome__art">
+        <Image
+          src={heroArt}
+          widths={[280, 420, 560]}
+          sizes="(min-width: 720px) 280px, 55vw"
+          alt={`${site.name}の立ち絵`}
+          loading="lazy"
+        />
+      </div>
+      <div class="welcome__body">
+        <p class="kicker kicker--dark">ABOUT</p>
+        <h2>ようこそ、和香松庵へ</h2>
+        <p class="welcome__lead">
+          皆さん、初めまして！　カフェ＆バーの店長、個人勢VTuberの<strong>和香松 庵</strong>です。
+          雑談やゲーム配信をメインに、いろいろなことに挑戦しながら、楽しさ・面白さを共有していきます。
+          グラス片手に、ゆるりとお立ち寄りください。
+        </p>
+        <ul class="chips">
+          <li>雑談</li>
+          <li>ゲーム実況</li>
+          <li>いろいろ挑戦</li>
+        </ul>
+        <div class="welcome__cta">
+          <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">チャンネル登録</a>
+          <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">Xをフォロー</a>
+          <a class="btn btn-ghost-dark sm" href="/about">プロフィール</a>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="lp-section" id="schedule">
-    <h2>次の配信</h2>
-    <ScheduleList events={next3} />
-    <p class="more-link"><a href="/schedule">スケジュールをすべて見る →</a></p>
+  <section class="lp-section lp-section--tint" id="schedule">
+    <div class="lp-inner">
+      <div class="section-head"><p class="section-kicker">SCHEDULE</p><h2>次の配信</h2></div>
+      <ScheduleList events={next3} />
+      <p class="more-link"><a href="/schedule">スケジュールをすべて見る →</a></p>
+    </div>
   </section>
 
   <section class="lp-section" id="videos">
-    <h2>最新動画</h2>
-    {
-      latestTop.length > 0 ? (
-        <>
-          <VideoList videos={latestTop} />
-          <p class="more-link"><a href="/videos">動画をすべて見る →</a></p>
-        </>
-      ) : (
-        <p class="placeholder-note">最新動画はまもなく表示されます。</p>
-      )
-    }
+    <div class="lp-inner">
+      <div class="section-head"><p class="section-kicker">VIDEO</p><h2>最新動画</h2></div>
+      {
+        latestTop.length > 0 ? (
+          <>
+            <VideoList videos={latestTop} />
+            <p class="more-link"><a href="/videos">動画をすべて見る →</a></p>
+          </>
+        ) : (
+          <p class="placeholder-note">最新動画はまもなく表示されます。</p>
+        )
+      }
+    </div>
   </section>
 
-  <section class="lp-section" id="goods">
-    <h2>グッズ</h2>
-    <p>オリジナルグッズは BOOTH にて販売中です。（自動掲載は準備中）</p>
-    <div class="sec-cta">
-      <a class="btn btn-gold sm" href={site.links.booth} rel="me noopener" target="_blank">BOOTHで見る</a>
+  <section class="lp-section lp-section--tint" id="goods">
+    <div class="lp-inner">
+      <div class="section-head"><p class="section-kicker">GOODS</p><h2>グッズ</h2></div>
+      <p class="sec-lead">オリジナルグッズは BOOTH にて販売中です。（自動掲載は準備中）</p>
+      <div class="sec-cta">
+        <a class="btn btn-gold sm" href={site.links.booth} rel="me noopener" target="_blank">BOOTHで見る</a>
+      </div>
     </div>
   </section>
 
   <section class="lp-section" id="follow">
-    <h2>フォロー</h2>
-    <p>配信のお知らせや日常は各SNSで。チャンネル登録・フォローで応援よろしくお願いします。</p>
-    <div class="sec-cta">
-      <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">YouTube</a>
-      <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">X (Twitter)</a>
+    <div class="lp-inner">
+      <div class="section-head"><p class="section-kicker">FOLLOW</p><h2>フォロー</h2></div>
+      <p class="sec-lead">配信のお知らせや日常は各SNSで。チャンネル登録・フォローで応援よろしくお願いします。</p>
+      <div class="sec-cta">
+        <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">YouTube</a>
+        <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">X (Twitter)</a>
+      </div>
     </div>
   </section>
 
-  <section class="lp-section" id="work">
-    <h2>お仕事のご依頼</h2>
-    <p>コラボ・企業案件などのご相談を受け付けています。詳細・ご連絡方法はこちらから。</p>
-    <div class="sec-cta">
-      <a class="btn btn-ghost-dark sm" href="/work">依頼内容・ご連絡方法 →</a>
+  <section class="lp-section lp-section--tint" id="work">
+    <div class="lp-inner">
+      <div class="section-head"><p class="section-kicker">CONTACT</p><h2>お仕事のご依頼</h2></div>
+      <p class="sec-lead">コラボ・企業案件などのご相談を受け付けています。詳細・ご連絡方法はこちらから。</p>
+      <div class="sec-cta">
+        <a class="btn btn-ghost-dark sm" href="/work">依頼内容・ご連絡方法 →</a>
+      </div>
     </div>
   </section>
 </Base>
@@ -265,7 +277,6 @@ try {
     align-items: center;
     gap: 1.25rem;
     text-align: center;
-    margin: 0.5rem 0 1rem;
   }
   .welcome__art { width: min(58%, 230px); }
   .welcome__art :global(img) { width: 100%; height: auto; }
@@ -293,9 +304,41 @@ try {
 
   .more-link { text-align: right; }
 
-  /* LP（1ページ縦スクロール）の各セクション。アンカー移動時に上が詰まりすぎないよう余白。 */
-  .lp-section { scroll-margin-top: 2rem; }
-  .sec-cta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 0.6rem; }
+  /* ===== LP（1ページ縦スクロール）のセクション土台 ===== */
+  /* 各セクションはフルブリード。中身は .lp-inner で読みやすい幅に収める。
+     交互に淡い帯（--tint）を敷いて縦のリズムを出す。 */
+  .lp-section {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    padding-block: clamp(2.75rem, 6vw, 4.5rem);
+    scroll-margin-top: 1rem;
+  }
+  .lp-section--tint { background: #f3f0e7; }
+  .lp-inner {
+    max-width: 760px;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  /* セクション見出し（英字キッカー＋日本語・中央寄せ） */
+  .section-head { text-align: center; margin: 0 auto 1.9rem; }
+  .section-kicker {
+    margin: 0 0 0.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.32em;
+    font-weight: 600;
+    color: var(--accent-strong);
+  }
+  .section-head h2 {
+    display: inline-block;
+    margin: 0;
+    padding-bottom: 0.6rem;
+    border-bottom: none;
+  }
+  .section-head h2::after { left: 50%; transform: translateX(-50%); } /* グローバルの左タブを中央へ */
+
+  .sec-lead { text-align: center; margin: 0 auto 1.1rem; max-width: 34rem; }
+  .sec-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; }
 
   @media (min-width: 720px) {
     .welcome {
