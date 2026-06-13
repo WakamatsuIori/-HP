@@ -86,8 +86,8 @@ try {
       <div class="welcome__art">
         <Image
           src={heroArt}
-          widths={[280, 420, 560, 680]}
-          sizes="(min-width: 720px) 340px, 64vw"
+          widths={[320, 480, 640, 840]}
+          sizes="(min-width: 720px) 420px, 64vw"
           alt={`${site.name}の立ち絵`}
           loading="lazy"
         />
@@ -273,7 +273,7 @@ try {
     text-decoration: none;
     transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
   }
-  .btn.sm { padding: 0.55rem 1.15rem; font-size: 0.86rem; }
+  .btn.sm { padding: 0.62rem 1.3rem; font-size: 0.95rem; }
   .btn-gold { background: #6f6444; color: #faf9f6; }
   .btn-gold:hover { background: #847650; transform: translateY(-1px); }
   .btn-ghost { border: 1px solid rgba(122, 108, 69, 0.55); color: var(--h-gold); background: rgba(255, 255, 255, 0.55); }
@@ -292,7 +292,7 @@ try {
   .welcome__art { width: min(64%, 260px); }
   .welcome__art :global(img) { width: 100%; height: auto; }
   .kicker--dark { color: var(--accent-strong); text-shadow: none; }
-  .welcome__lead { margin: 0.4rem 0 1.1rem; line-height: 1.95; }
+  .welcome__lead { margin: 0.4rem 0 1.2rem; line-height: 1.95; font-size: 1.12rem; }
   .welcome__lead strong { font-weight: 600; }
   .chips {
     display: flex;
@@ -304,10 +304,10 @@ try {
     list-style: none;
   }
   .chips li {
-    padding: 0.32rem 0.95rem;
+    padding: 0.38rem 1.1rem;
     border: 1px solid var(--accent);
     border-radius: 999px;
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     color: var(--accent-strong);
     background: rgba(156, 143, 107, 0.06);
   }
@@ -389,10 +389,10 @@ try {
 
   /* ようこそ(ABOUT)の見出しも同じ大英字スタイルに揃える（左寄せ） */
   .welcome__body h2 {
-    margin: 0.35rem 0 0.9rem;
+    margin: 0.4rem 0 1rem;
     padding: 0;
     border-bottom: none;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
   }
   .welcome__body h2::after { content: none; }
 
@@ -406,8 +406,8 @@ try {
       text-align: left;
       gap: 2.5rem;
     }
-    .welcome { max-width: 880px; }
-    .welcome__art { flex-shrink: 0; width: min(40%, 340px); }
+    .welcome { max-width: 1000px; }
+    .welcome__art { flex-shrink: 0; width: min(42%, 420px); }
     .chips, .welcome__cta { justify-content: flex-start; }
   }
 
