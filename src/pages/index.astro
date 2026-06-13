@@ -8,12 +8,32 @@ import { site } from '../config/site';
 import { loadSchedule } from '../lib/loadSchedule';
 import { loadVideos } from '../lib/loadVideos';
 import type { LiveStatus, Video } from '../lib/youtube';
+import type { StreamEvent } from '../lib/ics';
 import keyVisual from '../assets/IMG_5833.png'; // 横長キービジュアル（グレー背景）
 import heroArt from '../assets/Wakamatsu_full_size.png'; // 立ち絵（ABOUTで使用）
 
+// レイアウト確認用の仮予定（dev かつ実データが空のときだけ表示。本番=実データのみで安全）。
+function buildSampleEvents(): StreamEvent[] {
+  const base = Date.now();
+  const DAY = 86_400_000;
+  const mk = (offDays: number, hour: number, title: string): StreamEvent => {
+    const start = new Date(base + offDays * DAY);
+    start.setHours(hour, 0, 0, 0);
+    return { id: `sample-${offDays}-${hour}`, title, description: '', start, end: new Date(start.getTime() + 90 * 60_000) };
+  };
+  return [
+    mk(1, 21, '【雑談】夜のカフェタイム（仮）'),
+    mk(1, 23, '【ゲーム】〇〇 初見プレイ（仮）'),
+    mk(3, 20, '【歌枠】まったり弾き語り（仮）'),
+    mk(6, 21, '【コラボ】〇〇さんと（仮）'),
+  ];
+}
+
 const events = await loadSchedule();
-const next = events[0] ?? null;
-const next3 = events.slice(0, 3);
+const previewEvents = import.meta.env.DEV && events.length === 0 ? buildSampleEvents() : [];
+const allEvents = events.length ? events : previewEvents;
+const next = allEvents[0] ?? null;
+const next3 = allEvents.slice(0, 3);
 
 // 動画(YouTube)はトップの主役ではないので、未設定・取得失敗でもトップ全体は表示を続ける。
 // （/videos ページは従来どおり厳格＝設定漏れはビルド失敗のまま。CLAUDE.md §4）
@@ -179,6 +199,24 @@ try {
   </section>
 </Base>
 
+{/* ▼▼ 調整用パラメータ：ここの数値を変えると各サイズ・位置が変わります（手で動かせます） ▼▼ */}
+<style is:global>
+  :root {
+    /* ヒーロー */
+    --hero-h: clamp(440px, 80vh, 660px); /* ヒーローの高さ */
+    --hero-name: clamp(3rem, 10vw, 5.2rem); /* 名前の大きさ */
+    /* プロフィール（PCの横並び時に効く） */
+    --pf-art: 660px; /* 立ち絵の最大幅 */
+    --pf-drop: 2.5rem; /* 立ち絵の頭からプロフィールを下げる量 */
+    --pf-gap: 3.5rem; /* 立ち絵⇄文章の間隔 */
+    --pf-max: 1360px; /* プロフィール全体の最大幅 */
+    --pf-heading: 2.5rem; /* 「ようこそ」見出し */
+    --pf-lead: 1.46rem; /* 紹介文 */
+    --pf-label: 1.18rem; /* プロフィール項目のラベル */
+    --pf-value: 1.26rem; /* プロフィール項目の値 */
+  }
+</style>
+
 <style>
   /* ===== ヒーロー（明るい上品トーン：グレー背景KV＋クリームの霞＋濃い金） ===== */
   .hero2 {
@@ -189,7 +227,7 @@ try {
     /* main の左右パディングと上パディングを打ち消してフルブリード＋ヘッダー直下に密着 */
     width: 100vw;
     margin: -1.75rem calc(50% - 50vw) 2.5rem;
-    min-height: clamp(440px, 80vh, 660px);
+    min-height: var(--hero-h);
     display: flex;
     align-items: flex-end;
     overflow: hidden;
@@ -233,7 +271,7 @@ try {
   .hero2__name {
     font-family: var(--font-serif);
     color: var(--h-ink);
-    font-size: clamp(3rem, 10vw, 5.2rem);
+    font-size: var(--hero-name);
     font-weight: 500;
     letter-spacing: 0.08em;
     line-height: 1.08;
@@ -301,7 +339,7 @@ try {
   .welcome__art { width: min(80%, 400px); }
   .welcome__art :global(img) { width: 100%; height: auto; }
   .kicker--dark { color: var(--accent-strong); text-shadow: none; }
-  .welcome__lead { margin: 0.7rem 0 1.8rem; line-height: 2.05; font-size: 1.46rem; }
+  .welcome__lead { margin: 0.7rem 0 1.8rem; line-height: 2.05; font-size: var(--pf-lead); }
 
   /* プロフィール項目（VTuber定番・値は仮） */
   .profile-list { margin: 0 0 1.3rem; padding: 0; text-align: left; }
@@ -317,7 +355,7 @@ try {
     position: relative;
     padding-left: 1.4rem;
     color: var(--muted);
-    font-size: 1.18rem;
+    font-size: var(--pf-label);
     white-space: nowrap;
   }
   .profile-row dt::before {
@@ -328,7 +366,7 @@ try {
     color: var(--accent);
     font-size: 0.66rem;
   }
-  .profile-row dd { margin: 0; font-size: 1.26rem; }
+  .profile-row dd { margin: 0; font-size: var(--pf-value); }
   .welcome__lead strong { font-weight: 600; }
   .chips {
     display: flex;
@@ -428,7 +466,7 @@ try {
     margin: 0.4rem 0 1rem;
     padding: 0;
     border-bottom: none;
-    font-size: 2.5rem;
+    font-size: var(--pf-heading);
   }
   .welcome__body h2::after { content: none; }
 
@@ -440,11 +478,11 @@ try {
       flex-direction: row;
       align-items: flex-start;
       text-align: left;
-      gap: 3.5rem;
-      max-width: 1360px;
+      gap: var(--pf-gap);
+      max-width: var(--pf-max);
     }
-    .welcome__art { flex-shrink: 0; width: min(48%, 660px); }
-    .welcome__body { margin-top: 2.5rem; } /* 頭のラインから少しだけ下げる */
+    .welcome__art { flex-shrink: 0; width: min(48%, var(--pf-art)); }
+    .welcome__body { margin-top: var(--pf-drop); }
     .chips, .welcome__cta { justify-content: flex-start; }
   }
 
