@@ -29,6 +29,9 @@ try {
 ---
 
 <Base>
+  {/* JS有効時のみ出現アニメの初期非表示を効かせる（JS無効/クローラーでは内容がそのまま見える） */}
+  <script is:inline>document.documentElement.classList.add('js');</script>
+
   {/* ===== ヒーロー：キービジュアルを主役にしたシネマティックな第一印象 ===== */}
   <section class="hero2" id="top">
     <Image
@@ -41,6 +44,14 @@ try {
       fetchpriority="high"
     />
     <div class="hero2__scrim" aria-hidden="true"></div>
+    <div class="hero2__sparkles" aria-hidden="true">
+      <span class="spark" style="left: 14%; top: 20%;"></span>
+      <span class="spark" style="left: 78%; top: 16%;"></span>
+      <span class="spark" style="left: 88%; top: 52%;"></span>
+      <span class="spark" style="left: 24%; top: 70%;"></span>
+      <span class="spark" style="left: 62%; top: 34%;"></span>
+      <span class="spark" style="left: 46%; top: 12%;"></span>
+    </div>
     <div class="hero2__content">
       <div class="hero2__text">
         <p class="kicker">個人勢VTuber ・ Cafe &amp; Bar</p>
@@ -71,7 +82,7 @@ try {
 
   {/* ===== ようこそ（ABOUT）：誰が・何をしている人かを最初に伝える ===== */}
   <section class="lp-section" id="about">
-    <div class="lp-inner welcome">
+    <div class="lp-inner welcome reveal">
       <div class="welcome__art">
         <Image
           src={heroArt}
@@ -104,7 +115,7 @@ try {
   </section>
 
   <section class="lp-section lp-section--tint" id="schedule">
-    <div class="lp-inner">
+    <div class="lp-inner reveal">
       <div class="section-head"><p class="section-kicker">SCHEDULE</p><h2>次の配信</h2></div>
       <ScheduleList events={next3} />
       <p class="more-link"><a href="/schedule">スケジュールをすべて見る →</a></p>
@@ -112,7 +123,7 @@ try {
   </section>
 
   <section class="lp-section" id="videos">
-    <div class="lp-inner">
+    <div class="lp-inner reveal">
       <div class="section-head"><p class="section-kicker">VIDEO</p><h2>最新動画</h2></div>
       {
         latestTop.length > 0 ? (
@@ -128,7 +139,7 @@ try {
   </section>
 
   <section class="lp-section lp-section--tint" id="goods">
-    <div class="lp-inner">
+    <div class="lp-inner reveal">
       <div class="section-head"><p class="section-kicker">GOODS</p><h2>グッズ</h2></div>
       <p class="sec-lead">オリジナルグッズは BOOTH にて販売中です。（自動掲載は準備中）</p>
       <div class="sec-cta">
@@ -138,7 +149,7 @@ try {
   </section>
 
   <section class="lp-section" id="follow">
-    <div class="lp-inner">
+    <div class="lp-inner reveal">
       <div class="section-head"><p class="section-kicker">FOLLOW</p><h2>フォロー</h2></div>
       <p class="sec-lead">配信のお知らせや日常は各SNSで。チャンネル登録・フォローで応援よろしくお願いします。</p>
       <div class="sec-cta">
@@ -149,7 +160,7 @@ try {
   </section>
 
   <section class="lp-section lp-section--tint" id="work">
-    <div class="lp-inner">
+    <div class="lp-inner reveal">
       <div class="section-head"><p class="section-kicker">CONTACT</p><h2>お仕事のご依頼</h2></div>
       <p class="sec-lead">コラボ・企業案件などのご相談を受け付けています。詳細・ご連絡方法はこちらから。</p>
       <div class="sec-cta">
@@ -379,6 +390,40 @@ try {
     from { opacity: 0; transform: translateY(14px); }
     to { opacity: 1; transform: none; }
   }
+
+  /* ===== スクロールで現れる（JS有効時のみ初期非表示／JS無効・クローラーでは内容そのまま） ===== */
+  :global(html.js) .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  :global(html.js) .reveal.is-visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js) .reveal { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* ===== ヒーローの金のきらめき（控えめ・reduced-motionでは消灯） ===== */
+  .hero2__sparkles { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .spark {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201, 168, 105, 0.95) 0%, rgba(201, 168, 105, 0) 70%);
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .spark { animation: twinkle 4.5s ease-in-out infinite; }
+    .spark:nth-child(2) { animation-delay: 0.7s; }
+    .spark:nth-child(3) { animation-delay: 1.5s; }
+    .spark:nth-child(4) { animation-delay: 2.2s; }
+    .spark:nth-child(5) { animation-delay: 3s; }
+    .spark:nth-child(6) { animation-delay: 3.8s; }
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 0.85; transform: scale(1); }
+  }
 </style>
 
 <script>
@@ -404,4 +449,21 @@ try {
 
   render();
   timer = setInterval(render, 60_000);
+
+  // スクロールで各セクションをふわっと表示（画面に入ったら is-visible を付与）
+  const revealEls = document.querySelectorAll<HTMLElement>('.reveal');
+  if (revealEls.length && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-visible');
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+    );
+    revealEls.forEach((el) => io.observe(el));
+  }
 </script>
