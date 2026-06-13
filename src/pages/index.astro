@@ -80,26 +80,36 @@ try {
     </div>
   </section>
 
-  {/* ===== ようこそ（ABOUT）：誰が・何をしている人かを最初に伝える ===== */}
-  <section class="lp-section" id="about">
+  {/* ===== PROFILE：一番の売り。誰が・何をしている人かを伝える（項目は仮・要差し替え） ===== */}
+  <section class="lp-section" id="profile">
     <div class="lp-inner welcome reveal">
       <div class="welcome__art">
         <Image
           src={heroArt}
-          widths={[320, 480, 640, 840]}
-          sizes="(min-width: 720px) 420px, 64vw"
+          widths={[400, 560, 760, 1040]}
+          sizes="(min-width: 720px) 520px, 72vw"
           alt={`${site.name}の立ち絵`}
           loading="lazy"
         />
       </div>
       <div class="welcome__body">
-        <p class="section-kicker">ABOUT</p>
+        <p class="section-kicker">PROFILE</p>
         <h2>ようこそ、和香松庵へ</h2>
         <p class="welcome__lead">
           皆さん、初めまして！　カフェ＆バーの店長、個人勢VTuberの<strong>和香松 庵</strong>です。
           雑談やゲーム配信をメインに、いろいろなことに挑戦しながら、楽しさ・面白さを共有していきます。
           グラス片手に、ゆるりとお立ち寄りください。
         </p>
+        <dl class="profile-list">
+          <div class="profile-row"><dt>名前</dt><dd>和香松 庵（わかまつ いおり）</dd></div>
+          <div class="profile-row"><dt>設定</dt><dd>カフェ＆バーの店長</dd></div>
+          <div class="profile-row"><dt>誕生日</dt><dd>〇月〇日（仮）</dd></div>
+          <div class="profile-row"><dt>身長</dt><dd>〇〇cm（仮）</dd></div>
+          <div class="profile-row"><dt>配信内容</dt><dd>雑談・ゲーム・歌（仮）</dd></div>
+          <div class="profile-row"><dt>好きなもの</dt><dd>お酒・カクテル・〇〇（仮）</dd></div>
+          <div class="profile-row"><dt>ファンネーム</dt><dd>〇〇（仮）</dd></div>
+          <div class="profile-row"><dt>ハッシュタグ</dt><dd>#和香松庵 ／ #〇〇（仮）</dd></div>
+        </dl>
         <ul class="chips">
           <li>雑談</li>
           <li>ゲーム実況</li>
@@ -108,7 +118,6 @@ try {
         <div class="welcome__cta">
           <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">チャンネル登録</a>
           <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">Xをフォロー</a>
-          <a class="btn btn-ghost-dark sm" href="/about">プロフィール</a>
         </div>
       </div>
     </div>
@@ -289,10 +298,36 @@ try {
     gap: 1.25rem;
     text-align: center;
   }
-  .welcome__art { width: min(64%, 260px); }
+  .welcome__art { width: min(74%, 320px); }
   .welcome__art :global(img) { width: 100%; height: auto; }
   .kicker--dark { color: var(--accent-strong); text-shadow: none; }
   .welcome__lead { margin: 0.4rem 0 1.2rem; line-height: 1.95; font-size: 1.12rem; }
+
+  /* プロフィール項目（VTuber定番・値は仮） */
+  .profile-list { margin: 0 0 1.3rem; padding: 0; text-align: left; }
+  .profile-row {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: 0.3rem 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .profile-row dt {
+    margin: 0;
+    position: relative;
+    padding-left: 1.1rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .profile-row dt::before {
+    content: '◆';
+    position: absolute;
+    left: 0;
+    top: 0.15em;
+    color: var(--accent);
+    font-size: 0.66rem;
+  }
+  .profile-row dd { margin: 0; font-size: 1rem; }
   .welcome__lead strong { font-weight: 600; }
   .chips {
     display: flex;
@@ -392,7 +427,7 @@ try {
     margin: 0.4rem 0 1rem;
     padding: 0;
     border-bottom: none;
-    font-size: 1.5rem;
+    font-size: 1.7rem;
   }
   .welcome__body h2::after { content: none; }
 
@@ -406,8 +441,8 @@ try {
       text-align: left;
       gap: 2.5rem;
     }
-    .welcome { max-width: 1000px; }
-    .welcome__art { flex-shrink: 0; width: min(42%, 420px); }
+    .welcome { max-width: 1140px; }
+    .welcome__art { flex-shrink: 0; width: min(46%, 520px); }
     .chips, .welcome__cta { justify-content: flex-start; }
   }
 
