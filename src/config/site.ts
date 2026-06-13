@@ -7,6 +7,8 @@ export const site = {
   name: 'ミナモ（仮）',
   /** サイトの1行説明 */
   description: 'VTuber ミナモ（仮）の公式サイト。配信予定・動画・グッズ・お仕事のご依頼はこちらから。',
+  /** トップの主役画像。本物の立ち絵ができたら public/ に画像を置いてこのパスを差し替える（今は仮のシルエット） */
+  heroImage: '/hero-silhouette.svg',
   /** 公式リンク（なりすまし対策として全ページから参照する） */
   links: {
     youtube: 'https://www.youtube.com/@example-channel',

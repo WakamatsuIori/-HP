@@ -59,12 +59,13 @@ const nav = [
 
 <style is:global>
   :root {
-    --bg: #fbfbfd;
-    --text: #23232b;
-    --muted: #6b6b76;
-    --accent: #3f6fde;
-    --line: #e4e4ec;
+    --bg: #faf9f6;
+    --text: #423f38;
+    --muted: #8a8474;
+    --accent: #9c8f6b;
+    --line: #e7e3d9;
     --card: #ffffff;
+    --font-serif: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
   }
   * { box-sizing: border-box; }
   html { color-scheme: light; }
@@ -73,16 +74,27 @@ const nav = [
     font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.7;
+    line-height: 1.8;
+    letter-spacing: 0.02em;
   }
   a { color: var(--accent); }
   main {
     max-width: 720px;
     margin: 0 auto;
-    padding: 1rem 1rem 3rem;
+    padding: 1.5rem 1.25rem 3rem;
   }
-  h1 { font-size: 1.4rem; }
-  h2 { font-size: 1.15rem; margin-top: 2rem; }
+  h1, h2, h3 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+  h1 { font-size: 1.5rem; }
+  h2 {
+    font-size: 1.2rem;
+    margin-top: 2.5rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--line);
+  }
 
   .site-header {
     display: flex;
@@ -94,7 +106,9 @@ const nav = [
     background: var(--card);
   }
   .site-header .brand {
-    font-weight: 700;
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: 0.1em;
     text-decoration: none;
     color: var(--text);
   }
