@@ -11,6 +11,14 @@
   - 独自ドメインは未取得（pages.dev の無料URLで運用中）。取得したら astro.config.mjs の site と Pages のカスタムドメイン設定を更新
   - 秘密情報は全てGitHub Secrets（ICS_URL / DISCORD_WEBHOOK_URL / CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID）。ローカルは .env（gitignore済み）
 
+## デザイン作り込み（完了 2026-06-13・見た目専用、機能は不変）
+- 見出し・ロゴを **Zen Old Mincho のサブセット woff2**（約50KB・public/fonts/）でセルフホスト。@font-face＋preload、--font-serif 先頭に追加。本文はシステムフォント維持。再生成は `python scripts/subset_fonts.py`（見出しに新しい漢字を足したら HEADINGS に追記して再実行）。OFL.txt 同梱。
+- **OGP画像** public/og.jpg（1200×630・横長KV IMG_5834＝黒地。`node scripts/make-og.mjs` で生成、背景色は支配色から決定）＋ Base.astro head に og:/twitter:/canonical meta。※JSON-LD 等の本格SEOは Phase 3。
+- トップ立ち絵：背後に静止グロー、レスポンシブ画像(widths/sizes)でモバイル軽量、ローマ字ロゴ追加。
+- 配色：本文リンク用に `--accent-strong`（濃い金）で AA コントラスト確保。h2 に金アクセント、ナビ現在地に金下線。
+- 生成ツール(fonttools/sharp)はローカルのみ＝**npm run build / CI に新依存なし**。成果物(woff2/og.jpg)はリポジトリ同梱。
+- コミット: 4cb063b(font) / b6b29c4(ogp) / 331b5ff(hero) / 684a7dd(type) / e5c13d5(ogp背景修正)。**push 未実施**（公開は承認後）。
+
 ## Phase 2以降で実装予定（ユーザー承認済み 2026-06-13・構成図外の追加機能）
 - Discordから予定登録: `/予定 6/15 21:00 タイトル` 等のテンプレ書式/スラッシュコマンドでGoogleカレンダーに書き込む。ユーザーが「必要」と判断し実装決定。Phase 2で用意するカレンダー書き込み（サービスアカウント）に相乗りして作る。Phase 2のプランモードで正式にスコープへ入れること。代替（暫定）: Googleカレンダー公式アプリの音声入力。
 
