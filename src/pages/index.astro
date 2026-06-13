@@ -112,12 +112,14 @@ const next3 = events.slice(0, 3);
   const el = document.querySelector<HTMLElement>('.countdown');
   const out = el?.querySelector<HTMLElement>('[data-cd]');
   const startMs = el?.dataset.start ? Date.parse(el.dataset.start) : NaN;
+  let timer: ReturnType<typeof setInterval> | undefined;
 
   function render() {
     if (!out || Number.isNaN(startMs)) return;
     const diff = startMs - Date.now();
     if (diff <= 0) {
       out.textContent = 'まもなく';
+      if (timer) clearInterval(timer); // 配信時刻を過ぎたら更新を止める
       return;
     }
     const days = Math.floor(diff / 86_400_000);
@@ -127,5 +129,5 @@ const next3 = events.slice(0, 3);
   }
 
   render();
-  setInterval(render, 60_000);
+  timer = setInterval(render, 60_000);
 </script>

@@ -63,9 +63,10 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          # 直前の完了済み実行も失敗していたら「連続失敗」として@everyoneを付ける
-          prev=$(gh api "repos/${{ github.repository }}/actions/workflows/build.yml/runs?status=completed&per_page=1" \
-            --jq '.workflow_runs[0].conclusion' 2>/dev/null || echo "unknown")
+          # 直前の完了済み実行も失敗していたら「連続失敗」として@everyoneを付ける。
+          # 現在の実行(run_id)は除外し、ひとつ前の「完了済み」runの結果だけを見る（自分自身を誤って数えないため）。
+          prev=$(gh api "repos/${{ github.repository }}/actions/workflows/build.yml/runs?per_page=5" \
+            --jq "[.workflow_runs[] | select(.id != ${{ github.run_id }} and .status == \"completed\")][0].conclusion" 2>/dev/null || echo "unknown")
           mention=""
           if [ "$prev" = "failure" ]; then
             mention="@everyone 【連続失敗・要確認】 "
