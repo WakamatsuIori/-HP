@@ -82,7 +82,7 @@ try {
         />
       </div>
       <div class="welcome__body">
-        <p class="kicker kicker--dark">ABOUT</p>
+        <p class="section-kicker">ABOUT</p>
         <h2>ようこそ、和香松庵へ</h2>
         <p class="welcome__lead">
           皆さん、初めまして！　カフェ＆バーの店長、個人勢VTuberの<strong>和香松 庵</strong>です。
@@ -320,22 +320,36 @@ try {
     padding-inline: 1.25rem;
   }
 
-  /* セクション見出し（英字キッカー＋日本語・中央寄せ） */
-  .section-head { text-align: center; margin: 0 auto 1.9rem; }
+  /* セクション見出し：大きな英字のウォーターマーク＋日本語サブ（参考サイトの手法を金で翻訳） */
+  .section-head { text-align: center; margin: 0 auto 2rem; line-height: 1; }
   .section-kicker {
-    margin: 0 0 0.5rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.32em;
-    font-weight: 600;
-    color: var(--accent-strong);
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(2.6rem, 9vw, 4.6rem);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    color: rgba(156, 143, 107, 0.38); /* 薄い金のウォーターマーク */
   }
   .section-head h2 {
-    display: inline-block;
-    margin: 0;
-    padding-bottom: 0.6rem;
+    display: block;
+    margin: 0.35rem 0 0;
+    padding: 0;
     border-bottom: none;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    color: var(--text);
   }
-  .section-head h2::after { left: 50%; transform: translateX(-50%); } /* グローバルの左タブを中央へ */
+  .section-head h2::after { content: none; } /* 大英字がアクセントなのでグローバルの金タブは消す */
+
+  /* ようこそ(ABOUT)の見出しも同じ大英字スタイルに揃える（左寄せ） */
+  .welcome__body h2 {
+    margin: 0.35rem 0 0.9rem;
+    padding: 0;
+    border-bottom: none;
+    font-size: 1.2rem;
+  }
+  .welcome__body h2::after { content: none; }
 
   .sec-lead { text-align: center; margin: 0 auto 1.1rem; max-width: 34rem; }
   .sec-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; }
