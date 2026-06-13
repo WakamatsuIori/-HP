@@ -1,0 +1,21 @@
+# 和香松庵 公式サイト
+# 公式情報をAIにも広めるのが目的のため、AIクローラーも明示的に許可する（構成図 §6）。
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://vtuber-hp.pages.dev/sitemap.xml

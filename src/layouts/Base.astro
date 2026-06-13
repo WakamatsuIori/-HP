@@ -13,6 +13,26 @@ const pageTitle = title ? `${title} | ${site.name}` : site.name;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageURL = new URL('/og.jpg', Astro.site); // SNSシェアカードの画像（横長キービジュアル）
 
+// 構造化データ（AEO/SEO）。sameAs で公式SNSを相互リンクし「ここが一次情報源」とAIに認識させる。
+const homeURL = new URL('/', Astro.site).toString();
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  alternateName: 'WAKAMATSU IORI',
+  url: homeURL,
+  image: ogImageURL.toString(),
+  description: site.description,
+  sameAs: [site.links.youtube, site.links.x, site.links.booth],
+};
+const websiteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: site.name,
+  url: homeURL,
+  inLanguage: 'ja',
+};
+
 // ナビの現在地判定（現在ページのリンクに下線を付ける）
 const currentPath = Astro.url.pathname;
 const isActiveNav = (href: string) =>
@@ -53,6 +73,10 @@ const nav = [
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
+
+    {/* 構造化データ（JSON-LD）：人物＋サイト。AI/検索に「公式の一次情報」と認識させる */}
+    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
 
     {/* 見出し・ロゴ用の明朝（サブセット済み・全ページのヘッダーで使うため先読み） */}
     <link
