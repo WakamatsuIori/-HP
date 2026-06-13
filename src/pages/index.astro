@@ -2,48 +2,102 @@
 import Base from '../layouts/Base.astro';
 import { Image } from 'astro:assets';
 import ScheduleList from '../components/ScheduleList.astro';
+import VideoList from '../components/VideoList.astro';
+import LiveBadge from '../components/LiveBadge.astro';
 import { site } from '../config/site';
 import { loadSchedule } from '../lib/loadSchedule';
 import { loadVideos } from '../lib/loadVideos';
-import VideoList from '../components/VideoList.astro';
-import LiveBadge from '../components/LiveBadge.astro';
-import heroArt from '../assets/Wakamatsu_full_size.png';
+import type { LiveStatus, Video } from '../lib/youtube';
+import keyVisual from '../assets/IMG_5833.png'; // 横長キービジュアル（グレー背景）
+import heroArt from '../assets/Wakamatsu_full_size.png'; // 立ち絵（ABOUTで使用）
 
 const events = await loadSchedule();
 const next = events[0] ?? null;
 const next3 = events.slice(0, 3);
-const { latest, live } = await loadVideos();
-const latestTop = latest.slice(0, 6);
+
+// 動画(YouTube)はトップの主役ではないので、未設定・取得失敗でもトップ全体は表示を続ける。
+// （/videos ページは従来どおり厳格＝設定漏れはビルド失敗のまま。CLAUDE.md §4）
+let latestTop: Video[] = [];
+let live: LiveStatus = { isLive: false, liveVideo: null };
+try {
+  const v = await loadVideos();
+  latestTop = v.latest.slice(0, 6);
+  live = v.live;
+} catch (err) {
+  console.warn('[index] 動画の取得に失敗。トップは動画枠を準備中にして継続:', err instanceof Error ? err.message : err);
+}
 ---
 
 <Base>
-  <section class="hero">
-    <div class="hero-art-wrap">
+  {/* ===== ヒーロー：キービジュアルを主役にしたシネマティックな第一印象 ===== */}
+  <section class="hero2">
+    <Image
+      class="hero2__bg"
+      src={keyVisual}
+      widths={[768, 1280, 1920]}
+      sizes="100vw"
+      alt={`${site.name}のキービジュアル`}
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="hero2__scrim" aria-hidden="true"></div>
+    <div class="hero2__content">
+      <div class="hero2__text">
+        <p class="kicker">個人勢VTuber ・ Cafe &amp; Bar</p>
+        <h1 class="hero2__name">{site.name}</h1>
+        <p class="hero2__romaji">WAKAMATSU IORI</p>
+        <p class="hero2__tag">雑談とゲームを肴に、ゆるりと楽しい夜を。<br />ようこそ、隠れ家カフェ＆バーへ。</p>
+
+        <LiveBadge live={live} />
+        {
+          next ? (
+            <div class="countdown" data-start={next.start.toISOString()}>
+              <span class="cd-label">次の配信まで</span>
+              <span class="cd-time" data-cd>—</span>
+              <span class="cd-next-title">{next.title}</span>
+            </div>
+          ) : (
+            <p class="cd-label cd-label--solo">次の配信は調整中です</p>
+          )
+        }
+
+        <div class="hero2__cta">
+          <a class="btn btn-gold" href={site.links.youtube} rel="me noopener" target="_blank">▶ 最新の配信を見る</a>
+          <a class="btn btn-ghost" href="/schedule">配信スケジュール</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ===== ようこそ（ABOUT）：誰が・何をしている人かを最初に伝える ===== */}
+  <section class="welcome">
+    <div class="welcome__art">
       <Image
-        class="hero-art"
         src={heroArt}
-        widths={[300, 460, 680]}
-        sizes="(min-width: 640px) 340px, 78vw"
+        widths={[280, 420, 560]}
+        sizes="(min-width: 720px) 280px, 55vw"
         alt={`${site.name}の立ち絵`}
-        loading="eager"
-        fetchpriority="high"
+        loading="lazy"
       />
     </div>
-    <div class="hero-info">
-      <p class="hero-name">{site.name}</p>
-      <p class="hero-romaji">WAKAMATSU IORI</p>
-      <LiveBadge live={live} />
-      {
-        next ? (
-          <div class="countdown" data-start={next.start.toISOString()}>
-            <p class="cd-label">次の配信まで</p>
-            <p class="cd-time" data-cd>—</p>
-            <p class="cd-next-title">{next.title}</p>
-          </div>
-        ) : (
-          <p class="cd-label">次の配信は調整中です</p>
-        )
-      }
+    <div class="welcome__body">
+      <p class="kicker kicker--dark">ABOUT</p>
+      <h2>ようこそ、和香松庵へ</h2>
+      <p class="welcome__lead">
+        皆さん、初めまして！　カフェ＆バーの店長、個人勢VTuberの<strong>和香松 庵</strong>です。
+        雑談やゲーム配信をメインに、いろいろなことに挑戦しながら、楽しさ・面白さを共有していきます。
+        グラス片手に、ゆるりとお立ち寄りください。
+      </p>
+      <ul class="chips">
+        <li>雑談</li>
+        <li>ゲーム実況</li>
+        <li>いろいろ挑戦</li>
+      </ul>
+      <div class="welcome__cta">
+        <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">チャンネル登録</a>
+        <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">Xをフォロー</a>
+        <a class="btn btn-ghost-dark sm" href="/about">プロフィール</a>
+      </div>
     </div>
   </section>
 
@@ -52,111 +106,188 @@ const latestTop = latest.slice(0, 6);
   <p class="more-link"><a href="/schedule">スケジュールをすべて見る →</a></p>
 
   <h2>最新動画</h2>
-  <VideoList videos={latestTop} />
-  <p class="more-link"><a href="/videos">動画をすべて見る →</a></p>
+  {
+    latestTop.length > 0 ? (
+      <>
+        <VideoList videos={latestTop} />
+        <p class="more-link"><a href="/videos">動画をすべて見る →</a></p>
+      </>
+    ) : (
+      <p class="placeholder-note">最新動画はまもなく表示されます。</p>
+    )
+  }
 </Base>
 
 <style>
-  .hero {
+  /* ===== ヒーロー（明るい上品トーン：グレー背景KV＋クリームの霞＋濃い金） ===== */
+  .hero2 {
+    --h-ink: #3a352d; /* 濃い文字 */
+    --h-gold: #7a6c45; /* 濃い金（明るい背景でも読める） */
+    --h-bg: #e9e6df; /* 画像読み込み前のフォールバック（グレー寄り） */
+    position: relative;
+    /* main の左右パディングと上パディングを打ち消してフルブリード＋ヘッダー直下に密着 */
+    width: 100vw;
+    margin: -1.75rem calc(50% - 50vw) 2.5rem;
+    min-height: clamp(440px, 80vh, 660px);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    background: var(--h-bg);
+    isolation: isolate;
+  }
+  .hero2__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 62% center;
+    z-index: 0;
+  }
+  .hero2__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(to top, rgba(250, 249, 246, 0.97) 0%, rgba(250, 249, 246, 0.84) 26%, rgba(250, 249, 246, 0.36) 52%, rgba(250, 249, 246, 0) 78%),
+      linear-gradient(to right, rgba(250, 249, 246, 0.85) 0%, rgba(250, 249, 246, 0.3) 44%, rgba(250, 249, 246, 0) 68%);
+  }
+  .hero2__content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: clamp(2rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 4rem);
+  }
+  .hero2__text { max-width: 40rem; }
+  .kicker {
+    margin: 0 0 0.9rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.3em;
+    font-weight: 600;
+    color: var(--h-gold);
+    text-shadow: 0 1px 10px rgba(250, 249, 246, 0.95);
+  }
+  .hero2__name {
+    font-family: var(--font-serif);
+    color: var(--h-ink);
+    font-size: clamp(2.4rem, 8vw, 4rem);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+    margin: 0;
+    text-shadow: 0 1px 18px rgba(250, 249, 246, 0.78);
+  }
+  .hero2__romaji {
+    margin: 0.5rem 0 1.1rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.42em;
+    color: rgba(58, 53, 45, 0.55);
+  }
+  .hero2__tag {
+    margin: 0 0 1.5rem;
+    font-size: clamp(0.95rem, 2.4vw, 1.1rem);
+    line-height: 1.9;
+    color: rgba(58, 53, 45, 0.92);
+  }
+  /* ヒーロー内カウントダウン（明るいカード） */
+  .countdown {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2rem 0.7rem;
+    margin: 0 0 1.5rem;
+    padding: 0.55rem 1.1rem;
+    border: 1px solid rgba(122, 108, 69, 0.38);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.72);
+  }
+  .cd-label { margin: 0; font-size: 0.72rem; letter-spacing: 0.1em; color: rgba(58, 53, 45, 0.7); }
+  .cd-label--solo { margin: 0 0 1.5rem; }
+  .cd-time { font-size: 1.15rem; font-weight: 600; color: var(--h-gold); font-variant-numeric: tabular-nums; }
+  .cd-next-title { width: 100%; font-size: 0.82rem; color: rgba(58, 53, 45, 0.82); }
+
+  .hero2__cta { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  }
+  .btn.sm { padding: 0.55rem 1.15rem; font-size: 0.86rem; }
+  .btn-gold { background: #6f6444; color: #faf9f6; }
+  .btn-gold:hover { background: #847650; transform: translateY(-1px); }
+  .btn-ghost { border: 1px solid rgba(122, 108, 69, 0.55); color: var(--h-gold); background: rgba(255, 255, 255, 0.55); }
+  .btn-ghost:hover { background: rgba(122, 108, 69, 0.12); transform: translateY(-1px); }
+  .btn-ghost-dark { border: 1px solid var(--accent); color: var(--accent-strong); }
+  .btn-ghost-dark:hover { background: rgba(156, 143, 107, 0.1); transform: translateY(-1px); }
+
+  /* ===== ようこそ（ABOUT）：明るく読みやすく ===== */
+  .welcome {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 1.25rem;
     text-align: center;
-    padding: 1rem 0 1.5rem;
-    overflow-x: clip; /* 背後グローの横滲みでページが横スクロールしないように（縦は通常表示） */
+    margin: 0.5rem 0 1rem;
   }
-  .hero-art-wrap {
-    position: relative;
+  .welcome__art { width: min(58%, 230px); }
+  .welcome__art :global(img) { width: 100%; height: auto; }
+  .kicker--dark { color: var(--accent-strong); text-shadow: none; }
+  .welcome__lead { margin: 0.4rem 0 1.1rem; line-height: 1.95; }
+  .welcome__lead strong { font-weight: 600; }
+  .chips {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
+    gap: 0.5rem;
+    margin: 0 0 1.3rem;
+    padding: 0;
+    list-style: none;
   }
-  /* 立ち絵の背後にやわらかな光だまり（静止＝prefers-reduced-motionでも安全）。
-     透過PNGの周囲ににじむ金の光で、主役感と奥行きを出す。 */
-  .hero-art-wrap::before {
-    content: '';
-    position: absolute;
-    inset: -6% -10% 2%;
-    z-index: 0;
-    background: radial-gradient(
-      ellipse 58% 46% at 50% 36%,
-      rgba(156, 143, 107, 0.22) 0%,
-      rgba(156, 143, 107, 0.09) 40%,
-      transparent 72%
-    );
-    pointer-events: none;
+  .chips li {
+    padding: 0.32rem 0.95rem;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    color: var(--accent-strong);
+    background: rgba(156, 143, 107, 0.06);
   }
-  .hero-art {
-    position: relative;
-    z-index: 1;
-    width: min(76%, 300px);
-    height: auto;
-  }
-  .hero-info {
-    width: 100%;
-  }
-  .hero-name {
-    font-family: var(--font-serif);
-    font-size: 1.5rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    margin: 0 0 0.15rem;
-  }
-  .hero-romaji {
-    margin: 0 0 1rem;
-    font-family: var(--font-serif);
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.36em;
-    text-indent: 0.36em; /* 字間ぶんの右寄りを視覚的に中央へ補正 */
-    color: var(--muted);
-  }
-  .countdown {
-    display: inline-block;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 0.9rem 1.7rem;
-    box-shadow: 0 1px 4px rgba(66, 63, 56, 0.04);
-  }
-  .cd-label {
-    margin: 0;
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-  }
-  .cd-time {
-    margin: 0.15rem 0;
-    font-size: 1.7rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
-  }
-  .cd-next-title {
-    margin: 0;
-    font-size: 0.95rem;
-  }
-  .more-link {
-    text-align: right;
-  }
-  @media (min-width: 640px) {
-    .hero {
+  .welcome__cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; }
+
+  .more-link { text-align: right; }
+
+  @media (min-width: 720px) {
+    .welcome {
       flex-direction: row;
-      justify-content: center;
       align-items: center;
       text-align: left;
       gap: 2.5rem;
     }
-    .hero-info {
-      width: auto;
-    }
-    .hero-art {
-      width: min(40vw, 340px);
-    }
-    .hero-romaji {
-      text-indent: 0; /* 左寄せ時はインデント不要 */
-    }
+    .welcome__art { flex-shrink: 0; }
+    .chips, .welcome__cta { justify-content: flex-start; }
+  }
+
+  /* ===== 控えめな登場アニメ（トップのみ・reduced-motionで無効） ===== */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero2__text > * { animation: fadeUp 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .hero2__text > :nth-child(2) { animation-delay: 0.06s; }
+    .hero2__text > :nth-child(3) { animation-delay: 0.12s; }
+    .hero2__text > :nth-child(4) { animation-delay: 0.18s; }
+    .hero2__text > :nth-child(5) { animation-delay: 0.24s; }
+    .hero2__text > :nth-child(6) { animation-delay: 0.3s; }
+    .hero2__text > :nth-child(7) { animation-delay: 0.36s; }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
   }
 </style>
 

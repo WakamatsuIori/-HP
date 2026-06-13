@@ -119,7 +119,7 @@ const nav = [
     --font-serif: 'Zen Old Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
   }
   * { box-sizing: border-box; }
-  html { color-scheme: light; }
+  html { color-scheme: light; overflow-x: clip; } /* 100vwのフルブリードで横スクロールを出さない（縦は保持） */
   body {
     margin: 0;
     font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', system-ui, sans-serif;
@@ -127,6 +127,7 @@ const nav = [
     color: var(--text);
     line-height: 1.8;
     letter-spacing: 0.02em;
+    overflow-x: clip;
   }
   a { color: var(--accent-strong); }
   main {
