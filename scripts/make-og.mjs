@@ -15,7 +15,7 @@
  */
 import sharp from 'sharp';
 
-const SRC = 'src/assets/IMG_5834.png'; // 黒背景のキービジュアル
+const SRC = 'src/assets/IMG_5833.png'; // グレー背景のキービジュアル（黒より明るい）
 const OUT = 'public/og.jpg';
 const W = 1200;
 const H = 630;
