@@ -301,23 +301,24 @@ try {
   .welcome__art { width: min(80%, 400px); }
   .welcome__art :global(img) { width: 100%; height: auto; }
   .kicker--dark { color: var(--accent-strong); text-shadow: none; }
-  .welcome__lead { margin: 0.5rem 0 1.4rem; line-height: 2; font-size: 1.2rem; }
+  .welcome__lead { margin: 0.6rem 0 1.6rem; line-height: 2.05; font-size: 1.32rem; }
 
   /* プロフィール項目（VTuber定番・値は仮） */
   .profile-list { margin: 0 0 1.3rem; padding: 0; text-align: left; }
   .profile-row {
     display: grid;
-    grid-template-columns: 7.5rem 1fr;
-    gap: 0.3rem 1rem;
-    padding: 0.7rem 0;
+    grid-template-columns: 9rem 1fr;
+    gap: 0.3rem 1.2rem;
+    padding: 0.95rem 0;
     border-bottom: 1px solid var(--line);
   }
   .profile-row dt {
     margin: 0;
     position: relative;
-    padding-left: 1.2rem;
+    padding-left: 1.3rem;
     color: var(--muted);
-    font-size: 1.04rem;
+    font-size: 1.1rem;
+    white-space: nowrap;
   }
   .profile-row dt::before {
     content: '◆';
@@ -327,7 +328,7 @@ try {
     color: var(--accent);
     font-size: 0.66rem;
   }
-  .profile-row dd { margin: 0; font-size: 1.06rem; }
+  .profile-row dd { margin: 0; font-size: 1.16rem; }
   .welcome__lead strong { font-weight: 600; }
   .chips {
     display: flex;
@@ -339,10 +340,10 @@ try {
     list-style: none;
   }
   .chips li {
-    padding: 0.38rem 1.1rem;
+    padding: 0.45rem 1.3rem;
     border: 1px solid var(--accent);
     border-radius: 999px;
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: var(--accent-strong);
     background: rgba(156, 143, 107, 0.06);
   }
@@ -427,7 +428,7 @@ try {
     margin: 0.4rem 0 1rem;
     padding: 0;
     border-bottom: none;
-    font-size: 1.9rem;
+    font-size: 2.2rem;
   }
   .welcome__body h2::after { content: none; }
 
@@ -439,10 +440,10 @@ try {
       flex-direction: row;
       align-items: center;
       text-align: left;
-      gap: 3rem;
-      max-width: 1200px;
+      gap: 3.5rem;
+      max-width: 1320px;
     }
-    .welcome__art { flex-shrink: 0; width: min(50%, 600px); }
+    .welcome__art { flex-shrink: 0; width: min(46%, 600px); }
     .chips, .welcome__cta { justify-content: flex-start; }
   }
 
