@@ -43,8 +43,9 @@ describe('injectPosterData', () => {
     const out = injectPosterData(TPL, { month: 'M', range: 'R', schedule }, FIT);
     const expected = `const schedule = ${JSON.stringify(schedule)};`;
     expect(out).toContain(expected);
-    // 差し込んだJSONを取り出してパースし、タイトルが元どおり復元できることを確認
-    const parsed = JSON.parse(JSON.stringify(schedule));
+    // 差し込み後のHTMLから schedule のJSONを取り出してパースし、タイトルが復元できることを確認
+    const injected = out.match(/const schedule = (\[[\s\S]*?\]);/);
+    const parsed = JSON.parse(injected![1]);
     expect(parsed[0].title).toBe('お絵かき } ] < > " 配信');
     expect(parsed[1].title).toBe('配列](壊し)テスト');
   });
