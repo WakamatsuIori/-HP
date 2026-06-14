@@ -231,6 +231,14 @@ const featured = latestTop.slice(0, 3);
     </div>
   </section>
 
+  <section class="lp-section" id="gallery">
+    <div class="lp-inner reveal">
+      <div class="section-head"><p class="section-kicker">GALLERY</p><h2>ギャラリー</h2></div>
+      <p class="sec-lead">わたしの色んな姿や、みんなが描いてくれたファンアートをご紹介！</p>
+      <div class="gallery-soon">Coming soon …</div>
+    </div>
+  </section>
+
   {
     information.length > 0 && (
       <section class="lp-section" id="information">
@@ -681,6 +689,22 @@ const featured = latestTop.slice(0, 3);
     line-height: 1.55;
   }
   .pickup-arrow { color: var(--accent-strong); }
+
+  /* ===== GALLERY（準備中） ===== */
+  .gallery-soon {
+    display: grid;
+    place-items: center;
+    margin-top: 1.3rem;
+    min-height: clamp(150px, 24vw, 230px);
+    border: 1px dashed var(--accent);
+    border-radius: 14px;
+    background: linear-gradient(150deg, rgba(205, 161, 78, 0.07), rgba(0, 0, 0, 0.02));
+    color: var(--accent-strong);
+    font-family: var(--font-serif);
+    letter-spacing: 0.18em;
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    text-transform: uppercase;
+  }
 
   /* ===== INFORMATION（お知らせ） ===== */
   .info-grid {
