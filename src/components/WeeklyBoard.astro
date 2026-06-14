@@ -153,7 +153,10 @@ const {
   .wb__day { font-weight: 700; color: #7c2f24; font-size: 0.95rem; }
   .wb__date { color: #33241a; font-size: 0.82rem; }
   .wb__name {
-    flex-shrink: 0;
+    /* flex-shrink:1 + min-width:0 で、長いタイトル時は名前側が省略され、
+       時刻(右端)が枠からはみ出して見切れないようにする。 */
+    flex: 0 1 auto;
+    min-width: 0;
     max-width: 60%;
     overflow: hidden;
     text-overflow: ellipsis;

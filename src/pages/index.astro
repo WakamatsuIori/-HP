@@ -560,6 +560,54 @@ const featured = latestTop.slice(0, 3);
   }
   .welcome__cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; }
 
+  /* スマホはプロフィール周りの文字を一段小さく・余白を詰めてサイト全体と馴染ませる。
+     基底の .chips li 等より後ろに置き、確実に上書きする。 */
+  @media (max-width: 640px) {
+    :root {
+      --pf-lead: 1rem;
+      --pf-label: 0.86rem;
+      --pf-value: 0.95rem;
+    }
+    .welcome__lead { line-height: 1.95; margin-bottom: 1.4rem; }
+    .profile-row {
+      grid-template-columns: 6.2rem 1fr;
+      gap: 0.2rem 0.9rem;
+      padding: 0.8rem 0;
+    }
+    .profile-row dt { padding-left: 1rem; }
+    .chips { gap: 0.4rem; }
+    .chips li { font-size: 0.84rem; padding: 0.36rem 1.05rem; }
+
+    /* ===== ヒーロー：スマホ可読性 =====
+       立ち絵に文字が重なると読みにくいので、上に顔を覗かせつつ
+       下側をほぼ無地のオフホワイトにして文字をはっきり読めるようにする。 */
+    .hero2 { align-items: stretch; }
+    .hero2__bg { object-position: 50% 8%; } /* 顔を上に出す */
+    .hero2__scrim {
+      background: linear-gradient(
+        to top,
+        rgba(250, 249, 246, 0.99) 0%,
+        rgba(250, 249, 246, 0.985) 50%,
+        rgba(250, 249, 246, 0.88) 64%,
+        rgba(250, 249, 246, 0.42) 82%,
+        rgba(250, 249, 246, 0) 100%
+      );
+    }
+    .hero2__content {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.5rem 1.4rem 2rem;
+    }
+    .kicker { letter-spacing: 0.16em; font-size: 0.74rem; margin-bottom: 0.7rem; }
+    .hero2__romaji { margin: 0.45rem 0 1rem; letter-spacing: 0.34em; }
+    .hero2__tag { font-size: 0.98rem; line-height: 1.8; margin-bottom: 1.3rem; }
+    /* CTAは縦並び・全幅で揃え、左寄せの不揃いをなくす（カウントダウンカードと幅を合わせる） */
+    .countdown { display: flex; width: 100%; }
+    .hero2__cta { flex-direction: column; align-items: stretch; gap: 0.6rem; width: 100%; }
+    .hero2__cta .btn { width: 100%; justify-content: center; padding: 0.85rem 1.4rem; }
+  }
+
   .more-link { text-align: right; }
   .sched-foot { margin-top: 1.2rem; }
   /* 今週・来週ボード：広い画面では横並び、狭い画面では自動で縦積み */
