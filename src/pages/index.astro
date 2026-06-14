@@ -118,38 +118,43 @@ const featured = latestTop.slice(0, 3);
     </div>
   </section>
 
-  {/* ===== PROFILE：一番の売り。誰が・何をしている人かを伝える（内容は src/config/profile.ts） ===== */}
+  {/* ===== PROFILE：プロフィール項目（表）＋ごあいさつ（テキスト左＋立ち絵右） ===== */}
   <section class="lp-section" id="profile">
-    <div class="lp-inner welcome reveal">
-      <div class="welcome__art">
+    {/* プロフィール項目（表・立ち絵なし） */}
+    <div class="lp-inner profile-block reveal">
+      <p class="section-kicker">PROFILE</p>
+      <dl class="profile-list">
+        {profile.rows.map((row) => (
+          <div class="profile-row"><dt>{row.label}</dt><dd>{row.value}</dd></div>
+        ))}
+      </dl>
+      <ul class="chips">
+        {profile.chips.map((chip) => (<li>{chip}</li>))}
+      </ul>
+      <div class="welcome__cta">
+        <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">チャンネル登録</a>
+        <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">Xをフォロー</a>
+      </div>
+    </div>
+
+    {/* ごあいさつ（テキスト左＋立ち絵右） */}
+    <div class="about reveal">
+      <div class="about__body">
+        <h2 class="about__catch">{intro.catchLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</h2>
+        <p class="about__catch-en">{intro.catchEn}</p>
+        <span class="about__rule" aria-hidden="true"></span>
+        <div class="about__story">
+          {intro.story.map((para) => (<p>{para}</p>))}
+        </div>
+      </div>
+      <div class="about__art">
         <Image
           src={heroArt}
           widths={[480, 720, 960, 1320]}
-          sizes="(min-width: 900px) 660px, 82vw"
+          sizes="(min-width: 900px) 420px, 78vw"
           alt={`${site.name}の立ち絵`}
           loading="lazy"
         />
-      </div>
-      <div class="welcome__body">
-        <p class="section-kicker">PROFILE</p>
-        <h2 class="welcome__catch">{intro.catchLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</h2>
-        <p class="welcome__catch-en">{intro.catchEn}</p>
-        <span class="welcome__rule" aria-hidden="true"></span>
-        <div class="welcome__story">
-          {intro.story.map((para) => (<p>{para}</p>))}
-        </div>
-        <dl class="profile-list">
-          {profile.rows.map((row) => (
-            <div class="profile-row"><dt>{row.label}</dt><dd>{row.value}</dd></div>
-          ))}
-        </dl>
-        <ul class="chips">
-          {profile.chips.map((chip) => (<li>{chip}</li>))}
-        </ul>
-        <div class="welcome__cta">
-          <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">チャンネル登録</a>
-          <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">Xをフォロー</a>
-        </div>
       </div>
     </div>
   </section>
@@ -292,6 +297,10 @@ const featured = latestTop.slice(0, 3);
         <a class="sns-banner sns-banner--x" href={site.links.x} rel="me noopener" target="_blank">
           <span class="sns-banner__label">X (Twitter)</span>
           <span class="sns-banner__sub">お知らせ・日常をつぶやき中</span>
+        </a>
+        <a class="sns-banner sns-banner--marshmallow" href={site.links.marshmallow} rel="me noopener" target="_blank">
+          <span class="sns-banner__label">マシュマロ</span>
+          <span class="sns-banner__sub">気軽になんでも送っていいよ（匿名OK）</span>
         </a>
       </div>
     </div>
@@ -466,16 +475,6 @@ const featured = latestTop.slice(0, 3);
   .btn-ghost-dark { border: 1px solid var(--accent); color: var(--accent-strong); }
   .btn-ghost-dark:hover { background: rgba(156, 143, 107, 0.1); transform: translateY(-1px); }
 
-  /* ===== ようこそ（ABOUT）：明るく読みやすく ===== */
-  .welcome {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.25rem;
-    text-align: center;
-  }
-  .welcome__art { width: min(80%, 400px); }
-  .welcome__art :global(img) { width: 100%; height: auto; }
   .kicker--dark { color: var(--accent-strong); text-shadow: none; }
   .welcome__lead { margin: 0.7rem 0 1.8rem; line-height: 2.05; font-size: var(--pf-lead); }
 
@@ -543,37 +542,72 @@ const featured = latestTop.slice(0, 3);
     display: flex;
   }
 
-  /* ===== PROFILE：キャッチコピー化 ===== */
-  .welcome__catch {
-    margin: 0.1rem 0 0.35rem;
+  /* ===== プロフィール項目ブロック（立ち絵なし・中央寄せ） ===== */
+  .profile-block { text-align: center; }
+  .profile-block .profile-list { max-width: 30rem; margin-inline: auto; }
+
+  /* ===== ごあいさつ（ABOUT）：テキスト左＋立ち絵右（参考サイト風） ===== */
+  .about {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.6rem;
+    margin-top: 2.8rem;
+    padding-inline: 1.25rem;
+    text-align: center;
+  }
+  .about__art { width: min(78%, 320px); }
+  .about__art :global(img) { width: 100%; height: auto; }
+  /* キャッチコピー（金で強調・グローバルh2の下線/金タブ/上マージンを打ち消す） */
+  .about__catch {
+    margin: 0 0 0.4rem;
+    padding: 0;
+    border-bottom: none;
     font-family: var(--font-serif);
     font-weight: 700;
-    font-size: clamp(1.7rem, 4.6vw, 2.8rem);
-    line-height: 1.32;
+    font-size: clamp(1.7rem, 4.8vw, 2.7rem);
+    line-height: 1.42;
     letter-spacing: 0.02em;
-    color: var(--text);
+    color: var(--accent-strong);
   }
-  .welcome__catch-en {
-    margin: 0 0 0.9rem;
+  .about__catch::after { content: none; }
+  .about__catch-en {
+    margin: 0 0 1rem;
     font-style: italic;
     font-size: clamp(0.82rem, 2.3vw, 1.02rem);
     letter-spacing: 0.06em;
-    color: var(--accent-strong);
+    color: var(--accent);
   }
-  .welcome__rule {
+  .about__rule {
     display: block;
     width: 3.2rem;
     height: 2px;
-    margin: 0 0 1.25rem;
-    background: var(--accent-strong);
+    margin: 0 auto 1.3rem;
+    background: var(--accent);
   }
-  .welcome__story p {
-    margin: 0 0 0.85rem;
-    font-size: var(--pf-lead, 1.1rem);
-    line-height: 1.95;
-    color: var(--text);
+  .about__story { text-align: left; max-width: 34rem; }
+  .about__story p {
+    margin: 0 0 0.95rem;
+    font-size: 1.04rem;
+    line-height: 2;
+    color: var(--muted);
   }
-  .welcome__story strong { color: var(--accent-strong); font-weight: 700; }
+  .about__story p:last-child { margin-bottom: 0; }
+
+  @media (min-width: 900px) {
+    .about {
+      flex-direction: row;
+      align-items: center;
+      text-align: left;
+      gap: 3rem;
+      max-width: 1080px;
+      margin-inline: auto;
+    }
+    .about__body { flex: 1 1 0; min-width: 0; }
+    .about__art { flex-shrink: 0; width: min(42%, 360px); }
+    .about__rule { margin-left: 0; margin-right: auto; }
+    .about__story { max-width: none; }
+  }
 
   /* ===== PICK UP（おすすめ） ===== */
   .pickup-grid {
@@ -782,7 +816,7 @@ const featured = latestTop.slice(0, 3);
   /* ===== YouTube / X バナーカード ===== */
   .sns-banners {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
     gap: 1.1rem;
     margin-top: 1.2rem;
   }
@@ -802,6 +836,7 @@ const featured = latestTop.slice(0, 3);
   }
   .sns-banner--yt { background: linear-gradient(120deg, #7a1f1f, #b3352f); }
   .sns-banner--x { background: linear-gradient(120deg, #181818, #3a3a3a); }
+  .sns-banner--marshmallow { background: linear-gradient(120deg, #ec6a9c, #f4a0c2); }
   .sns-banner__label {
     font-family: var(--font-serif);
     font-size: clamp(1.3rem, 3.5vw, 1.8rem);
@@ -843,30 +878,8 @@ const featured = latestTop.slice(0, 3);
     color: rgba(156, 143, 107, 0.38); /* 薄い金のウォーターマーク */
   }
 
-  /* ようこそ(ABOUT)の見出しも同じ大英字スタイルに揃える（左寄せ） */
-  .welcome__body h2 {
-    margin: 0.4rem 0 1rem;
-    padding: 0;
-    border-bottom: none;
-    font-size: var(--pf-heading);
-  }
-  .welcome__body h2::after { content: none; }
-
   .sec-lead { text-align: center; margin: 0 auto 1.1rem; max-width: 34rem; }
   .sec-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; }
-
-  @media (min-width: 900px) {
-    .welcome {
-      flex-direction: row;
-      align-items: flex-start;
-      text-align: left;
-      gap: var(--pf-gap);
-      max-width: var(--pf-max);
-    }
-    .welcome__art { flex-shrink: 0; width: min(48%, var(--pf-art)); }
-    .welcome__body { margin-top: var(--pf-drop); }
-    .chips, .welcome__cta { justify-content: flex-start; }
-  }
 
   /* ===== 控えめな登場アニメ（トップのみ・reduced-motionで無効） ===== */
   @media (prefers-reduced-motion: no-preference) {

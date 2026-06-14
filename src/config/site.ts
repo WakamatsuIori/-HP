@@ -12,6 +12,8 @@ export const site = {
     youtube: 'https://www.youtube.com/channel/UC_7ehPcs0J67P-5k-qJmjmA',
     x: 'https://x.com/Wakamatsu_VT',
     booth: 'https://wakamatsu-iori.booth.pm/',
+    /** マシュマロ（匿名で質問・メッセージを受け取る） */
+    marshmallow: 'https://marshmallow-qa.com/wakamatsu_vt',
   },
   /**
    * 自動掲載のデータ取得元（いずれも公開情報。APIキー等の秘密は .env / GitHub Secrets で管理）。
