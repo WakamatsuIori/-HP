@@ -111,8 +111,8 @@ const nav = [
       <nav class="foot-nav" aria-label="セクション">
         <a class="foot-diamond" href="/#profile"><span>PROFILE</span></a>
         <a class="foot-diamond" href="/#gallery"><span>GALLERY</span></a>
-        <a class="foot-diamond" href="/#information"><span>INFO</span></a>
-        <a class="foot-diamond" href="/#discography"><span>WORKS</span></a>
+        <a class="foot-diamond" href="/#information"><span>INFORMATION</span></a>
+        <a class="foot-diamond" href="/#discography"><span>DISCOGRAPHY</span></a>
         <a class="foot-diamond" href="/#work"><span>CONTACT</span></a>
       </nav>
       <p class="foot-brand">
@@ -259,25 +259,20 @@ const nav = [
     padding: 0.6rem 0;
   }
   .foot-diamond {
-    width: clamp(80px, 13vw, 118px);
-    aspect-ratio: 1;
     margin: 0 !important;
-    display: grid;
-    place-items: center;
-    transform: rotate(45deg);
+    display: inline-flex;
+    align-items: center;
+    padding: 0.55rem 1.25rem;
     border: 1px solid var(--accent);
-    border-radius: 14px;
+    border-radius: 999px;
     background: var(--card);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
     text-decoration: none;
-    transition: background 0.25s ease, transform 0.25s ease;
+    transition: background 0.25s ease;
   }
   .foot-diamond span {
-    display: block;
-    transform: rotate(-45deg);
     font-family: var(--font-serif);
-    font-size: clamp(0.6rem, 1.5vw, 0.72rem);
-    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
     color: var(--accent-strong);
     white-space: nowrap;
   }
