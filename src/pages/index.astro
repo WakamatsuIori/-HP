@@ -9,6 +9,7 @@ import { loadSchedule } from '../lib/loadSchedule';
 import { loadVideos } from '../lib/loadVideos';
 import type { LiveStatus, Video } from '../lib/youtube';
 import type { StreamEvent } from '../lib/ics';
+import { buildWeek } from '../lib/weekly';
 import keyVisual from '../assets/IMG_5833.png'; // 横長キービジュアル（グレー背景）
 import heroArt from '../assets/Wakamatsu_full_size.png'; // 立ち絵（ABOUTで使用）
 
@@ -33,6 +34,10 @@ const events = await loadSchedule();
 const previewEvents = import.meta.env.DEV && events.length === 0 ? buildSampleEvents() : [];
 const allEvents = events.length ? events : previewEvents;
 const next = allEvents[0] ?? null;
+
+// 週間ボード用データ：本番＝今週(月〜日)の実データ。devで実データが空のときだけ
+// ボードの既定サンプル（poster の月〜日）を表示してレイアウト確認できるようにする。
+const weekData = import.meta.env.DEV && events.length === 0 ? null : buildWeek(events);
 
 // 動画(YouTube)はトップの主役ではないので、未設定・取得失敗でもトップ全体は表示を続ける。
 // （/videos ページは従来どおり厳格＝設定漏れはビルド失敗のまま。CLAUDE.md §4）
@@ -146,7 +151,15 @@ try {
     <div class="lp-inner reveal">
       <div class="section-head"><p class="section-kicker">SCHEDULE</p><h2>今週の予定</h2></div>
     </div>
-    <div class="reveal"><WeeklyBoard /></div>
+    <div class="reveal">
+      {
+        weekData ? (
+          <WeeklyBoard month={weekData.month} range={weekData.range} days={weekData.days} />
+        ) : (
+          <WeeklyBoard />
+        )
+      }
+    </div>
     <div class="lp-inner sched-foot">
       <p class="more-link"><a href="/schedule">スケジュールをすべて見る →</a></p>
     </div>
