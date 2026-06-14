@@ -50,6 +50,14 @@ const commands = [
       },
     ],
   },
+  {
+    name: '予定消去',
+    description: '指定した日付の予定をすべて消します',
+    type: 1, // CHAT_INPUT
+    options: [
+      { name: '日付', description: '消したい日（例：6/18 または 2026/6/18）', type: 3, required: true },
+    ],
+  },
 ];
 
 const url = GUILD

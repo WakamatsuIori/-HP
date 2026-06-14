@@ -83,3 +83,19 @@ export function buildWhen(dateStr: string, timeStr: string | undefined, now: Dat
   const endDate = `${next.getUTCFullYear()}-${pad(next.getUTCMonth() + 1)}-${pad(next.getUTCDate())}`;
   return { startDate, endDate, label: `${m}/${d}(${dow}) 終日` };
 }
+
+/** 日付文字列(JST)を、その日の0:00〜翌0:00（RFC3339 +09:00）に変換する。削除の検索範囲用 */
+export function dayRange(
+  dateStr: string,
+  now: Date,
+): { timeMin: string; timeMax: string; label: string } | { error: string } {
+  const ymd = parseDate(dateStr, currentJstYear(now));
+  if (!ymd) return { error: `日付の形式が読めませんでした：「${dateStr}」。例：6/18 または 2026/6/18` };
+  const { y, m, d } = ymd;
+  const next = new Date(Date.UTC(y, m - 1, d + 1, 12));
+  return {
+    timeMin: `${y}-${pad(m)}-${pad(d)}T00:00:00+09:00`,
+    timeMax: `${next.getUTCFullYear()}-${pad(next.getUTCMonth() + 1)}-${pad(next.getUTCDate())}T00:00:00+09:00`,
+    label: `${m}/${d}(${dowOf(y, m, d)})`,
+  };
+}

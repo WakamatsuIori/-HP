@@ -13,8 +13,8 @@ import {
   EPHEMERAL,
   json,
 } from '../_lib/discord';
-import { getAccessToken, insertEvent } from '../_lib/google';
-import { buildWhen, type ParsedWhen } from '../_lib/datetime';
+import { getAccessToken, insertEvent, listEvents, deleteEvent } from '../_lib/google';
+import { buildWhen, dayRange, type ParsedWhen } from '../_lib/datetime';
 
 interface Env {
   DISCORD_PUBLIC_KEY: string;
@@ -105,6 +105,14 @@ export async function onRequestPost(ctx: {
       return json({ type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data: { flags: EPHEMERAL } });
     }
 
+    if (body.data?.name === '予定消去') {
+      const opts = optMap(body.data.options);
+      const range = dayRange(String(opts['日付'] ?? ''), new Date());
+      if ('error' in range) return reply(`⚠️ ${range.error}`);
+      ctx.waitUntil(handleDelete(env, body, range));
+      return json({ type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data: { flags: EPHEMERAL } });
+    }
+
     return reply('不明なコマンドです。');
   }
 
@@ -156,7 +164,40 @@ async function handleSchedule(
   }
 }
 
-/** /ポスター：GitHub Actions(repository_dispatch)を起動して画像生成を依頼する */
+/** /予定消去：指定日のその日の予定をすべて削除する */
+async function handleDelete(
+  env: Env,
+  interaction: { token: string },
+  range: { timeMin: string; timeMax: string; label: string },
+): Promise<void> {
+  const followup = `https://discord.com/api/v10/webhooks/${env.DISCORD_APP_ID}/${interaction.token}/messages/@original`;
+  const edit = (content: string) =>
+    fetch(followup, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content }) });
+
+  try {
+    const token = await getAccessToken(
+      { clientEmail: env.GOOGLE_SA_EMAIL, privateKey: env.GOOGLE_SA_PRIVATE_KEY.replace(/\\n/g, '\n') },
+      Math.floor(Date.now() / 1000),
+    );
+    const items = await listEvents(token, env.GOOGLE_CALENDAR_ID, range.timeMin, range.timeMax);
+    if (items.length === 0) {
+      await edit(`ℹ️ ${range.label} に消す予定はありませんでした。`);
+      return;
+    }
+    const titles: string[] = [];
+    for (const it of items) {
+      await deleteEvent(token, env.GOOGLE_CALENDAR_ID, it.id);
+      titles.push(it.summary ?? '(無題)');
+    }
+    await edit(
+      `🗑️ ${range.label} の予定を${titles.length}件削除しました：\n${titles.map((t) => `・${t}`).join('\n')}\nHPの週間ボードには次回更新（最大15分）で反映されます。`,
+    );
+  } catch (e) {
+    await edit(`⚠️ 削除に失敗しました：${e instanceof Error ? e.message : String(e)}`);
+  }
+}
+
+/** /予定表：GitHub Actions(repository_dispatch)を起動して画像生成を依頼する */
 async function handlePoster(env: Env, interaction: { token: string }, week: string): Promise<void> {
   const followup = `https://discord.com/api/v10/webhooks/${env.DISCORD_APP_ID}/${interaction.token}/messages/@original`;
   const edit = (content: string) =>

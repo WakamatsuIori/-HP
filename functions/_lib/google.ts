@@ -103,3 +103,38 @@ export async function insertEvent(
   if (!res.ok) throw new Error(`予定の追加に失敗: ${res.status} ${await res.text()}`);
   return (await res.json()) as { id: string; htmlLink?: string };
 }
+
+export interface CalendarItem {
+  id: string;
+  summary?: string;
+  start?: { dateTime?: string; date?: string };
+  recurringEventId?: string;
+}
+
+/** 指定期間に開始する予定を取得する（繰り返しは展開）。削除対象を探すのに使う */
+export async function listEvents(
+  token: string,
+  calendarId: string,
+  timeMin: string,
+  timeMax: string,
+): Promise<CalendarItem[]> {
+  const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`);
+  url.searchParams.set('timeMin', timeMin);
+  url.searchParams.set('timeMax', timeMax);
+  url.searchParams.set('singleEvents', 'true');
+  url.searchParams.set('orderBy', 'startTime');
+  const res = await fetch(url.toString(), { headers: { authorization: `Bearer ${token}` } });
+  if (!res.ok) throw new Error(`予定の取得に失敗: ${res.status} ${await res.text()}`);
+  const data = (await res.json()) as { items?: CalendarItem[] };
+  return data.items ?? [];
+}
+
+/** 予定を1件削除する */
+export async function deleteEvent(token: string, calendarId: string, eventId: string): Promise<void> {
+  const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`;
+  const res = await fetch(url, { method: 'DELETE', headers: { authorization: `Bearer ${token}` } });
+  // 200/204 は成功。既に消えている(410/404)は成功扱い。
+  if (!res.ok && res.status !== 410 && res.status !== 404) {
+    throw new Error(`予定の削除に失敗: ${res.status} ${await res.text()}`);
+  }
+}
