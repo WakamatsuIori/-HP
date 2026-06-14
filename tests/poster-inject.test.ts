@@ -48,4 +48,11 @@ describe('injectPosterData', () => {
     expect(parsed[0].title).toBe('お絵かき } ] < > " 配信');
     expect(parsed[1].title).toBe('配列](壊し)テスト');
   });
+
+  it('タイトルに $&, $1, $` などの置換特殊シーケンスが来ても壊れない（D-17）', () => {
+    const schedule = [{ ja: '金', date: '6/19', time: '21:00', title: '賞金 $1,000,000 $& $` 企画', featured: true }];
+    const out = injectPosterData(TPL, { month: 'M', range: 'R', schedule }, FIT);
+    // 関数置換なので JSON はそのままリテラルで入る（文字列置換だと $ シーケンスが展開され壊れる）
+    expect(out).toContain(`const schedule = ${JSON.stringify(schedule)};`);
+  });
 });

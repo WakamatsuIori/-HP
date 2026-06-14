@@ -4,14 +4,12 @@
  */
 import type { StreamEvent } from './ics';
 import { jstDateKey, jstTime } from './schedule';
+import { FEATURED_MARK } from './featured';
 
 const JA = ['日', '月', '火', '水', '木', '金', '土'];
 
-/**
- * 「おすすめ枠」の目印。Discordで おすすめ=はい にすると予定の説明欄にこの文字列が入り、
- * 週間ボードで金色強調＋◆になる。functions/discord/interactions.ts の FEATURED_MARK と一致させること。
- */
-export const FEATURED_MARK = '#おすすめ';
+// 「おすすめ枠」の目印は src/lib/featured.ts に一元化。互換のため従来どおりここでも再エクスポートする。
+export { FEATURED_MARK };
 
 export interface WeekDay {
   ja: string;

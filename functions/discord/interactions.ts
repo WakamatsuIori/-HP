@@ -15,6 +15,7 @@ import {
 } from '../_lib/discord';
 import { getAccessToken, insertEvent, listEvents, deleteEvent } from '../_lib/google';
 import { buildWhen, dayRange, type ParsedWhen } from '../_lib/datetime';
+import { FEATURED_MARK } from '../../src/lib/featured';
 
 interface Env {
   DISCORD_PUBLIC_KEY: string;
@@ -31,12 +32,23 @@ interface Env {
   SCHED_KV?: { get(k: string): Promise<string | null>; put(k: string, v: string, o?: { expirationTtl?: number }): Promise<void> };
 }
 
-// おすすめ枠の目印。src/lib/weekly.ts の FEATURED_MARK と必ず一致させること。
-const FEATURED_MARK = '#おすすめ';
 // 1日の書き込み上限（KVバインド時のみ有効）。CLAUDE.md §3 の書き込みガード。
 const DAILY_WRITE_CAP = 30;
 
-function optMap(options: Array<{ name: string; value: unknown }> | undefined): Record<string, unknown> {
+/** 受け取る Discord interaction の最小型（必要なフィールドだけ・依存追加なし） */
+interface InteractionOption {
+  name: string;
+  value?: unknown;
+}
+interface DiscordInteraction {
+  type: number;
+  token: string;
+  data?: { name?: string; options?: InteractionOption[] };
+  member?: { user?: { id?: string } };
+  user?: { id?: string };
+}
+
+function optMap(options: InteractionOption[] | undefined): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const o of options ?? []) out[o.name] = o.value;
   return out;
@@ -71,7 +83,7 @@ export async function onRequestPost(ctx: {
     return new Response('invalid request signature', { status: 401 });
   }
 
-  const body = JSON.parse(raw);
+  const body = JSON.parse(raw) as DiscordInteraction;
 
   // 疎通確認（Discordの登録時とヘルスチェック）
   if (body.type === InteractionType.PING) {
@@ -79,6 +91,9 @@ export async function onRequestPost(ctx: {
   }
 
   if (body.type === InteractionType.APPLICATION_COMMAND) {
+    // コマンド本体が無いペイロードは不正として弾く（想定外の入力への防御）
+    if (!body.data?.name) return reply('不明なコマンドです。');
+
     // 実行できる人を本人のDiscordユーザーIDに限定（書き込みの第一ガード）
     const userId = body.member?.user?.id ?? body.user?.id;
     const allow = (env.DISCORD_ALLOWED_USER_IDS ?? '')
