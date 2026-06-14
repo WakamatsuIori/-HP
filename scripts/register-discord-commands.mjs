@@ -34,7 +34,7 @@ const commands = [
     ],
   },
   {
-    name: 'ポスター',
+    name: '予定表',
     description: '週間予定ポスター（画像）を生成してこのサーバーに投稿します',
     type: 1, // CHAT_INPUT
     options: [

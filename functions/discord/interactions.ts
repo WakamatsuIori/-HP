@@ -98,7 +98,7 @@ export async function onRequestPost(ctx: {
       return json({ type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data: { flags: EPHEMERAL } });
     }
 
-    if (body.data?.name === 'ポスター') {
+    if (body.data?.name === '予定表') {
       const opts = optMap(body.data.options);
       const week = opts['週'] === '来週' ? '来週' : '今週';
       ctx.waitUntil(handlePoster(env, body, week));
