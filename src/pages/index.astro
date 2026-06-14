@@ -11,6 +11,7 @@ import type { LiveStatus, Video } from '../lib/youtube';
 import type { StreamEvent } from '../lib/ics';
 import { buildWeek } from '../lib/weekly';
 import { externalAttrs } from '../lib/links';
+import { profile } from '../config/profile';
 import { information } from '../config/information';
 import { featuredLabels } from '../config/featured';
 import keyVisual from '../assets/IMG_5833.png'; // 横長キービジュアル（グレー背景）
@@ -130,8 +131,8 @@ const featured = latestTop.slice(0, 3);
       </div>
       <div class="welcome__body">
         <p class="section-kicker">PROFILE</p>
-        <h2 class="welcome__catch">ちょっと一杯、<br />寄っていきませんか？</h2>
-        <p class="welcome__catch-en">Care for a drink with me, tonight ...?</p>
+        <h2 class="welcome__catch">{profile.catchLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</h2>
+        <p class="welcome__catch-en">{profile.catchEn}</p>
         <span class="welcome__rule" aria-hidden="true"></span>
         <div class="welcome__story">
           <p>カフェ＆バー「Bar Bluebell」の店長をしている、個人勢VTuberの<strong>和香松 庵</strong>です。</p>
@@ -140,19 +141,12 @@ const featured = latestTop.slice(0, 3);
           <p>今日あった他愛もない話も、好きなものの早口も。あなたの夜に、そっと寄り添えたら嬉しいです。</p>
         </div>
         <dl class="profile-list">
-          <div class="profile-row"><dt>名前</dt><dd>和香松 庵（わかまつ いおり）</dd></div>
-          <div class="profile-row"><dt>設定</dt><dd>カフェ＆バーの店長</dd></div>
-          <div class="profile-row"><dt>誕生日</dt><dd>〇月〇日（仮）</dd></div>
-          <div class="profile-row"><dt>身長</dt><dd>〇〇cm（仮）</dd></div>
-          <div class="profile-row"><dt>配信内容</dt><dd>雑談・ゲーム・歌（仮）</dd></div>
-          <div class="profile-row"><dt>好きなもの</dt><dd>お酒・カクテル・〇〇（仮）</dd></div>
-          <div class="profile-row"><dt>ファンネーム</dt><dd>〇〇（仮）</dd></div>
-          <div class="profile-row"><dt>ハッシュタグ</dt><dd>#和香松庵 ／ #〇〇（仮）</dd></div>
+          {profile.rows.map((row) => (
+            <div class="profile-row"><dt>{row.label}</dt><dd>{row.value}</dd></div>
+          ))}
         </dl>
         <ul class="chips">
-          <li>雑談</li>
-          <li>ゲーム実況</li>
-          <li>いろいろ挑戦</li>
+          {profile.chips.map((chip) => (<li>{chip}</li>))}
         </ul>
         <div class="welcome__cta">
           <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">チャンネル登録</a>
