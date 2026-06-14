@@ -3,10 +3,8 @@
  * 日時はすべて日本時間(JST)で扱う。空き日は「本日休業」になる。
  */
 import type { StreamEvent } from './ics';
+import { jstDateKey, jstTime } from './schedule';
 
-const JST = 'Asia/Tokyo';
-const keyFmt = new Intl.DateTimeFormat('sv-SE', { timeZone: JST, dateStyle: 'short' }); // YYYY-MM-DD
-const timeFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: JST, hour: '2-digit', minute: '2-digit', hour12: false });
 const JA = ['日', '月', '火', '水', '木', '金', '土'];
 
 /**
@@ -14,10 +12,6 @@ const JA = ['日', '月', '火', '水', '木', '金', '土'];
  * 週間ボードで金色強調＋◆になる。functions/discord/interactions.ts の FEATURED_MARK と一致させること。
  */
 export const FEATURED_MARK = '#おすすめ';
-
-function jstKey(d: Date): string {
-  return keyFmt.format(d);
-}
 
 export interface WeekDay {
   ja: string;
@@ -34,7 +28,7 @@ export interface WeekData {
 
 export function buildWeek(events: StreamEvent[], now: Date = new Date(), weekOffset = 0): WeekData {
   // 今日のJSTカレンダー日付（日本にDSTは無いので UTC 正午で安全に表現できる）
-  const [y, m, d] = jstKey(now).split('-').map(Number);
+  const [y, m, d] = jstDateKey(now).split('-').map(Number);
   const today = new Date(Date.UTC(y, m - 1, d, 12));
   const dow = today.getUTCDay(); // 0=日 .. 6=土
   const monday = new Date(today);
@@ -44,7 +38,7 @@ export function buildWeek(events: StreamEvent[], now: Date = new Date(), weekOff
   // JST日付キー → その日のイベント
   const byDay = new Map<string, StreamEvent[]>();
   for (const e of events) {
-    const k = jstKey(e.start);
+    const k = jstDateKey(e.start);
     const arr = byDay.get(k);
     if (arr) arr.push(e);
     else byDay.set(k, [e]);
@@ -54,12 +48,12 @@ export function buildWeek(events: StreamEvent[], now: Date = new Date(), weekOff
   for (let i = 0; i < 7; i++) {
     const dd = new Date(monday);
     dd.setUTCDate(monday.getUTCDate() + i);
-    const ev = (byDay.get(jstKey(dd)) ?? []).sort((a, b) => a.start.getTime() - b.start.getTime())[0];
+    const ev = (byDay.get(jstDateKey(dd)) ?? []).sort((a, b) => a.start.getTime() - b.start.getTime())[0];
     const off = !ev || ev.allDay === true; // 予定なし or 終日（休業）登録は休業扱い
     days.push({
       ja: JA[dd.getUTCDay()],
       date: `${dd.getUTCMonth() + 1}/${dd.getUTCDate()}`,
-      time: off ? '' : timeFmt.format(ev.start),
+      time: off ? '' : jstTime(ev.start),
       title: ev ? ev.title : '本日休業',
       featured: !off && (ev.description ?? '').includes(FEATURED_MARK),
     });

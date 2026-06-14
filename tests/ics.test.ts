@@ -63,6 +63,14 @@ describe('parseIcsEvents', () => {
     ).toBeDefined();
   });
 
+  it('終日予定(VALUE=DATE)は allDay=true、時間指定の予定は allDay が立たない', () => {
+    const off = events.find((e) => e.title === 'お休み（終日）');
+    expect(off).toBeDefined();
+    expect(off!.allDay).toBe(true);
+    const timed = events.find((e) => e.title === 'ゲーム配信');
+    expect(timed!.allDay).not.toBe(true);
+  });
+
   it('開始時刻の昇順に並んでいる', () => {
     const times = events.map((e) => e.start.getTime());
     expect(times).toEqual([...times].sort((a, b) => a - b));

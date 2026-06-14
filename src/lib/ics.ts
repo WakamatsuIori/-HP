@@ -25,6 +25,14 @@ function durationMs(ev: VEvent): number {
   return ev.end && ev.start ? ev.end.getTime() - ev.start.getTime() : 0;
 }
 
+/**
+ * 終日予定（VALUE=DATE）かどうか。node-ical は終日の開始日に内部フラグ dateOnly=true を立てる。
+ * この内部仕様への依存をこの1関数に閉じ込める（仕様変更時はここだけ直せばよい）。
+ */
+function isDateOnly(start: Date): boolean {
+  return (start as unknown as { dateOnly?: boolean }).dateOnly === true;
+}
+
 function toStreamEvent(ev: VEvent, start: Date, end: Date | null): StreamEvent {
   return {
     id: `${ev.uid}@${start.toISOString()}`,
@@ -32,8 +40,7 @@ function toStreamEvent(ev: VEvent, start: Date, end: Date | null): StreamEvent {
     description: typeof ev.description === 'string' ? ev.description : '',
     start,
     end,
-    // node-ical は VALUE=DATE（終日）の開始日に dateOnly=true を立てる
-    allDay: (start as unknown as { dateOnly?: boolean }).dateOnly === true,
+    allDay: isDateOnly(start),
   };
 }
 

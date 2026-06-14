@@ -49,6 +49,13 @@ function reply(content: string) {
   });
 }
 
+/** deferred応答の後追い編集（元メッセージをPATCH）を行う関数を作る。3コマンドで共通。 */
+function makeEditor(env: Env, interactionToken: string): (content: string) => Promise<Response> {
+  const url = `https://discord.com/api/v10/webhooks/${env.DISCORD_APP_ID}/${interactionToken}/messages/@original`;
+  return (content: string) =>
+    fetch(url, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content }) });
+}
+
 export async function onRequestPost(ctx: {
   request: Request;
   env: Env;
@@ -127,9 +134,7 @@ async function handleSchedule(
   title: string,
   featured: boolean,
 ): Promise<void> {
-  const followup = `https://discord.com/api/v10/webhooks/${env.DISCORD_APP_ID}/${interaction.token}/messages/@original`;
-  const edit = (content: string) =>
-    fetch(followup, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content }) });
+  const edit = makeEditor(env, interaction.token);
 
   try {
     // 1日の書き込み上限ガード（KVがバインドされているときだけ）
@@ -171,9 +176,7 @@ async function handleDelete(
   interaction: { token: string },
   range: { timeMin: string; timeMax: string; label: string },
 ): Promise<void> {
-  const followup = `https://discord.com/api/v10/webhooks/${env.DISCORD_APP_ID}/${interaction.token}/messages/@original`;
-  const edit = (content: string) =>
-    fetch(followup, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content }) });
+  const edit = makeEditor(env, interaction.token);
 
   try {
     const token = await getAccessToken(
@@ -201,9 +204,7 @@ async function handleDelete(
 
 /** /予定表：GitHub Actions(repository_dispatch)を起動して画像生成を依頼する */
 async function handlePoster(env: Env, interaction: { token: string }, week: string): Promise<void> {
-  const followup = `https://discord.com/api/v10/webhooks/${env.DISCORD_APP_ID}/${interaction.token}/messages/@original`;
-  const edit = (content: string) =>
-    fetch(followup, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content }) });
+  const edit = makeEditor(env, interaction.token);
 
   if (!env.GITHUB_DISPATCH_TOKEN || !env.GITHUB_REPO) {
     await edit('⚠️ ポスター生成の設定（GitHubトークン）が未完了です。手順書 08 を確認してください。');

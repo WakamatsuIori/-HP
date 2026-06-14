@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { site } from '../config/site';
 import { information } from '../config/information';
+import { externalAttrs } from '../lib/links';
 ---
 
 <Base title="お知らせ" description={`${site.name}のお知らせ・活動報告の一覧。`}>
@@ -13,10 +14,7 @@ import { information } from '../config/information';
       <ul class="news-list">
         {information.map((item) => (
           <li class="news-item">
-            <a
-              href={item.url}
-              {...(item.url.startsWith('http') ? { rel: 'noopener', target: '_blank' } : {})}
-            >
+            <a href={item.url} {...externalAttrs(item.url)}>
               <span class="news-meta">
                 <time>{item.date}</time>
                 <span class="news-cat">{item.category}</span>

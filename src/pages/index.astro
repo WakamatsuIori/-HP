@@ -10,6 +10,7 @@ import { loadVideos } from '../lib/loadVideos';
 import type { LiveStatus, Video } from '../lib/youtube';
 import type { StreamEvent } from '../lib/ics';
 import { buildWeek } from '../lib/weekly';
+import { externalAttrs } from '../lib/links';
 import { information } from '../config/information';
 import { featuredLabels } from '../config/featured';
 import keyVisual from '../assets/IMG_5833.png'; // 横長キービジュアル（グレー背景）
@@ -247,10 +248,7 @@ const featured = latestTop.slice(0, 3);
           <ul class="info-grid">
             {information.map((item) => (
               <li class="info-card">
-                <a
-                  href={item.url}
-                  {...(item.url.startsWith('http') ? { rel: 'noopener', target: '_blank' } : {})}
-                >
+                <a href={item.url} {...externalAttrs(item.url)}>
                   <span class="info-thumb">
                     {item.image ? (
                       <img src={item.image} alt="" loading="lazy" decoding="async" />
