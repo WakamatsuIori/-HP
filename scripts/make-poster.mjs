@@ -86,9 +86,11 @@ console.log(`画像を生成しました: ${out}（${week.range}）`);
 if (WEBHOOK) {
   const buf = await readFile(out);
   const label = WEEK_OFFSET >= 1 ? '来週' : '今週';
+  // ファイル名は日付（その週の範囲）に。Windowsで使えない文字を避ける（例 6-15_6-21.png）。
+  const fileName = `${week.range.replace(/\//g, '-').replace(/\s*〜\s*/, '_').replace(/\s+/g, '')}.png`;
   const form = new FormData();
   form.append('payload_json', JSON.stringify({ content: `🗓️ ${label}の配信予定（${week.range}）` }));
-  form.append('files[0]', new Blob([buf], { type: 'image/png' }), 'weekly_schedule.png');
+  form.append('files[0]', new Blob([buf], { type: 'image/png' }), fileName);
   const res = await fetch(WEBHOOK, { method: 'POST', body: form });
   if (!res.ok) {
     console.error('Discord投稿に失敗:', res.status, await res.text());
