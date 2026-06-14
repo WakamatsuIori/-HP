@@ -50,7 +50,7 @@ let latestTop: Video[] = [];
 let live: LiveStatus = { isLive: false, liveVideo: null };
 try {
   const v = await loadVideos();
-  latestTop = v.latest.slice(0, 6);
+  latestTop = v.latest.slice(0, 4);
   live = v.live;
 } catch (err) {
   console.warn('[index] 動画の取得に失敗。トップは動画枠を準備中にして継続:', err instanceof Error ? err.message : err);
