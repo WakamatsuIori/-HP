@@ -195,7 +195,8 @@ const featured = latestTop.slice(0, 3);
       <section class="lp-section" id="pickup">
         <div class="lp-inner reveal">
           <div class="section-head"><p class="section-kicker">PICK UP</p><h2>おすすめ</h2></div>
-          <ul class="pickup-grid">
+        </div>
+        <ul class="pickup-grid reveal">
             {featured.map((v, i) => (
               <li class="pickup-card">
                 <a href={v.url} rel="noopener" target="_blank">
@@ -209,8 +210,7 @@ const featured = latestTop.slice(0, 3);
                 </a>
               </li>
             ))}
-          </ul>
-        </div>
+        </ul>
       </section>
     )
   }
@@ -621,11 +621,15 @@ const featured = latestTop.slice(0, 3);
   /* ===== PICK UP（おすすめ） ===== */
   .pickup-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.7rem 1.25rem;
-    margin: 1.5rem 0 0;
-    padding: 0;
+    margin: 1.5rem auto 0;
+    max-width: 1120px;
+    padding-inline: 1.25rem;
     list-style: none;
+  }
+  @media (max-width: 680px) {
+    .pickup-grid { grid-template-columns: 1fr; max-width: 520px; }
   }
   .pickup-card a { display: block; text-decoration: none; color: var(--text); }
   .pickup-bubble {
