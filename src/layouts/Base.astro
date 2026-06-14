@@ -110,8 +110,8 @@ const nav = [
     <footer class="site-footer">
       <nav class="foot-nav" aria-label="セクション">
         <a class="foot-diamond" href="/#profile"><span>PROFILE</span></a>
-        <a class="foot-diamond" href="/#gallery"><span>GALLERY</span></a>
         <a class="foot-diamond" href="/#information"><span>INFORMATION</span></a>
+        <a class="foot-diamond" href="/#gallery"><span>GALLERY</span></a>
         <a class="foot-diamond" href="/#discography"><span>DISCOGRAPHY</span></a>
         <a class="foot-diamond" href="/#work"><span>CONTACT</span></a>
       </nav>
@@ -119,16 +119,26 @@ const nav = [
         <span class="foot-brand__name">{site.name}</span>
         <span class="foot-brand__en">OFFICIAL WEB SITE</span>
       </p>
-      <p class="official-links">
-        <a href={site.links.youtube} rel="me noopener" target="_blank">YouTube</a>
-        <a href={site.links.x} rel="me noopener" target="_blank">X</a>
-        <a href={site.links.booth} rel="me noopener" target="_blank">BOOTH</a>
-      </p>
+      <nav class="social-icons" aria-label="公式SNS・リンク">
+        <a href={site.links.youtube} rel="me noopener" target="_blank" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.5 15.5v-7l6.3 3.5-6.3 3.5Z"/></svg>
+        </a>
+        <a href={site.links.x} rel="me noopener" target="_blank" aria-label="X (Twitter)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.2 2.3h3.3l-7.2 8.2L22.8 22h-6.6l-5.2-6.8L4.9 22H1.6l7.7-8.8L1.2 2.3h6.8l4.7 6.2 5.5-6.2Zm-1.2 17.7h1.8L7.1 4.2H5.2L17 20Z"/></svg>
+        </a>
+        <a href={site.links.booth} rel="me noopener" target="_blank" aria-label="BOOTH（グッズ）">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 7.5h12l-1 12.5H7L6 7.5Z"/><path fill="none" stroke="currentColor" stroke-width="1.8" d="M9 9V6.2a3 3 0 0 1 6 0V9"/></svg>
+        </a>
+        <a href={site.links.marshmallow} rel="noopener" target="_blank" aria-label="マシュマロ（匿名メッセージ）">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4.5 5h15v10.5H9.5L5.5 19v-3.5h-1V5Z"/></svg>
+        </a>
+      </nav>
       <p class="footer-nav">
-        <a href="/guidelines">ガイドライン</a>
+        <a href="/#guideline">ガイドライン</a>
         <a href="/privacy">プライバシーポリシー</a>
       </p>
       <LastUpdated />
+      <p class="foot-copy">© {site.name}</p>
     </footer>
   </body>
 </html>
@@ -303,6 +313,41 @@ const nav = [
   @media (prefers-reduced-motion: reduce) {
     .foot-diamond { transition: none; }
   }
+
+  /* 公式SNS（円形アイコン） */
+  .social-icons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.9rem;
+    margin: 0 0 1.1rem;
+  }
+  .social-icons a {
+    margin: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--accent-strong);
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  .social-icons a:hover { background: var(--accent); color: #fffdf8; }
+  .social-icons svg { width: 20px; height: 20px; display: block; }
+  @media (prefers-reduced-motion: reduce) {
+    .social-icons a { transition: none; }
+  }
+
+  .foot-copy {
+    margin: 1.4rem 0 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .foot-copy a { margin: 0; }
 
   .placeholder-note {
     background: var(--card);
