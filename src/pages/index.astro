@@ -10,6 +10,8 @@ import { loadVideos } from '../lib/loadVideos';
 import type { LiveStatus, Video } from '../lib/youtube';
 import type { StreamEvent } from '../lib/ics';
 import { buildWeek } from '../lib/weekly';
+import { information } from '../config/information';
+import { featuredLabels } from '../config/featured';
 import keyVisual from '../assets/IMG_5833.png'; // 横長キービジュアル（グレー背景）
 import heroArt from '../assets/Wakamatsu_full_size.png'; // 立ち絵（ABOUTで使用）
 
@@ -53,6 +55,9 @@ try {
 } catch (err) {
   console.warn('[index] 動画の取得に失敗。トップは動画枠を準備中にして継続:', err instanceof Error ? err.message : err);
 }
+
+// おすすめ（PICK UP）：いまは最新動画の上位3本に吹き出しラベルを付けて表示
+const featured = latestTop.slice(0, 3);
 ---
 
 <Base>
@@ -124,12 +129,15 @@ try {
       </div>
       <div class="welcome__body">
         <p class="section-kicker">PROFILE</p>
-        <h2>ようこそ、和香松庵へ</h2>
-        <p class="welcome__lead">
-          皆さん、初めまして！　カフェ＆バーの店長、個人勢VTuberの<strong>和香松 庵</strong>です。
-          雑談やゲーム配信をメインに、いろいろなことに挑戦しながら、楽しさ・面白さを共有していきます。
-          グラス片手に、ゆるりとお立ち寄りください。
-        </p>
+        <h2 class="welcome__catch">ちょっと一杯、<br />寄っていきませんか？</h2>
+        <p class="welcome__catch-en">Care for a drink with me, tonight ...?</p>
+        <span class="welcome__rule" aria-hidden="true"></span>
+        <div class="welcome__story">
+          <p>カフェ＆バー「Bar Bluebell」の店長をしている、個人勢VTuberの<strong>和香松 庵</strong>です。</p>
+          <p>雑談とゲームを肴に、夜のひとときをゆるりとお届け。気が向けば、歌うことも。</p>
+          <p>「ただいま」も「はじめまして」も大歓迎。グラス片手に、肩の力を抜いて過ごせる隠れ家を目指しています。</p>
+          <p>今日あった他愛もない話も、好きなものの早口も。あなたの夜に、そっと寄り添えたら嬉しいです。</p>
+        </div>
         <dl class="profile-list">
           <div class="profile-row"><dt>名前</dt><dd>和香松 庵（わかまつ いおり）</dd></div>
           <div class="profile-row"><dt>設定</dt><dd>カフェ＆バーの店長</dd></div>
@@ -182,7 +190,32 @@ try {
     </div>
   </section>
 
-  <section class="lp-section" id="videos">
+  {
+    featured.length > 0 && (
+      <section class="lp-section" id="pickup">
+        <div class="lp-inner reveal">
+          <div class="section-head"><p class="section-kicker">PICK UP</p><h2>おすすめ</h2></div>
+          <ul class="pickup-grid">
+            {featured.map((v, i) => (
+              <li class="pickup-card">
+                <a href={v.url} rel="noopener" target="_blank">
+                  <span class="pickup-bubble">{featuredLabels[i] ?? 'おすすめ！'}</span>
+                  <span class="pickup-thumb">
+                    <img src={v.thumbnailUrl} alt="" loading="lazy" decoding="async" />
+                  </span>
+                  <span class="pickup-title">
+                    {v.title} <span class="pickup-arrow" aria-hidden="true">→</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="lp-section lp-section--tint" id="videos">
     <div class="lp-inner reveal">
       <div class="section-head"><p class="section-kicker">VIDEO</p><h2>最新動画</h2></div>
       {
@@ -198,13 +231,51 @@ try {
     </div>
   </section>
 
+  {
+    information.length > 0 && (
+      <section class="lp-section" id="information">
+        <div class="lp-inner reveal">
+          <div class="section-head"><p class="section-kicker">INFORMATION</p><h2>お知らせ</h2></div>
+          <ul class="info-grid">
+            {information.map((item) => (
+              <li class="info-card">
+                <a
+                  href={item.url}
+                  {...(item.url.startsWith('http') ? { rel: 'noopener', target: '_blank' } : {})}
+                >
+                  <span class="info-thumb">
+                    {item.image ? (
+                      <img src={item.image} alt="" loading="lazy" decoding="async" />
+                    ) : (
+                      <span class="info-thumb__ph">{item.category}</span>
+                    )}
+                  </span>
+                  <span class="info-meta">
+                    <time>{item.date}</time>
+                    <span class="info-cat">{item.category}</span>
+                  </span>
+                  <span class="info-title">{item.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
   <section class="lp-section lp-section--tint" id="goods">
     <div class="lp-inner reveal">
       <div class="section-head"><p class="section-kicker">GOODS</p><h2>グッズ</h2></div>
-      <p class="sec-lead">オリジナルグッズは BOOTH にて販売中です。（自動掲載は準備中）</p>
-      <div class="sec-cta">
-        <a class="btn btn-gold sm" href={site.links.booth} rel="me noopener" target="_blank">BOOTHで見る</a>
-      </div>
+      <p class="sec-lead">オフィシャルストアではオリジナルグッズを販売中。画像から BOOTH へ。</p>
+      <a class="goods-banner" href={site.links.booth} rel="me noopener" target="_blank" aria-label="BOOTHでグッズを見る">
+        <span class="goods-banner__bg" style={`background-image:url(${keyVisual.src})`}></span>
+        <span class="goods-banner__text">
+          <span class="goods-banner__en">OFFICIAL STORE</span>
+          <span class="goods-banner__jp">和香松庵 グッズ</span>
+        </span>
+        <span class="goods-banner__btn">BOOTH ▸</span>
+      </a>
     </div>
   </section>
 
@@ -212,9 +283,15 @@ try {
     <div class="lp-inner reveal">
       <div class="section-head"><p class="section-kicker">FOLLOW</p><h2>フォロー</h2></div>
       <p class="sec-lead">配信のお知らせや日常は各SNSで。チャンネル登録・フォローで応援よろしくお願いします。</p>
-      <div class="sec-cta">
-        <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">YouTube</a>
-        <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">X (Twitter)</a>
+      <div class="sns-banners">
+        <a class="sns-banner sns-banner--yt" href={site.links.youtube} rel="me noopener" target="_blank">
+          <span class="sns-banner__label">YouTube</span>
+          <span class="sns-banner__sub">和香松庵 / 配信・アーカイブ</span>
+        </a>
+        <a class="sns-banner sns-banner--x" href={site.links.x} rel="me noopener" target="_blank">
+          <span class="sns-banner__label">X (Twitter)</span>
+          <span class="sns-banner__sub">お知らせ・日常をつぶやき中</span>
+        </a>
       </div>
     </div>
   </section>
@@ -508,6 +585,223 @@ try {
     min-width: 0;
     display: flex;
   }
+
+  /* ===== PROFILE：キャッチコピー化 ===== */
+  .welcome__catch {
+    margin: 0.1rem 0 0.35rem;
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: clamp(1.7rem, 4.6vw, 2.8rem);
+    line-height: 1.32;
+    letter-spacing: 0.02em;
+    color: var(--text);
+  }
+  .welcome__catch-en {
+    margin: 0 0 0.9rem;
+    font-style: italic;
+    font-size: clamp(0.82rem, 2.3vw, 1.02rem);
+    letter-spacing: 0.06em;
+    color: var(--accent-strong);
+  }
+  .welcome__rule {
+    display: block;
+    width: 3.2rem;
+    height: 2px;
+    margin: 0 0 1.25rem;
+    background: var(--accent-strong);
+  }
+  .welcome__story p {
+    margin: 0 0 0.85rem;
+    font-size: var(--pf-lead, 1.1rem);
+    line-height: 1.95;
+    color: var(--text);
+  }
+  .welcome__story strong { color: var(--accent-strong); font-weight: 700; }
+
+  /* ===== PICK UP（おすすめ） ===== */
+  .pickup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.7rem 1.25rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pickup-card a { display: block; text-decoration: none; color: var(--text); }
+  .pickup-bubble {
+    position: relative;
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto 0.8rem;
+    padding: 0.42rem 1.05rem;
+    background: var(--card);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--accent-strong);
+    text-align: center;
+  }
+  .pickup-bubble::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    transform: translateX(-50%) rotate(45deg);
+    width: 12px;
+    height: 12px;
+    background: var(--card);
+    border-right: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+  }
+  .pickup-thumb {
+    display: block;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+  }
+  .pickup-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pickup-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 0.65rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+  .pickup-arrow { color: var(--accent-strong); }
+
+  /* ===== INFORMATION（お知らせ） ===== */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.4rem;
+    margin: 1.3rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .info-card a { display: block; text-decoration: none; color: var(--text); }
+  .info-thumb {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background: linear-gradient(150deg, #2a2118, #15110b);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+  }
+  .info-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .info-thumb__ph {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-serif);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-size: 1.05rem;
+  }
+  .info-meta {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    margin: 0.7rem 0 0.25rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .info-cat { color: var(--accent-strong); letter-spacing: 0.08em; text-transform: uppercase; }
+  .info-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+
+  /* ===== GOODS バナー ===== */
+  .goods-banner {
+    position: relative;
+    display: block;
+    margin-top: 1.2rem;
+    border-radius: 14px;
+    overflow: hidden;
+    min-height: clamp(150px, 26vw, 240px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+    text-decoration: none;
+  }
+  .goods-banner__bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center 28%;
+    transition: transform 0.5s ease;
+  }
+  .goods-banner:hover .goods-banner__bg { transform: scale(1.04); }
+  .goods-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(15, 12, 9, 0.85) 0%, rgba(15, 12, 9, 0.52) 45%, rgba(15, 12, 9, 0.12) 100%);
+  }
+  .goods-banner__text {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: clamp(1.4rem, 4vw, 2.4rem);
+  }
+  .goods-banner__en { font-family: var(--font-serif); letter-spacing: 0.22em; font-size: 0.82rem; color: #e2c98e; }
+  .goods-banner__jp { font-family: var(--font-serif); font-size: clamp(1.4rem, 4vw, 2.1rem); color: #fffdf8; font-weight: 700; }
+  .goods-banner__btn {
+    position: absolute;
+    right: clamp(1rem, 3vw, 2rem);
+    bottom: clamp(1rem, 3vw, 2rem);
+    z-index: 1;
+    padding: 0.5rem 1.15rem;
+    border-radius: 999px;
+    background: #cda14e;
+    color: #1b110a;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  /* ===== YouTube / X バナーカード ===== */
+  .sns-banners {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.1rem;
+    margin-top: 1.2rem;
+  }
+  .sns-banner {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    min-height: clamp(110px, 18vw, 150px);
+    padding: clamp(1.1rem, 3vw, 1.7rem);
+    border-radius: 12px;
+    text-decoration: none;
+    color: #fffdf8;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  }
+  .sns-banner--yt { background: linear-gradient(120deg, #7a1f1f, #b3352f); }
+  .sns-banner--x { background: linear-gradient(120deg, #181818, #3a3a3a); }
+  .sns-banner__label {
+    font-family: var(--font-serif);
+    font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .sns-banner__sub { font-size: 0.85rem; opacity: 0.9; }
 
   /* ===== LP（1ページ縦スクロール）のセクション土台 ===== */
   /* 各セクションはフルブリード。中身は .lp-inner で読みやすい幅に収める。
