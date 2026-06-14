@@ -15,7 +15,7 @@ export const GET: APIRoute = ({ site: astroSite }) => {
 - [グッズ](${base}/goods/): BOOTHのグッズ一覧（購入はBOOTHへ）
 - [プロフィール](${base}/about/): カフェ＆バーの店長・個人勢VTuber 和香松 庵 の紹介
 - [お仕事のご依頼](${base}/work/): コラボ・企業案件のご相談
-- [ガイドライン](${base}/guidelines/): 二次創作・ファンアート・切り抜きのルール
+- [ガイドライン](${base}/#guideline): 二次創作・ファンアート・切り抜きのルール（トップページ内）
 
 ## 公式リンク
 - YouTube: ${site.links.youtube}

@@ -8,7 +8,6 @@ const paths = [
   '/goods/',
   '/about/',
   '/work/',
-  '/guidelines/',
   '/privacy/',
 ];
 

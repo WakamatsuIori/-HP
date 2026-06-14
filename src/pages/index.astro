@@ -332,14 +332,38 @@ const featured = latestTop.slice(0, 3);
   <section class="lp-section" id="guideline">
     <div class="lp-inner reveal">
       <SectionHead kicker="GUIDELINE" title="ガイドライン" />
-      <p class="sec-lead">応援・二次創作・切り抜きに関するお願いをまとめています。</p>
-      <ul class="guide-points">
-        <li><strong>切り抜き</strong>　原則OK。元動画リンクの記載をお願いします</li>
-        <li><strong>ファンアート・二次創作</strong>　大歓迎。指定ハッシュタグでの投稿が嬉しいです</li>
-        <li><strong>AI学習</strong>　イラストのAI学習への利用はご遠慮ください</li>
-      </ul>
-      <div class="sec-cta">
-        <a class="btn btn-ghost-dark sm" href="/guidelines">ガイドラインを詳しく見る →</a>
+      <p class="sec-lead">みなさんに安心して楽しんでもらえるよう、二次創作・切り抜き・応援についてのお願いをまとめました。みんなで心地よく過ごすためのささやかな約束ごとです。</p>
+
+      <div class="guide-block">
+        <h3 class="guide-h">切り抜き動画</h3>
+        <ul class="guide-points">
+          <li>配信の切り抜きは原則OKです。</li>
+          <li>元動画のリンクを概要欄に必ず記載してください。</li>
+          <li>悪意のある編集・切り抜きはご遠慮ください。</li>
+          <li>切り抜き動画の収益化はご遠慮ください。</li>
+          <li>YouTube・X・niconico など、ご自由に投稿いただけます。</li>
+          <li>ハッシュタグ：<strong>#庵のおかわり</strong></li>
+        </ul>
+      </div>
+
+      <div class="guide-block">
+        <h3 class="guide-h">二次創作・ファンアート</h3>
+        <ul class="guide-points">
+          <li>イラスト・音楽・小説など、基本的に大歓迎です。</li>
+          <li>R-18 / R-18G 作品は苦手な方もいるため、ワンクッション挟むなどの配慮をお願いします。</li>
+          <li>誰かが不快・悲しい気持ちになる作品の投稿はご遠慮ください。</li>
+          <li>ハッシュタグ：<strong>#和香松庵</strong> ／ ファンアート用 <strong>#庵のお品書き</strong></li>
+        </ul>
+      </div>
+
+      <div class="guide-block">
+        <h3 class="guide-h">イラストのAI学習について</h3>
+        <p class="guide-text">和香松庵が発信するイラストを、AIの学習データとして利用することは固くお断りしています。描いてくださったイラストレーターさんの権利を守るため、どうかご理解とご協力をお願いいたします。</p>
+      </div>
+
+      <div class="guide-block">
+        <h3 class="guide-h">判断に迷ったら</h3>
+        <p class="guide-text">ここに書かれていないことで迷った場合は、<a href={site.links.x} rel="me noopener" target="_blank">X</a> までお気軽にご連絡ください。</p>
       </div>
     </div>
   </section>
@@ -756,6 +780,28 @@ const featured = latestTop.slice(0, 3);
   .guide-points strong {
     color: var(--accent-strong);
     margin-right: 0.5rem;
+  }
+  .guide-block {
+    max-width: 42rem;
+    margin: 1.8rem auto 0;
+    text-align: left;
+  }
+  .guide-block:first-of-type { margin-top: 1.2rem; }
+  .guide-h {
+    margin: 0 0 0.4rem;
+    font-size: 1.12rem;
+    color: var(--accent-strong);
+  }
+  .guide-block .guide-points { margin-top: 0.5rem; }
+  .guide-text {
+    margin: 0.5rem 0 0;
+    font-size: 0.96rem;
+    line-height: 1.75;
+    color: var(--muted);
+  }
+  .guide-text a {
+    color: var(--accent-strong);
+    text-underline-offset: 2px;
   }
 
   /* ===== INFORMATION（お知らせ） ===== */
