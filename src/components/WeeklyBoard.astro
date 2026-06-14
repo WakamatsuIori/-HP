@@ -1,0 +1,195 @@
+---
+/**
+ * 週間スケジュール（バーのメニュー表 風）。
+ * いまはサンプルデータ。後でカレンダー(.ics)の今週分を days に流し込めば自動化できる。
+ * サイズ/位置は :root の --wb-* 変数（index.astro の調整パネル）で動かせる。
+ */
+interface Day {
+  ja: string; // 曜日（月〜日）
+  date: string; // M/D
+  time: string; // HH:MM（空なら休業扱い）
+  title: string;
+  featured?: boolean; // おすすめ強調
+}
+interface Props {
+  month?: string;
+  range?: string;
+  days?: Day[];
+}
+const {
+  month = 'JUNE 2026',
+  range = '6/15 〜 6/21',
+  days = [
+    { ja: '月', date: '6/15', time: '20:00', title: '雑談配信' },
+    { ja: '火', date: '6/16', time: '21:00', title: '新作ゲーム実況 #1' },
+    { ja: '水', date: '6/17', time: '', title: '本日休業' },
+    { ja: '木', date: '6/18', time: '20:00', title: '歌枠（リクエスト募集）', featured: true },
+    { ja: '金', date: '6/19', time: '22:00', title: '深夜ホラー' },
+    { ja: '土', date: '6/20', time: '19:00', title: 'コラボ配信' },
+    { ja: '日', date: '', time: '', title: '本日休業' },
+  ],
+} = Astro.props;
+---
+
+<div class="wb">
+  <span class="wb__frame" aria-hidden="true"></span>
+  <div class="wb__inner">
+    <div class="wb__head">
+      <div class="wb__title">
+        <p class="wb__en">Weekly Schedule</p>
+        <p class="wb__jp">今週のメニュー</p>
+      </div>
+      <div class="wb__week">
+        <span class="wb__mon">{month}</span>
+        <span class="wb__rng">{range}</span>
+      </div>
+    </div>
+
+    <ul class="wb__menu">
+      {
+        days.map((d) => {
+          const off = !d.time;
+          return (
+            <li class:list={['wb__row', { 'is-off': off, 'is-featured': d.featured && !off }]}>
+              <span class="wb__chip">
+                <span class="wb__day">{d.ja}</span>
+                <span class="wb__date">{d.date}</span>
+              </span>
+              <span class="wb__name">{d.title}</span>
+              <span class="wb__leader" aria-hidden="true"></span>
+              <span class="wb__time">{off ? '—' : d.time}</span>
+            </li>
+          );
+        })
+      }
+    </ul>
+
+    <p class="wb__foot">all times in JST</p>
+  </div>
+</div>
+
+<style>
+  .wb {
+    position: relative;
+    width: min(var(--wb-max, 920px), calc(100% - 2.5rem));
+    margin-inline: auto;
+    border-radius: 14px;
+    overflow: hidden;
+    padding: var(--wb-pad, clamp(1.3rem, 3.2vw, 2.2rem));
+    color: #f3e7cf;
+    background:
+      radial-gradient(120% 90% at 72% -10%, rgba(240, 176, 97, 0.22), transparent 55%),
+      radial-gradient(140% 120% at 40% 120%, rgba(0, 0, 0, 0.5), transparent 60%),
+      linear-gradient(160deg, #3a2415, #1b110a);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+  }
+  .wb__frame {
+    position: absolute;
+    inset: 9px;
+    border: 1px solid #cda14e;
+    border-radius: 9px;
+    box-shadow: 0 0 0 4px rgba(205, 161, 78, 0.16);
+    pointer-events: none;
+  }
+  .wb__inner { position: relative; }
+
+  .wb__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.4rem 1rem;
+    margin-bottom: clamp(0.9rem, 2.2vw, 1.4rem);
+  }
+  .wb__en {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 4.4vw, 2.3rem);
+    letter-spacing: 0.04em;
+    color: #e8cf95;
+    line-height: 1;
+  }
+  .wb__jp {
+    margin: 0.3rem 0 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.28em;
+    color: #c4ab7e;
+  }
+  .wb__week { text-align: right; line-height: 1.2; }
+  .wb__mon { font-style: italic; font-size: 0.82rem; color: #c4ab7e; }
+  .wb__rng {
+    display: block;
+    font-size: clamp(1.1rem, 3vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #e8cf95;
+  }
+
+  .wb__menu { list-style: none; margin: 0; padding: 0; }
+  .wb__row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    padding: clamp(0.5rem, 1.5vw, 0.85rem) 0.1rem;
+    border-bottom: 1px solid rgba(226, 201, 142, 0.16);
+  }
+  .wb__row:last-child { border-bottom: none; }
+  .wb__chip {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    min-width: 3.4rem;
+    justify-content: center;
+    padding: 0.28rem 0.6rem;
+    border: 1px solid rgba(226, 201, 142, 0.5);
+    border-radius: 7px;
+    background: rgba(243, 231, 207, 0.94);
+    align-self: center;
+  }
+  .wb__day { font-weight: 700; color: #7c2f24; font-size: 0.95rem; }
+  .wb__date { color: #33241a; font-size: 0.82rem; }
+  .wb__name {
+    flex-shrink: 0;
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: clamp(0.95rem, 2.3vw, 1.15rem);
+  }
+  .wb__leader {
+    flex: 1;
+    align-self: flex-end;
+    margin-bottom: 0.38em;
+    border-bottom: 2px dotted rgba(226, 201, 142, 0.45);
+  }
+  .wb__time {
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: clamp(1rem, 2.5vw, 1.28rem);
+    color: #e8cf95;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wb__row.is-off .wb__name,
+  .wb__row.is-off .wb__time { color: #9a8567; }
+  .wb__row.is-off .wb__chip { background: rgba(243, 231, 207, 0.55); }
+
+  .wb__row.is-featured .wb__chip { background: #cda14e; border-color: #cda14e; }
+  .wb__row.is-featured .wb__day { color: #fffdf8; }
+  .wb__row.is-featured .wb__date { color: #1b110a; }
+  .wb__row.is-featured .wb__name { color: #fffdf8; }
+  .wb__row.is-featured .wb__name::after { content: ' ◆'; color: #cda14e; }
+
+  .wb__foot {
+    margin: clamp(0.8rem, 2vw, 1.1rem) 0 0;
+    text-align: right;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: #9a8567;
+  }
+
+  @media (max-width: 480px) {
+    .wb__name { max-width: 48%; }
+  }
+</style>

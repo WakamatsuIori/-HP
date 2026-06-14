@@ -1,9 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import { Image } from 'astro:assets';
-import ScheduleList from '../components/ScheduleList.astro';
 import VideoList from '../components/VideoList.astro';
 import LiveBadge from '../components/LiveBadge.astro';
+import WeeklyBoard from '../components/WeeklyBoard.astro';
 import { site } from '../config/site';
 import { loadSchedule } from '../lib/loadSchedule';
 import { loadVideos } from '../lib/loadVideos';
@@ -33,7 +33,6 @@ const events = await loadSchedule();
 const previewEvents = import.meta.env.DEV && events.length === 0 ? buildSampleEvents() : [];
 const allEvents = events.length ? events : previewEvents;
 const next = allEvents[0] ?? null;
-const next3 = allEvents.slice(0, 3);
 
 // 動画(YouTube)はトップの主役ではないので、未設定・取得失敗でもトップ全体は表示を続ける。
 // （/videos ページは従来どおり厳格＝設定漏れはビルド失敗のまま。CLAUDE.md §4）
@@ -145,8 +144,10 @@ try {
 
   <section class="lp-section lp-section--tint" id="schedule">
     <div class="lp-inner reveal">
-      <div class="section-head"><p class="section-kicker">SCHEDULE</p><h2>次の配信</h2></div>
-      <ScheduleList events={next3} />
+      <div class="section-head"><p class="section-kicker">SCHEDULE</p><h2>今週の予定</h2></div>
+    </div>
+    <div class="reveal"><WeeklyBoard /></div>
+    <div class="lp-inner sched-foot">
       <p class="more-link"><a href="/schedule">スケジュールをすべて見る →</a></p>
     </div>
   </section>
@@ -214,6 +215,9 @@ try {
     --pf-lead: 1.46rem; /* 紹介文 */
     --pf-label: 1.18rem; /* プロフィール項目のラベル */
     --pf-value: 1.26rem; /* プロフィール項目の値 */
+    /* 週間ボード（SCHEDULE） */
+    --wb-max: 920px; /* 週間ボードの最大幅（位置はセクション中央） */
+    --wb-pad: clamp(1.3rem, 3.2vw, 2.2rem); /* 週間ボードの内側余白 */
   }
 </style>
 
@@ -388,6 +392,7 @@ try {
   .welcome__cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; }
 
   .more-link { text-align: right; }
+  .sched-foot { margin-top: 1.2rem; }
 
   /* ===== LP（1ページ縦スクロール）のセクション土台 ===== */
   /* 各セクションはフルブリード。中身は .lp-inner で読みやすい幅に収める。
