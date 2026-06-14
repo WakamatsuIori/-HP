@@ -2,9 +2,11 @@
  * カレンダーの予定（StreamEvent[]）を「今週(月〜日)」の週間ボード用データに変換する純関数。
  * 日時はすべて日本時間(JST)で扱う。空き日は「本日休業」になる。
  */
-import type { StreamEvent } from './ics';
-import { jstDateKey, jstTime } from './schedule';
-import { FEATURED_MARK } from './featured';
+// 相対importは拡張子(.ts)付き：Node 24 がこの .ts を直接実行（型ストリッピング）する際、
+// 拡張子なしの相対指定は解決できないため（ポスター生成 scripts/make-poster.mjs 経由で読まれる）。
+import type { StreamEvent } from './ics.ts';
+import { jstDateKey, jstTime } from './schedule.ts';
+import { FEATURED_MARK } from './featured.ts';
 
 const JA = ['日', '月', '火', '水', '木', '金', '土'];
 
