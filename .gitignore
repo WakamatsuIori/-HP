@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+_discord_secret.txt
+_poster_webhook.txt
 
 # 依存・ビルド成果物
 node_modules/
