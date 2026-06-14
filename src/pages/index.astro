@@ -35,9 +35,12 @@ const previewEvents = import.meta.env.DEV && events.length === 0 ? buildSampleEv
 const allEvents = events.length ? events : previewEvents;
 const next = allEvents[0] ?? null;
 
-// 週間ボード用データ：本番＝今週(月〜日)の実データ。devで実データが空のときだけ
-// ボードの既定サンプル（poster の月〜日）を表示してレイアウト確認できるようにする。
-const weekData = import.meta.env.DEV && events.length === 0 ? null : buildWeek(events);
+// 週間ボード用データ：本番＝今週/来週(月〜日)の実データ。devで実データが空のときだけ
+// ボードの既定サンプルを表示してレイアウト確認できるようにする。
+const showSample = import.meta.env.DEV && events.length === 0;
+const nowDate = new Date();
+const weekData = showSample ? null : buildWeek(events, nowDate, 0);
+const nextWeekData = showSample ? null : buildWeek(events, nowDate, 1);
 
 // 動画(YouTube)はトップの主役ではないので、未設定・取得失敗でもトップ全体は表示を続ける。
 // （/videos ページは従来どおり厳格＝設定漏れはビルド失敗のまま。CLAUDE.md §4）
@@ -154,9 +157,18 @@ try {
     <div class="reveal">
       {
         weekData ? (
-          <WeeklyBoard month={weekData.month} range={weekData.range} days={weekData.days} />
+          <WeeklyBoard label="今週" month={weekData.month} range={weekData.range} days={weekData.days} />
         ) : (
-          <WeeklyBoard />
+          <WeeklyBoard label="今週" />
+        )
+      }
+    </div>
+    <div class="reveal wb-next">
+      {
+        nextWeekData ? (
+          <WeeklyBoard label="来週" month={nextWeekData.month} range={nextWeekData.range} days={nextWeekData.days} />
+        ) : (
+          <WeeklyBoard label="来週" />
         )
       }
     </div>
@@ -476,6 +488,7 @@ try {
 
   .more-link { text-align: right; }
   .sched-foot { margin-top: 1.2rem; }
+  .wb-next { margin-top: 1.5rem; }
 
   /* ===== LP（1ページ縦スクロール）のセクション土台 ===== */
   /* 各セクションはフルブリード。中身は .lp-inner で読みやすい幅に収める。

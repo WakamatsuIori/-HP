@@ -12,11 +12,13 @@ interface Day {
   featured?: boolean; // おすすめ強調
 }
 interface Props {
+  label?: string; // 「今週」「来週」など
   month?: string;
   range?: string;
   days?: Day[];
 }
 const {
+  label = '今週',
   month = 'JUNE 2026',
   range = '6/15 〜 6/21',
   days = [
@@ -37,7 +39,7 @@ const {
     <div class="wb__head">
       <div class="wb__title">
         <p class="wb__en">Weekly Schedule</p>
-        <p class="wb__jp">今週のメニュー</p>
+        <p class="wb__jp">{label}のメニュー</p>
       </div>
       <div class="wb__week">
         <span class="wb__mon">{month}</span>

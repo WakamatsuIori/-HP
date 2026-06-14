@@ -26,13 +26,14 @@ export interface WeekData {
   days: WeekDay[];
 }
 
-export function buildWeek(events: StreamEvent[], now: Date = new Date()): WeekData {
+export function buildWeek(events: StreamEvent[], now: Date = new Date(), weekOffset = 0): WeekData {
   // 今日のJSTカレンダー日付（日本にDSTは無いので UTC 正午で安全に表現できる）
   const [y, m, d] = jstKey(now).split('-').map(Number);
   const today = new Date(Date.UTC(y, m - 1, d, 12));
   const dow = today.getUTCDay(); // 0=日 .. 6=土
   const monday = new Date(today);
-  monday.setUTCDate(today.getUTCDate() + (dow === 0 ? -6 : 1 - dow));
+  // 今週(weekOffset=0)/来週(1)… の月曜に合わせる
+  monday.setUTCDate(today.getUTCDate() + (dow === 0 ? -6 : 1 - dow) + 7 * weekOffset);
 
   // JST日付キー → その日のイベント
   const byDay = new Map<string, StreamEvent[]>();
