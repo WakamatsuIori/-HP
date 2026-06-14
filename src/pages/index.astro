@@ -4,6 +4,7 @@ import { Image } from 'astro:assets';
 import VideoList from '../components/VideoList.astro';
 import LiveBadge from '../components/LiveBadge.astro';
 import WeeklyBoard from '../components/WeeklyBoard.astro';
+import SectionHead from '../components/SectionHead.astro';
 import { site } from '../config/site';
 import { loadSchedule } from '../lib/loadSchedule';
 import { loadVideos } from '../lib/loadVideos';
@@ -158,7 +159,7 @@ const featured = latestTop.slice(0, 3);
 
   <section class="lp-section lp-section--tint" id="schedule">
     <div class="lp-inner reveal">
-      <div class="section-head"><p class="section-kicker">SCHEDULE</p><h2>今週の予定</h2></div>
+      <SectionHead kicker="SCHEDULE" title="今週の予定" />
     </div>
     <div class="sched-grid reveal">
       <div class="sched-col">
@@ -189,7 +190,7 @@ const featured = latestTop.slice(0, 3);
     featured.length > 0 && (
       <section class="lp-section" id="pickup">
         <div class="lp-inner reveal">
-          <div class="section-head"><p class="section-kicker">PICK UP</p><h2>おすすめ</h2></div>
+          <SectionHead kicker="PICK UP" title="おすすめ" />
         </div>
         <ul class="pickup-grid reveal">
             {featured.map((v, i) => (
@@ -212,7 +213,7 @@ const featured = latestTop.slice(0, 3);
 
   <section class="lp-section lp-section--tint" id="videos">
     <div class="lp-inner reveal">
-      <div class="section-head"><p class="section-kicker">VIDEO</p><h2>最新動画</h2></div>
+      <SectionHead kicker="VIDEO" title="最新動画" />
       {
         latestTop.length > 0 ? (
           <>
@@ -228,7 +229,7 @@ const featured = latestTop.slice(0, 3);
 
   <section class="lp-section" id="gallery">
     <div class="lp-inner reveal">
-      <div class="section-head"><p class="section-kicker">GALLERY</p><h2>ギャラリー</h2></div>
+      <SectionHead kicker="GALLERY" title="ギャラリー" />
       <p class="sec-lead">わたしの色んな姿や、みんなが描いてくれたファンアートをご紹介！</p>
       <div class="gallery-soon">Coming soon …</div>
     </div>
@@ -238,7 +239,7 @@ const featured = latestTop.slice(0, 3);
     information.length > 0 && (
       <section class="lp-section" id="information">
         <div class="lp-inner reveal">
-          <div class="section-head"><p class="section-kicker">INFORMATION</p><h2>お知らせ</h2></div>
+          <SectionHead kicker="INFORMATION" title="お知らせ" />
           <ul class="info-grid">
             {information.map((item) => (
               <li class="info-card">
@@ -269,7 +270,7 @@ const featured = latestTop.slice(0, 3);
 
   <section class="lp-section lp-section--tint" id="goods">
     <div class="lp-inner reveal">
-      <div class="section-head"><p class="section-kicker">GOODS</p><h2>グッズ</h2></div>
+      <SectionHead kicker="GOODS" title="グッズ" />
       <p class="sec-lead">オフィシャルストアではオリジナルグッズを販売中。画像から BOOTH へ。</p>
       <a class="goods-banner" href={site.links.booth} rel="me noopener" target="_blank" aria-label="BOOTHでグッズを見る">
         <span class="goods-banner__bg" style={`background-image:url(${keyVisual.src})`}></span>
@@ -284,7 +285,7 @@ const featured = latestTop.slice(0, 3);
 
   <section class="lp-section" id="follow">
     <div class="lp-inner reveal">
-      <div class="section-head"><p class="section-kicker">FOLLOW</p><h2>フォロー</h2></div>
+      <SectionHead kicker="FOLLOW" title="フォロー" />
       <p class="sec-lead">配信のお知らせや日常は各SNSで。チャンネル登録・フォローで応援よろしくお願いします。</p>
       <div class="sns-banners">
         <a class="sns-banner sns-banner--yt" href={site.links.youtube} rel="me noopener" target="_blank">
@@ -301,7 +302,7 @@ const featured = latestTop.slice(0, 3);
 
   <section class="lp-section lp-section--tint" id="discography">
     <div class="lp-inner reveal">
-      <div class="section-head"><p class="section-kicker">DISCOGRAPHY</p><h2>活動実績</h2></div>
+      <SectionHead kicker="DISCOGRAPHY" title="活動実績" />
       <p class="sec-lead">これまでの活動実績・お仕事情報をこちらに掲載予定です。</p>
       <div class="gallery-soon">Coming soon …</div>
       <div class="sec-cta">
@@ -312,7 +313,7 @@ const featured = latestTop.slice(0, 3);
 
   <section class="lp-section" id="guideline">
     <div class="lp-inner reveal">
-      <div class="section-head"><p class="section-kicker">GUIDELINE</p><h2>ガイドライン</h2></div>
+      <SectionHead kicker="GUIDELINE" title="ガイドライン" />
       <p class="sec-lead">応援・二次創作・切り抜きに関するお願いをまとめています。</p>
       <ul class="guide-points">
         <li><strong>切り抜き</strong>　原則OK。元動画リンクの記載をお願いします</li>
@@ -327,7 +328,7 @@ const featured = latestTop.slice(0, 3);
 
   <section class="lp-section lp-section--tint" id="work">
     <div class="lp-inner reveal">
-      <div class="section-head"><p class="section-kicker">CONTACT</p><h2>お仕事のご依頼</h2></div>
+      <SectionHead kicker="CONTACT" title="お仕事のご依頼" />
       <p class="sec-lead">コラボ・企業案件などのご相談を受け付けています。詳細・ご連絡方法はこちらから。</p>
       <div class="sec-cta">
         <a class="btn btn-ghost-dark sm" href="/work">依頼内容・ご連絡方法 →</a>
@@ -834,36 +835,7 @@ const featured = latestTop.slice(0, 3);
     padding-inline: 1.25rem;
   }
 
-  /* セクション見出し：大きな英字のウォーターマーク＋日本語サブ（参考サイトの手法を金で翻訳） */
-  .section-head {
-    position: relative;
-    text-align: center;
-    margin: 0 auto 1.7rem;
-    padding-bottom: 1.3rem;
-    line-height: 1;
-  }
-  /* アールデコ調の区切り（金の細線＋中央のひし形） */
-  .section-head::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: 0.5rem;
-    transform: translateX(-50%);
-    width: 76px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent) 50%, transparent);
-  }
-  .section-head::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: calc(0.5rem - 3.5px);
-    transform: translateX(-50%) rotate(45deg);
-    width: 7px;
-    height: 7px;
-    background: var(--accent);
-    z-index: 1;
-  }
+  /* PROFILE/ABOUT で単独で使う大英字キッカー（section-head 本体は components/SectionHead.astro に移設） */
   .section-kicker {
     margin: 0;
     font-family: var(--font-serif);
@@ -873,16 +845,6 @@ const featured = latestTop.slice(0, 3);
     line-height: 1;
     color: rgba(156, 143, 107, 0.38); /* 薄い金のウォーターマーク */
   }
-  .section-head h2 {
-    display: block;
-    margin: 0.35rem 0 0;
-    padding: 0;
-    border-bottom: none;
-    font-size: 1.1rem;
-    letter-spacing: 0.1em;
-    color: var(--text);
-  }
-  .section-head h2::after { content: none; } /* 大英字がアクセントなのでグローバルの金タブは消す */
 
   /* ようこそ(ABOUT)の見出しも同じ大英字スタイルに揃える（左寄せ） */
   .welcome__body h2 {

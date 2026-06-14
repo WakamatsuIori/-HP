@@ -1,0 +1,65 @@
+---
+/**
+ * セクション見出し（大きな英字のウォーターマーク＋日本語サブ＋アールデコ調の金の区切り）。
+ * index.astro の各セクションで使う共通見出し。出力・見た目は従来の <div class="section-head"> と同一。
+ */
+interface Props {
+  kicker: string; // 大英字（例: SCHEDULE）
+  title: string; // 日本語サブ（例: 今週の予定）
+}
+const { kicker, title } = Astro.props;
+---
+
+<div class="section-head"><p class="section-kicker">{kicker}</p><h2>{title}</h2></div>
+
+<style>
+  /* セクション見出し：大きな英字のウォーターマーク＋日本語サブ（参考サイトの手法を金で翻訳） */
+  .section-head {
+    position: relative;
+    text-align: center;
+    margin: 0 auto 1.7rem;
+    padding-bottom: 1.3rem;
+    line-height: 1;
+  }
+  /* アールデコ調の区切り（金の細線＋中央のひし形） */
+  .section-head::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0.5rem;
+    transform: translateX(-50%);
+    width: 76px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent) 50%, transparent);
+  }
+  .section-head::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: calc(0.5rem - 3.5px);
+    transform: translateX(-50%) rotate(45deg);
+    width: 7px;
+    height: 7px;
+    background: var(--accent);
+    z-index: 1;
+  }
+  .section-kicker {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(2.6rem, 9vw, 4.6rem);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    color: rgba(156, 143, 107, 0.38); /* 薄い金のウォーターマーク */
+  }
+  .section-head h2 {
+    display: block;
+    margin: 0.35rem 0 0;
+    padding: 0;
+    border-bottom: none;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    color: var(--text);
+  }
+  .section-head h2::after { content: none; } /* 大英字がアクセントなのでグローバルの金タブは消す */
+</style>
