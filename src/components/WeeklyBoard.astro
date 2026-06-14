@@ -1,8 +1,9 @@
 ---
 /**
  * 週間スケジュール（バーのメニュー表 風）。
- * いまはサンプルデータ。後でカレンダー(.ics)の今週分を days に流し込めば自動化できる。
- * サイズ/位置は :root の --wb-* 変数（index.astro の調整パネル）で動かせる。
+ * 実データは index.astro が buildWeek(.ics の今週/来週分) を days に渡して描画する。
+ * 下の days 既定値は props 未指定時（dev・単体表示）のフォールバック見本。
+ * サイズ/位置は :root の --wb-* 変数（index.astro）で調整する。
  */
 interface Day {
   ja: string; // 曜日（月〜日）

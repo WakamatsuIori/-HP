@@ -204,17 +204,21 @@
   if(wmon) wmon.textContent = WEEK.month;
   if(wrng) wrng.textContent = WEEK.range;
   const menu = document.getElementById("menu");
+  // \u30ab\u30ec\u30f3\u30c0\u30fc\u7531\u6765\u306e\u30c6\u30ad\u30b9\u30c8\u306f\u4fe1\u983c\u3057\u306a\u3044\u5916\u90e8\u5165\u529b\u3002innerHTML\u306b\u5165\u308c\u308b\u524d\u306bHTML\u30a8\u30b9\u30b1\u30fc\u30d7\u3059\u308b\uff08CLAUDE.md \u00a73\uff09\u3002
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => (
+    { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]
+  ));
   schedule.forEach(d=>{
     const off = !d.time;
     const cls = ["day"]; if(off) cls.push("off"); if(d.featured && !off) cls.push("featured");
     const row = document.createElement("div");
     row.className = cls.join(" ");
     row.innerHTML = `
-      <div class="dchip"><span class="ja">${d.ja}</span><span class="sep"></span><span class="dt">${d.date}</span></div>
+      <div class="dchip"><span class="ja">${esc(d.ja)}</span><span class="sep"></span><span class="dt">${esc(d.date)}</span></div>
       <div class="main">
-        <span class="title">${off ? CLOSED_LABEL : d.title}</span>
+        <span class="title">${off ? esc(CLOSED_LABEL) : esc(d.title)}</span>
         <span class="leader"></span>
-        <span class="time">${off ? "\u2014" : d.time}</span>
+        <span class="time">${off ? "\u2014" : esc(d.time)}</span>
       </div>`;
     menu.appendChild(row);
   });

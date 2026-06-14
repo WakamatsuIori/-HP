@@ -160,6 +160,7 @@ async function handleSchedule(
     const kind = when.startDateTime ? '配信予定' : '休業';
     await edit(`✅ ${kind}を登録しました：\n**${when.label}　${title}**${star}\nHPの週間ボードには次回更新（最大15分）で反映されます。`);
   } catch (e) {
+    console.error('[/予定] 登録に失敗', e);
     await edit(`⚠️ 登録に失敗しました：${e instanceof Error ? e.message : String(e)}`);
   }
 }
@@ -193,6 +194,7 @@ async function handleDelete(
       `🗑️ ${range.label} の予定を${titles.length}件削除しました：\n${titles.map((t) => `・${t}`).join('\n')}\nHPの週間ボードには次回更新（最大15分）で反映されます。`,
     );
   } catch (e) {
+    console.error('[/予定消去] 削除に失敗', e);
     await edit(`⚠️ 削除に失敗しました：${e instanceof Error ? e.message : String(e)}`);
   }
 }
@@ -224,6 +226,7 @@ async function handlePoster(env: Env, interaction: { token: string }, week: stri
     }
     await edit(`🛠️ ${week}のポスター生成を開始しました。1〜2分でこのサーバーに画像が投稿されます。`);
   } catch (e) {
+    console.error('[/予定表] 生成の起動に失敗', e);
     await edit(`⚠️ 生成の起動に失敗しました：${e instanceof Error ? e.message : String(e)}`);
   }
 }

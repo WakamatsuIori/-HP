@@ -40,6 +40,9 @@ jobs:
       - name: 依存関係をインストール
         run: npm ci
 
+      - name: スモーク（Node 24 の .ts 直接importが壊れていないか確認）
+        run: node --input-type=module -e "await import('./src/lib/ics.ts'); await import('./src/lib/weekly.ts'); await import('./scripts/poster/inject.mjs'); console.log('smoke ok');"
+
       - name: 対象週(オフセット)を決定
         id: week
         run: |
