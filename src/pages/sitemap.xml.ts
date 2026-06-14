@@ -13,7 +13,7 @@ const paths = [
 ];
 
 export const GET: APIRoute = ({ site }) => {
-  const base = (site?.toString() ?? 'https://vtuber-hp.pages.dev/').replace(/\/$/, '');
+  const base = (site?.toString() ?? 'https://wakamatsu-iori.com/').replace(/\/$/, '');
   const urls = paths.map((p) => `  <url><loc>${base}${p}</loc></url>`).join('\n');
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

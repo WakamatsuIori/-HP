@@ -3,7 +3,7 @@ import { site } from '../config/site';
 
 // AI検索向けの索引（llms.txt）。サイト概要＋主要ページ＋公式リンクを簡潔に。
 export const GET: APIRoute = ({ site: astroSite }) => {
-  const base = (astroSite?.toString() ?? 'https://vtuber-hp.pages.dev/').replace(/\/$/, '');
+  const base = (astroSite?.toString() ?? 'https://wakamatsu-iori.com/').replace(/\/$/, '');
   const body = `# ${site.name}
 
 > ${site.description}

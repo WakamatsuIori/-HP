@@ -1,8 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
-// サイトURL。後日、独自ドメインを取得したらここを差し替える
+// サイトURL（独自ドメイン）。canonical/OGP/sitemap/llms.txt の絶対URL生成に使う。
 export default defineConfig({
-  site: 'https://vtuber-hp.pages.dev',
+  site: 'https://wakamatsu-iori.com',
   output: 'static',
 });
