@@ -88,20 +88,23 @@ try {
 
         <LiveBadge live={live} />
         {
-          next ? (
-            <div class="countdown" data-start={next.start.toISOString()}>
-              <span class="cd-label">次の配信まで</span>
-              <span class="cd-time" data-cd>—</span>
-              <span class="cd-next-title">{next.title}</span>
-            </div>
-          ) : (
-            <p class="cd-label cd-label--solo">次の配信は調整中です</p>
-          )
+          /* 配信中はカウントダウンを出さない（「配信中」と「次の配信まで」の二重表示を防ぐ） */
+          !live.isLive &&
+            (next ? (
+              <div class="countdown" data-start={next.start.toISOString()}>
+                <span class="cd-label">次の配信まで</span>
+                <span class="cd-time" data-cd>—</span>
+                <span class="cd-next-title">{next.title}</span>
+              </div>
+            ) : (
+              <p class="cd-label cd-label--solo">次の配信は調整中です</p>
+            ))
         }
 
         <div class="hero2__cta">
-          <a class="btn btn-gold" href={site.links.youtube} rel="me noopener" target="_blank">▶ 最新の配信を見る</a>
-          <a class="btn btn-ghost" href="/schedule">配信スケジュール</a>
+          <a class="btn btn-gold" href={site.links.youtube} rel="me noopener" target="_blank">YouTubeチャンネルへ</a>
+          <a class="btn btn-ghost" href={site.links.x} rel="me noopener" target="_blank">Xをフォロー</a>
+          <a class="btn btn-ghost" href="#schedule">今週の予定を見る ↓</a>
         </div>
       </div>
     </div>
@@ -154,23 +157,25 @@ try {
     <div class="lp-inner reveal">
       <div class="section-head"><p class="section-kicker">SCHEDULE</p><h2>今週の予定</h2></div>
     </div>
-    <div class="reveal">
-      {
-        weekData ? (
-          <WeeklyBoard label="今週" month={weekData.month} range={weekData.range} days={weekData.days} />
-        ) : (
-          <WeeklyBoard label="今週" />
-        )
-      }
-    </div>
-    <div class="reveal wb-next">
-      {
-        nextWeekData ? (
-          <WeeklyBoard label="来週" month={nextWeekData.month} range={nextWeekData.range} days={nextWeekData.days} />
-        ) : (
-          <WeeklyBoard label="来週" />
-        )
-      }
+    <div class="sched-grid reveal">
+      <div class="sched-col">
+        {
+          weekData ? (
+            <WeeklyBoard label="今週" month={weekData.month} range={weekData.range} days={weekData.days} />
+          ) : (
+            <WeeklyBoard label="今週" />
+          )
+        }
+      </div>
+      <div class="sched-col">
+        {
+          nextWeekData ? (
+            <WeeklyBoard label="来週" month={nextWeekData.month} range={nextWeekData.range} days={nextWeekData.days} />
+          ) : (
+            <WeeklyBoard label="来週" />
+          )
+        }
+      </div>
     </div>
     <div class="lp-inner sched-foot">
       <p class="more-link"><a href="/schedule">スケジュールをすべて見る →</a></p>
@@ -488,7 +493,21 @@ try {
 
   .more-link { text-align: right; }
   .sched-foot { margin-top: 1.2rem; }
-  .wb-next { margin-top: 1.5rem; }
+  /* 今週・来週ボード：広い画面では横並び、狭い画面では自動で縦積み */
+  .sched-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    max-width: 1360px;
+    margin-inline: auto;
+    padding-inline: 1.1rem;
+  }
+  .sched-col {
+    flex: 1 1 500px;
+    min-width: 0;
+    display: flex;
+  }
 
   /* ===== LP（1ページ縦スクロール）のセクション土台 ===== */
   /* 各セクションはフルブリード。中身は .lp-inner で読みやすい幅に収める。
