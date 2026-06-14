@@ -15,16 +15,7 @@ export interface InfoItem {
 }
 
 export const information: InfoItem[] = [
-  {
-    date: '2026.06.14',
-    category: 'info',
-    title: '公式サイトをリニューアルしました！',
-    url: '#top',
-  },
-  {
-    date: '2026.06.14',
-    category: 'stream',
-    title: '今週・来週の配信スケジュールを公開中',
-    url: '/schedule',
-  },
+  // お知らせは未掲載。0件のときトップのINFORMATIONセクションは非表示、/news は「まだありません」。
+  // 下の形式で追加すると、トップのお知らせカードと /news に反映される（新しい順に上から）。
+  // { date: '2026.06.20', category: 'info', title: 'タイトル', url: 'https://example.com/...' },
 ];

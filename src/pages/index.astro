@@ -12,7 +12,7 @@ import type { LiveStatus, Video } from '../lib/youtube';
 import type { StreamEvent } from '../lib/ics';
 import { buildWeek } from '../lib/weekly';
 import { externalAttrs } from '../lib/links';
-import { profile } from '../config/profile';
+import { intro, profile } from '../config/profile';
 import { information } from '../config/information';
 import { featuredLabels } from '../config/featured';
 import keyVisual from '../assets/IMG_5833.png'; // 横長キービジュアル（グレー背景）
@@ -118,7 +118,7 @@ const featured = latestTop.slice(0, 3);
     </div>
   </section>
 
-  {/* ===== PROFILE：一番の売り。誰が・何をしている人かを伝える（項目は仮・要差し替え） ===== */}
+  {/* ===== PROFILE：一番の売り。誰が・何をしている人かを伝える（内容は src/config/profile.ts） ===== */}
   <section class="lp-section" id="profile">
     <div class="lp-inner welcome reveal">
       <div class="welcome__art">
@@ -132,14 +132,11 @@ const featured = latestTop.slice(0, 3);
       </div>
       <div class="welcome__body">
         <p class="section-kicker">PROFILE</p>
-        <h2 class="welcome__catch">{profile.catchLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</h2>
-        <p class="welcome__catch-en">{profile.catchEn}</p>
+        <h2 class="welcome__catch">{intro.catchLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</h2>
+        <p class="welcome__catch-en">{intro.catchEn}</p>
         <span class="welcome__rule" aria-hidden="true"></span>
         <div class="welcome__story">
-          <p>カフェ＆バー「Bar Bluebell」の店長をしている、個人勢VTuberの<strong>和香松 庵</strong>です。</p>
-          <p>雑談とゲームを肴に、夜のひとときをゆるりとお届け。気が向けば、歌うことも。</p>
-          <p>「ただいま」も「はじめまして」も大歓迎。グラス片手に、肩の力を抜いて過ごせる隠れ家を目指しています。</p>
-          <p>今日あった他愛もない話も、好きなものの早口も。あなたの夜に、そっと寄り添えたら嬉しいです。</p>
+          {intro.story.map((para) => (<p>{para}</p>))}
         </div>
         <dl class="profile-list">
           {profile.rows.map((row) => (
