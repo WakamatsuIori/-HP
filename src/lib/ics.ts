@@ -13,6 +13,8 @@ export interface StreamEvent {
   description: string;
   start: Date;
   end: Date | null;
+  /** 終日予定（時間指定なし）。Discord連携の「休業」登録などで使う */
+  allDay?: boolean;
 }
 
 function isVEvent(c: CalendarComponent): c is VEvent {
@@ -30,6 +32,8 @@ function toStreamEvent(ev: VEvent, start: Date, end: Date | null): StreamEvent {
     description: typeof ev.description === 'string' ? ev.description : '',
     start,
     end,
+    // node-ical は VALUE=DATE（終日）の開始日に dateOnly=true を立てる
+    allDay: (start as unknown as { dateOnly?: boolean }).dateOnly === true,
   };
 }
 

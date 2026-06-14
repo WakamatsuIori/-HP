@@ -9,6 +9,12 @@ const keyFmt = new Intl.DateTimeFormat('sv-SE', { timeZone: JST, dateStyle: 'sho
 const timeFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: JST, hour: '2-digit', minute: '2-digit', hour12: false });
 const JA = ['日', '月', '火', '水', '木', '金', '土'];
 
+/**
+ * 「おすすめ枠」の目印。Discordで おすすめ=はい にすると予定の説明欄にこの文字列が入り、
+ * 週間ボードで金色強調＋◆になる。functions/discord/interactions.ts の FEATURED_MARK と一致させること。
+ */
+export const FEATURED_MARK = '#おすすめ';
+
 function jstKey(d: Date): string {
   return keyFmt.format(d);
 }
@@ -49,11 +55,13 @@ export function buildWeek(events: StreamEvent[], now: Date = new Date(), weekOff
     const dd = new Date(monday);
     dd.setUTCDate(monday.getUTCDate() + i);
     const ev = (byDay.get(jstKey(dd)) ?? []).sort((a, b) => a.start.getTime() - b.start.getTime())[0];
+    const off = !ev || ev.allDay === true; // 予定なし or 終日（休業）登録は休業扱い
     days.push({
       ja: JA[dd.getUTCDay()],
       date: `${dd.getUTCMonth() + 1}/${dd.getUTCDate()}`,
-      time: ev ? timeFmt.format(ev.start) : '',
+      time: off ? '' : timeFmt.format(ev.start),
       title: ev ? ev.title : '本日休業',
+      featured: !off && (ev.description ?? '').includes(FEATURED_MARK),
     });
   }
 
