@@ -20,7 +20,7 @@ import { FEATURED_MARK } from '../../src/lib/featured';
 interface Env {
   DISCORD_PUBLIC_KEY: string;
   DISCORD_APP_ID: string;
-  /** 実行を許可するDiscordユーザーID（カンマ区切り）。空なら誰でも可＝非推奨 */
+  /** 実行を許可するDiscordユーザーID（カンマ区切り）。未設定/空なら全員拒否（fail-closed）。オーナー自身のIDを入れる。 */
   DISCORD_ALLOWED_USER_IDS?: string;
   GOOGLE_SA_EMAIL: string;
   GOOGLE_SA_PRIVATE_KEY: string;
@@ -94,13 +94,14 @@ export async function onRequestPost(ctx: {
     // コマンド本体が無いペイロードは不正として弾く（想定外の入力への防御）
     if (!body.data?.name) return reply('不明なコマンドです。');
 
-    // 実行できる人を本人のDiscordユーザーIDに限定（書き込みの第一ガード）
+    // 実行できる人をオーナー本人のDiscordユーザーIDに限定（書き込みの第一ガード）。
+    // 許可リストが未設定/空なら全員拒否（fail-closed）。事故防止のため明示的に許可した人だけ通す。
     const userId = body.member?.user?.id ?? body.user?.id;
     const allow = (env.DISCORD_ALLOWED_USER_IDS ?? '')
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
-    if (allow.length && !allow.includes(userId)) {
+    if (!allow.length || !userId || !allow.includes(userId)) {
       return reply('⚠️ このコマンドを使う権限がありません。');
     }
 
