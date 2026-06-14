@@ -24,6 +24,9 @@ interface Env {
   GOOGLE_SA_EMAIL: string;
   GOOGLE_SA_PRIVATE_KEY: string;
   GOOGLE_CALENDAR_ID: string;
+  /** /ポスター 用：GitHub Actions を起動するためのトークンと対象リポジトリ（owner/repo） */
+  GITHUB_DISPATCH_TOKEN?: string;
+  GITHUB_REPO?: string;
   /** 任意：1日の書き込み上限ガード用（KVをバインドしたときだけ有効） */
   SCHED_KV?: { get(k: string): Promise<string | null>; put(k: string, v: string, o?: { expirationTtl?: number }): Promise<void> };
 }
@@ -95,6 +98,13 @@ export async function onRequestPost(ctx: {
       return json({ type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data: { flags: EPHEMERAL } });
     }
 
+    if (body.data?.name === 'ポスター') {
+      const opts = optMap(body.data.options);
+      const week = opts['週'] === '来週' ? '来週' : '今週';
+      ctx.waitUntil(handlePoster(env, body, week));
+      return json({ type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data: { flags: EPHEMERAL } });
+    }
+
     return reply('不明なコマンドです。');
   }
 
@@ -143,5 +153,36 @@ async function handleSchedule(
     await edit(`✅ ${kind}を登録しました：\n**${when.label}　${title}**${star}\nHPの週間ボードには次回更新（最大15分）で反映されます。`);
   } catch (e) {
     await edit(`⚠️ 登録に失敗しました：${e instanceof Error ? e.message : String(e)}`);
+  }
+}
+
+/** /ポスター：GitHub Actions(repository_dispatch)を起動して画像生成を依頼する */
+async function handlePoster(env: Env, interaction: { token: string }, week: string): Promise<void> {
+  const followup = `https://discord.com/api/v10/webhooks/${env.DISCORD_APP_ID}/${interaction.token}/messages/@original`;
+  const edit = (content: string) =>
+    fetch(followup, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content }) });
+
+  if (!env.GITHUB_DISPATCH_TOKEN || !env.GITHUB_REPO) {
+    await edit('⚠️ ポスター生成の設定（GitHubトークン）が未完了です。手順書 08 を確認してください。');
+    return;
+  }
+  try {
+    const res = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/dispatches`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${env.GITHUB_DISPATCH_TOKEN}`,
+        accept: 'application/vnd.github+json',
+        'user-agent': 'wakamatsu-hp-bot',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ event_type: 'make-poster', client_payload: { week } }),
+    });
+    if (!res.ok) {
+      await edit(`⚠️ 生成の起動に失敗しました：${res.status} ${await res.text()}`);
+      return;
+    }
+    await edit(`🛠️ ${week}のポスター生成を開始しました。1〜2分でこのサーバーに画像が投稿されます。`);
+  } catch (e) {
+    await edit(`⚠️ 生成の起動に失敗しました：${e instanceof Error ? e.message : String(e)}`);
   }
 }

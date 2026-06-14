@@ -1,0 +1,72 @@
+# 週間予定ポスター（Full HD画像）を生成してDiscordへ投稿する。
+# トリガー3種:
+#   1) schedule       … 毎週日曜18:00 JST（=日曜09:00 UTC）。来週ぶんを自動生成。
+#   2) workflow_dispatch … GitHubの画面から手動実行（今週/来週を選べる・追加設定不要）。
+#   3) repository_dispatch(make-poster) … Discordの /ポスター から起動（client_payload.week）。
+name: weekly-poster
+
+on:
+  schedule:
+    - cron: '0 9 * * 0' # 日曜 09:00 UTC = 日曜 18:00 JST
+  workflow_dispatch:
+    inputs:
+      week:
+        description: '対象の週'
+        required: true
+        default: '来週'
+        type: choice
+        options: ['今週', '来週']
+  repository_dispatch:
+    types: [make-poster]
+
+concurrency:
+  group: weekly-poster
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  poster:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: 依存関係をインストール
+        run: npm ci
+
+      - name: 対象週(オフセット)を決定
+        id: week
+        run: |
+          case "${{ github.event_name }}" in
+            schedule) offset=1 ;;
+            workflow_dispatch) [ "${{ github.event.inputs.week }}" = "来週" ] && offset=1 || offset=0 ;;
+            repository_dispatch) [ "${{ github.event.client_payload.week }}" = "来週" ] && offset=1 || offset=0 ;;
+            *) offset=1 ;;
+          esac
+          echo "offset=$offset" >> "$GITHUB_OUTPUT"
+
+      - name: ポスターを生成してDiscordへ投稿
+        run: node scripts/make-poster.mjs
+        env:
+          ICS_URL: ${{ secrets.ICS_URL }}
+          DISCORD_POSTER_WEBHOOK_URL: ${{ secrets.DISCORD_POSTER_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          POSTER_WEEK_OFFSET: ${{ steps.week.outputs.offset }}
+          CHROME_BIN: google-chrome
+
+      - name: 失敗をDiscordへ通知
+        if: failure()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+            jq -n --arg c "⚠️ 週間ポスターの生成に失敗しました。詳細: ${run_url}" '{content:$c}' \
+              | curl -sS -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK_URL"
+          fi

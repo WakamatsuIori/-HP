@@ -33,6 +33,23 @@ const commands = [
       { name: 'おすすめ', description: '週間ボードで金色強調＋◆を付ける', type: 5, required: false }, // BOOLEAN
     ],
   },
+  {
+    name: 'ポスター',
+    description: '週間予定ポスター（画像）を生成してこのサーバーに投稿します',
+    type: 1, // CHAT_INPUT
+    options: [
+      {
+        name: '週',
+        description: 'どの週のポスターを作るか（省略時は今週）',
+        type: 3, // STRING
+        required: false,
+        choices: [
+          { name: '今週', value: '今週' },
+          { name: '来週', value: '来週' },
+        ],
+      },
+    ],
+  },
 ];
 
 const url = GUILD
