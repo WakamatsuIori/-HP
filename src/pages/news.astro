@@ -1,0 +1,75 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config/site';
+import { information } from '../config/information';
+---
+
+<Base title="お知らせ" description={`${site.name}のお知らせ・活動報告の一覧。`}>
+  <h1>お知らせ</h1>
+  {
+    information.length === 0 ? (
+      <p class="placeholder-note">お知らせはまだありません。</p>
+    ) : (
+      <ul class="news-list">
+        {information.map((item) => (
+          <li class="news-item">
+            <a
+              href={item.url}
+              {...(item.url.startsWith('http') ? { rel: 'noopener', target: '_blank' } : {})}
+            >
+              <span class="news-meta">
+                <time>{item.date}</time>
+                <span class="news-cat">{item.category}</span>
+              </span>
+              <span class="news-title">{item.title}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</Base>
+
+<style>
+  .news-list {
+    list-style: none;
+    margin: 1.6rem 0 0;
+    padding: 0;
+  }
+  .news-item {
+    border-top: 1px solid var(--line);
+  }
+  .news-item:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .news-item a {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1.2rem;
+    padding: 1rem 0.25rem;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .news-item a:hover .news-title {
+    color: var(--accent-strong);
+  }
+  .news-meta {
+    display: flex;
+    gap: 0.85rem;
+    align-items: center;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .news-cat {
+    color: var(--accent-strong);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+  }
+  .news-title {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+</style>
