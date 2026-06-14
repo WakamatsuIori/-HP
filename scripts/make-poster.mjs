@@ -48,9 +48,17 @@ const scheduleData = week.days.map((d) => ({
   title: d.title,
   featured: !!d.featured,
 }));
+// 撮影時だけキャンバスを1920×1080いっぱいに広げる（テンプレ本体の見た目は変えない）。
+// テンプレは画面表示用に width:min(1280px,96vw) で上限があるため、FHD撮影では全画面化する。
+const FIT_FHD = `<style id="poster-fit">
+  html,body{margin:0!important;padding:0!important;overflow:hidden!important;background:#15100c}
+  .canvas{width:1920px!important;height:1080px!important;max-width:none!important;
+    aspect-ratio:auto!important;border-radius:0!important;box-shadow:none!important}
+</style></head>`;
 const injected = tpl
   .replace(/const WEEK = \{[^}]*\};/, `const WEEK = ${JSON.stringify({ month: week.month, range: week.range })};`)
-  .replace(/const schedule = \[[\s\S]*?\];/, `const schedule = ${JSON.stringify(scheduleData)};`);
+  .replace(/const schedule = \[[\s\S]*?\];/, `const schedule = ${JSON.stringify(scheduleData)};`)
+  .replace('</head>', FIT_FHD);
 
 const htmlPath = join(tmpdir(), 'poster.html');
 await writeFile(htmlPath, injected, 'utf8');
