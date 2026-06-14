@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "astro": "^6.4.6",
-    "node-ical": "^0.26.1"
+    "node-ical": "^0.26.1",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "typescript": "^6.0.3",
