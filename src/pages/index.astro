@@ -16,7 +16,8 @@ import { intro, profile } from '../config/profile';
 import { information } from '../config/information';
 import { featuredLabels } from '../config/featured';
 import keyVisual from '../assets/IMG_5833.png'; // 横長キービジュアル（グレー背景）
-import heroArt from '../assets/Wakamatsu_full_size.png'; // 立ち絵（ABOUTで使用）
+import heroArt from '../assets/Wakamatsu_full_size.png'; // 立ち絵（PROFILEで使用）
+import barArt from '../assets/wakamatsusan_.png'; // トレイ＆カクテルの立ち絵（ABOUTで使用）
 
 // レイアウト確認用の仮予定（dev かつ実データが空のときだけ表示。本番=実データのみで安全）。
 function buildSampleEvents(): StreamEvent[] {
@@ -120,20 +121,31 @@ const featured = latestTop.slice(0, 3);
 
   {/* ===== PROFILE：プロフィール項目（表）＋ごあいさつ（テキスト左＋立ち絵右） ===== */}
   <section class="lp-section" id="profile">
-    {/* プロフィール項目（表・立ち絵なし） */}
-    <div class="lp-inner profile-block reveal">
-      <p class="section-kicker">PROFILE</p>
-      <dl class="profile-list">
-        {profile.rows.map((row) => (
-          <div class="profile-row"><dt>{row.label}</dt><dd>{row.value}</dd></div>
-        ))}
-      </dl>
-      <ul class="chips">
-        {profile.chips.map((chip) => (<li>{chip}</li>))}
-      </ul>
-      <div class="welcome__cta">
-        <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">チャンネル登録</a>
-        <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">Xをフォロー</a>
+    {/* プロフィール項目（立ち絵左＋表右） */}
+    <div class="profile reveal">
+      <div class="profile__art">
+        <Image
+          src={heroArt}
+          widths={[480, 720, 960, 1320]}
+          sizes="(min-width: 900px) 660px, 82vw"
+          alt={`${site.name}の立ち絵`}
+          loading="lazy"
+        />
+      </div>
+      <div class="profile__body">
+        <p class="section-kicker">PROFILE</p>
+        <dl class="profile-list">
+          {profile.rows.map((row) => (
+            <div class="profile-row"><dt>{row.label}</dt><dd>{row.value}</dd></div>
+          ))}
+        </dl>
+        <ul class="chips">
+          {profile.chips.map((chip) => (<li>{chip}</li>))}
+        </ul>
+        <div class="welcome__cta">
+          <a class="btn btn-gold sm" href={site.links.youtube} rel="me noopener" target="_blank">チャンネル登録</a>
+          <a class="btn btn-ghost-dark sm" href={site.links.x} rel="me noopener" target="_blank">Xをフォロー</a>
+        </div>
       </div>
     </div>
 
@@ -149,10 +161,10 @@ const featured = latestTop.slice(0, 3);
       </div>
       <div class="about__art">
         <Image
-          src={heroArt}
+          src={barArt}
           widths={[480, 720, 960, 1320]}
-          sizes="(min-width: 900px) 420px, 78vw"
-          alt={`${site.name}の立ち絵`}
+          sizes="(min-width: 900px) 500px, 86vw"
+          alt={`${site.name}の立ち絵（カクテルをお届け）`}
           loading="lazy"
         />
       </div>
@@ -542,9 +554,33 @@ const featured = latestTop.slice(0, 3);
     display: flex;
   }
 
-  /* ===== プロフィール項目ブロック（立ち絵なし・中央寄せ） ===== */
-  .profile-block { text-align: center; }
-  .profile-block .profile-list { max-width: 30rem; margin-inline: auto; }
+  /* ===== プロフィール項目（立ち絵左＋表右・元のサイズに復元） ===== */
+  .profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding-inline: 1.25rem;
+    text-align: center;
+  }
+  .profile__art { width: min(80%, 400px); }
+  .profile__art :global(img) { width: 100%; height: auto; }
+  .profile__body { width: 100%; max-width: 34rem; }
+  .profile .profile-list { margin-inline: auto; }
+
+  @media (min-width: 900px) {
+    .profile {
+      flex-direction: row;
+      align-items: flex-start;
+      text-align: left;
+      gap: var(--pf-gap);
+      max-width: var(--pf-max);
+      margin-inline: auto;
+    }
+    .profile__art { flex-shrink: 0; width: min(48%, var(--pf-art)); }
+    .profile__body { flex: 1 1 0; min-width: 0; max-width: none; margin-top: var(--pf-drop); }
+    .profile .chips, .profile .welcome__cta { justify-content: flex-start; }
+  }
 
   /* ===== ごあいさつ（ABOUT）：テキスト左＋立ち絵右（参考サイト風） ===== */
   .about {
@@ -556,8 +592,14 @@ const featured = latestTop.slice(0, 3);
     padding-inline: 1.25rem;
     text-align: center;
   }
-  .about__art { width: min(78%, 320px); }
-  .about__art :global(img) { width: 100%; height: auto; }
+  .about__art { width: min(86%, 400px); }
+  /* 足元をぼかして（下を透過グラデでフェード）大きく見せる */
+  .about__art :global(img) {
+    width: 100%;
+    height: auto;
+    -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+  }
   /* キャッチコピー（金で強調・グローバルh2の下線/金タブ/上マージンを打ち消す） */
   .about__catch {
     margin: 0 0 0.4rem;
@@ -604,7 +646,7 @@ const featured = latestTop.slice(0, 3);
       margin-inline: auto;
     }
     .about__body { flex: 1 1 0; min-width: 0; }
-    .about__art { flex-shrink: 0; width: min(42%, 360px); }
+    .about__art { flex-shrink: 0; width: min(50%, 500px); }
     .about__rule { margin-left: 0; margin-right: auto; }
     .about__story { max-width: none; }
   }
