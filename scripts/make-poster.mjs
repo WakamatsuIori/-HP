@@ -18,6 +18,7 @@ import { join } from 'node:path';
 import sharp from 'sharp';
 import { parseIcsEvents } from '../src/lib/ics.ts';
 import { buildWeek } from '../src/lib/weekly.ts';
+import { injectPosterData } from './poster/inject.mjs';
 
 const exec = promisify(execFile);
 
@@ -55,10 +56,11 @@ const FIT_FHD = `<style id="poster-fit">
   .canvas{width:1920px!important;height:1080px!important;max-width:none!important;
     aspect-ratio:auto!important;border-radius:0!important;box-shadow:none!important}
 </style></head>`;
-const injected = tpl
-  .replace(/const WEEK = \{[^}]*\};/, `const WEEK = ${JSON.stringify({ month: week.month, range: week.range })};`)
-  .replace(/const schedule = \[[\s\S]*?\];/, `const schedule = ${JSON.stringify(scheduleData)};`)
-  .replace('</head>', FIT_FHD);
+const injected = injectPosterData(
+  tpl,
+  { month: week.month, range: week.range, schedule: scheduleData },
+  FIT_FHD,
+);
 
 const htmlPath = join(tmpdir(), 'poster.html');
 await writeFile(htmlPath, injected, 'utf8');
