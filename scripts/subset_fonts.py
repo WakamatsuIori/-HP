@@ -47,6 +47,16 @@ CINZEL_OUT_FILE = os.path.join(OUT_DIR, "cinzel-500.subset.woff2")
 CINZEL_OFL_OUT = os.path.join(OUT_DIR, "Cinzel-OFL.txt")
 CINZEL_WEIGHT = 500
 
+# --- 和文見出し候補 しっぽり明朝（Medium。耽美寄りの明朝。Zen Old Mincho と見比べる用） ---
+SHIPPORI_SRC = os.path.normpath(
+    os.path.join(REPO_ROOT, "..", "fonts", "shipporimincho", "ShipporiMincho-Medium.ttf")
+)
+SHIPPORI_OFL_SRC = os.path.normpath(
+    os.path.join(REPO_ROOT, "..", "fonts", "shipporimincho", "OFL.txt")
+)
+SHIPPORI_OUT_FILE = os.path.join(OUT_DIR, "shippori-mincho-medium.subset.woff2")
+SHIPPORI_OFL_OUT = os.path.join(OUT_DIR, "ShipporiMincho-OFL.txt")
+
 # --- 収録する文字 ---------------------------------------------------------
 # サイトで明朝表示される全テキスト（ブランド名＋各ページの見出し h1/h2/h3）。
 # 新しい見出しを足したらここに追記して再実行する。
@@ -146,10 +156,24 @@ def build_cinzel() -> None:
         print(f"  ⚠ OFL が見つかりません（手動で同梱してください）: {CINZEL_OFL_SRC}")
 
 
+def build_shippori() -> None:
+    """和文見出し候補の しっぽり明朝 Medium を、使う文字だけに絞って出力。"""
+    if not os.path.exists(SHIPPORI_SRC):
+        raise SystemExit(f"しっぽり明朝 元フォントが見つかりません: {SHIPPORI_SRC}")
+    font = TTFont(SHIPPORI_SRC)
+    _subset_and_save(font, build_unicodes(), SHIPPORI_OUT_FILE, SHIPPORI_SRC)
+    if os.path.exists(SHIPPORI_OFL_SRC):
+        shutil.copyfile(SHIPPORI_OFL_SRC, SHIPPORI_OFL_OUT)
+        print(f"  ライセンス: {SHIPPORI_OFL_OUT}")
+    else:
+        print(f"  ⚠ OFL が見つかりません（手動で同梱してください）: {SHIPPORI_OFL_SRC}")
+
+
 def main() -> None:
     os.makedirs(OUT_DIR, exist_ok=True)
     build_zen()
     build_cinzel()
+    build_shippori()
 
 
 if __name__ == "__main__":
