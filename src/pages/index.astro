@@ -89,6 +89,8 @@ const featured = latestTop.slice(0, 3);
       <span class="spark"></span>
       <span class="spark"></span>
     </div>
+    {/* 掛軸風の縦書きアクセント（装飾・デスクトップのみ。読み上げは主見出しがあるので除外） */}
+    <p class="hero2__vertical" aria-hidden="true">和香松庵</p>
     <div class="hero2__content">
       <div class="hero2__text">
         <p class="kicker">個人勢VTuber ・ Cafe &amp; Bar</p>
@@ -452,6 +454,25 @@ const featured = latestTop.slice(0, 3);
     padding: clamp(2rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 4rem);
   }
   .hero2__text { max-width: 46rem; }
+  /* 掛軸風の縦書きアクセント（広い画面のみ・左の余白に控えめに） */
+  .hero2__vertical { display: none; }
+  @media (min-width: 1000px) {
+    .hero2__vertical {
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: clamp(0.6rem, 2vw, 1.8rem);
+      transform: translateY(-50%);
+      z-index: 2;
+      margin: 0;
+      writing-mode: vertical-rl;
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      letter-spacing: 0.5em;
+      color: rgba(58, 53, 45, 0.34);
+      text-shadow: 0 1px 10px rgba(250, 249, 246, 0.85);
+    }
+  }
   .kicker {
     margin: 0 0 1rem;
     font-size: 0.86rem;
@@ -700,6 +721,7 @@ const featured = latestTop.slice(0, 3);
     -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
     mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
   }
+
   /* キャッチコピー（金で強調・グローバルh2の下線/金タブ/上マージンを打ち消す） */
   .about__catch {
     margin: 0 0 0.4rem;
@@ -726,6 +748,16 @@ const featured = latestTop.slice(0, 3);
     height: 2px;
     margin: 0 auto 1.3rem;
     background: var(--accent);
+  }
+  /* 罫線ドロー：ABOUTが現れる時、金の罫が中央から左右へ伸びる（JS有効時のみ） */
+  :global(html.js) .about.reveal .about__rule {
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s;
+  }
+  :global(html.js) .about.reveal.is-visible .about__rule { transform: scaleX(1); }
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js) .about.reveal .about__rule { transform: none; transition: none; }
   }
   .about__story { text-align: left; max-width: 34rem; }
   .about__story p {
@@ -1057,7 +1089,7 @@ const featured = latestTop.slice(0, 3);
   .lp-section--tint {
     position: relative;
     overflow: clip;
-    background: #f3f0e7;
+    background-color: #f3f0e7;
   }
   .lp-section--tint::before {
     content: '';
@@ -1106,7 +1138,7 @@ const featured = latestTop.slice(0, 3);
     font-weight: 500;
     letter-spacing: 0.1em;
     line-height: 1;
-    color: rgba(156, 143, 107, 0.38); /* 薄い金のウォーターマーク */
+    color: rgba(156, 143, 107, 0.55); /* 単色の金ウォーターマーク（可読性優先・箔グラデは廃止） */
   }
 
   .sec-lead { text-align: center; margin: 0 auto 0.9rem; max-width: 34rem; line-height: 1.7; }
@@ -1140,6 +1172,26 @@ const featured = latestTop.slice(0, 3);
 
   /* ===== ヒーローの金のきらめき（控えめ・reduced-motionでは消灯） ===== */
   .hero2__sparkles { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  /* マウストレイル（金の軌跡）の粒。JSでヒーロー内に生成するため :global で当てる
+     （Astroのスコープ付きCSSは動的生成要素にマッチしない）。アニメ後に自己削除。 */
+  :global(.trail-spark) {
+    position: absolute;
+    z-index: 2; /* テキスト面と同層まで上げて確実に見える */
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(232, 207, 149, 0.98), rgba(201, 168, 105, 0.55) 38%, rgba(201, 168, 105, 0) 72%);
+    filter: drop-shadow(0 0 5px rgba(201, 168, 105, 0.7));
+    transform: translate(-50%, -50%);
+  }
+  /* リンクパネル：ホバーでふわっと浮くだけ（傾けすぎない・上品な浮き） */
+  .goods-banner, .sns-banner { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+  .goods-banner:hover, .sns-banner:hover { transform: translateY(-6px); box-shadow: 0 22px 52px rgba(0, 0, 0, 0.26); }
+  @media (prefers-reduced-motion: reduce) {
+    .goods-banner, .sns-banner { transition: none; }
+    .goods-banner:hover, .sns-banner:hover { transform: none; }
+  }
   .spark {
     position: absolute;
     width: 6px;
@@ -1212,7 +1264,7 @@ const featured = latestTop.slice(0, 3);
 
   // 無限アニメ（Ken Burns・灯りボケ・スパークル）は画面内のときだけ動かす。
   // 画面外では一時停止＝モバイルのバッテリー/CPU/INP配慮、WCAG 2.2.2（動きの停止）。
-  const animEls = document.querySelectorAll<HTMLElement>('.hero2, .lp-section--tint');
+  const animEls = document.querySelectorAll<HTMLElement>('.hero2, .lp-section--tint, .foot-brand');
   if (animEls.length && 'IntersectionObserver' in window) {
     const animIo = new IntersectionObserver(
       (entries) => {
@@ -1221,5 +1273,36 @@ const featured = latestTop.slice(0, 3);
       { rootMargin: '0px 0px 100px 0px' },
     );
     animEls.forEach((el) => animIo.observe(el));
+  }
+
+  // マウス追従系（精密ポインタ＝マウス/トラックパッドがある時のみ・動きが苦手な設定では無効）。
+  // any-* を使うとタッチ対応ノートPCでもマウスがあれば有効になる（hover/pointer だと主ポインタ依存で誤判定）。
+  const finePointer = matchMedia('(any-hover: hover) and (any-pointer: fine)').matches;
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (finePointer && !reduceMotion) {
+    // I. 金の軌跡：ヒーロー上でカーソルに金の粒が尾を引く
+    const hero = document.querySelector<HTMLElement>('.hero2');
+    if (hero) {
+      let lastTrail = 0;
+      hero.addEventListener('pointermove', (e) => {
+        const now = performance.now();
+        if (now - lastTrail < 22) return; // 間引き（負荷対策）
+        lastTrail = now;
+        const r = hero.getBoundingClientRect();
+        const p = document.createElement('span');
+        p.className = 'trail-spark';
+        p.style.left = `${e.clientX - r.left}px`;
+        p.style.top = `${e.clientY - r.top}px`;
+        hero.appendChild(p);
+        p.animate(
+          [
+            { opacity: 0.8, transform: 'translate(-50%, -50%) scale(1)' },
+            { opacity: 0, transform: 'translate(-50%, -50%) scale(0.2) translateY(14px)' },
+          ],
+          { duration: 750, easing: 'ease-out' },
+        ).onfinish = () => p.remove();
+      });
+    }
+    // （リンクパネルの“浮き”はCSSの :hover で実装。傾きすぎ回避のためJSティルトは廃止）
   }
 </script>

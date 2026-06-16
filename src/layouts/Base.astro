@@ -56,6 +56,17 @@ const nav = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="theme-color" content="#1b110a" />
+    <script is:inline>
+      // 初回訪問のみ紋章スプラッシュを表示（同一セッションの2回目以降は出さない）。
+      // FOUC防止のため head 先頭で判定し、既訪問なら描画前に隠す。
+      if (sessionStorage.getItem('iori-seen')) {
+        document.documentElement.classList.add('no-splash');
+      } else {
+        sessionStorage.setItem('iori-seen', '1');
+        // 立ち絵を主役にするので、読み込み後さらに少し溜めてからフェードアウト（一瞬で消えない）。
+        addEventListener('load', () => setTimeout(() => document.getElementById('splash')?.classList.add('done'), 1000));
+      }
+    </script>
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
@@ -80,10 +91,11 @@ const nav = [
     <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
     <script type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
 
-    {/* 見出し・ロゴ用の明朝（サブセット済み・全ページのヘッダーで使うため先読み） */}
+    {/* 見出し・ロゴ用の明朝（サブセット済み・全ページのヘッダーで使うため先読み）。
+        現在の見出しは しっぽり明朝。Zen Old Mincho はフォールバックとして @font-face のみ保持。 */}
     <link
       rel="preload"
-      href="/fonts/zen-old-mincho-medium.subset.woff2"
+      href="/fonts/shippori-mincho-medium.subset.woff2"
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
@@ -98,6 +110,11 @@ const nav = [
     />
   </head>
   <body>
+    {/* 初回のみのスプラッシュ：黒地に屋号だけのタイトルカード。判定スクリプトは head 先頭。 */}
+    <div id="splash" aria-hidden="true">
+      <p class="splash__name">{site.name}</p>
+      <p class="splash__en">WAKAMATSU IORI</p>
+    </div>
     <header class="site-header">
       <a class="brand" href="/">{site.name}</a>
       <nav aria-label="メインメニュー">
@@ -156,6 +173,15 @@ const nav = [
 <style is:global>
   /* 見出し・ロゴ専用の明朝（使う文字だけのサブセット woff2・約50KB）。
      本文はシステムフォントのまま＝軽量維持。再生成は scripts/subset_fonts.py。 */
+  /* 現在の見出し＝しっぽり明朝（耽美寄りの明朝・サブセット約43KB） */
+  @font-face {
+    font-family: 'Shippori Mincho';
+    src: url('/fonts/shippori-mincho-medium.subset.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  /* フォールバック兼・見比べ用に Zen Old Mincho も保持（--font-serif の2番手。未参照なら読み込まれない） */
   @font-face {
     font-family: 'Zen Old Mincho';
     src: url('/fonts/zen-old-mincho-medium.subset.woff2') format('woff2');
@@ -180,11 +206,55 @@ const nav = [
     --accent-strong: #6f6444; /* 濃い金：本文リンク等の小さい文字用（白背景でAAコントラスト確保） */
     --line: #e7e3d9;
     --card: #ffffff;
-    --font-serif: 'Zen Old Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+    --font-serif: 'Shippori Mincho', 'Zen Old Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
     --font-logo: 'Cinzel', var(--font-serif); /* 欧文ロゴ・英字ディスプレイ用（未読込時は明朝へ） */
   }
   * { box-sizing: border-box; }
   html { color-scheme: light; overflow-x: clip; } /* 100vwのフルブリードで横スクロールを出さない（縦は保持） */
+
+  /* ===== 初回のみ スプラッシュ（屋号だけのタイトルカード） ===== */
+  #splash {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    background: radial-gradient(120% 100% at 50% 35%, #2a2118, #120c07 72%);
+    z-index: 9999;
+  }
+  .splash__name {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(2.2rem, 8vw, 3.4rem);
+    letter-spacing: 0.3em;
+    color: #e8cf95;
+    animation: splashRise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .splash__en {
+    margin: 0;
+    font-family: var(--font-logo);
+    font-size: clamp(0.72rem, 2.5vw, 0.92rem);
+    letter-spacing: 0.42em;
+    color: rgba(232, 207, 149, 0.6);
+    animation: splashFade 0.9s ease 0.3s both;
+  }
+  #splash.done {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease, visibility 0s 0.8s;
+  }
+  .no-splash #splash { display: none; }
+  @keyframes splashRise {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes splashFade { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .splash__name, .splash__en { animation: none; }
+    #splash.done { transition: none; }
+  }
   /* LPの画面内アンカー移動をなめらかに（動きが苦手な設定の人には無効） */
   @media (prefers-reduced-motion: no-preference) {
     html { scroll-behavior: smooth; }
@@ -348,11 +418,29 @@ const nav = [
   .foot-diamond:hover span { color: #fffdf8; }
 
   .foot-brand {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.2rem;
     margin: 0 0 1.4rem;
+  }
+  /* 行灯グロー：ブランド背後に暖色の柔らかい灯り。常時は静止、画面内のときだけゆっくり明滅 */
+  .foot-brand::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: 230px;
+    height: 130px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at center, rgba(216, 170, 92, 0.20), rgba(216, 170, 92, 0) 70%);
+    z-index: -1;
+    pointer-events: none;
+  }
+  @keyframes andonGlow { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: no-preference) {
+    .foot-brand.in-view::before { animation: andonGlow 5.5s ease-in-out infinite; }
   }
   .foot-brand__name {
     font-family: var(--font-serif);
