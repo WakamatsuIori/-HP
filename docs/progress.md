@@ -30,12 +30,14 @@
 - **手順書**: `docs/setup/05-youtube-api.md`(APIキー+チャンネルID) / `06-booth-feed.md`(フィードURL)
 - 設計判断(レビュー反映): 再生リスト取得は `Promise.allSettled`（1リスト失敗で全体を巻き込まない）/ ライブ判定取得失敗は非ライブ扱いで継続 / dev中もキャッシュ（クォータ・BOOTH制限対策）。**中核データ（uploads最新動画・設定欠落）失敗はビルド失敗を維持**（§4）。
 
-**本番反映に必要（残りはこれだけ）**:
-1. ✅ `src/config/site.ts` に実値設定済み（youtubeChannelId=UC_7ehPcs0J67P-5k-qJmjmA / boothFeedUrl=https://wakamatsu-iori.booth.pm/items.rss）
-2. ⏳ `YOUTUBE_API_KEY` を ローカル`.env`（ローカル確認用）と GitHub Secret（本番用）に設定（ユーザー作業）
-3. その後 `npm run build`/`dev` で /videos / を実データ確認 → 問題なければ commit & push（push=自動デプロイ）
-
-**確認済み（資格情報なしの範囲）**: 全テンプレートがビルドでコンパイル成功／loadSchedule(Phase1)は実.icsでビルドOK／グッズはBOOTH406でもフォールバック表示でビルド継続を実証／残る失敗は /videos の YOUTUBE_API_KEY 未設定のみ。テスト33件パス。差分レビュー済み（重大なし）。
+**✅ 本番公開済み・検証済み（2026-06-13）**: commit 421280f を main にpush → GitHub Actionsビルド成功 → Cloudflare Pagesデプロイ。https://vtuber-hp.pages.dev/ で実機確認:
+- `/videos`: 実動画50件超＋公開再生リストのミラー仕分け（最新動画 / short!!✨️ / NTE / アークナイツ：エンドフィールド / 同時視聴 / 雑談配信 / 鳴潮 / SANDTRIX / エルデンリング）。サムネ(i.ytimg)・watch リンク正常
+- `/`(トップ): 最新動画 実データ表示。ライブ中バッジは非ライブ時は非表示（正常）＝**ライブ時の実表示は次回配信で要目視**
+- `/goods`: BOOTHショップへのリンクページ（クリーン、エラーなし）
+- 設定: `youtubeChannelId=UC_7ehPcs0J67P-5k-qJmjmA`／公式リンク youtube(チャンネルURL)・x=Wakamatsu_VT・booth=実ショップ。`YOUTUBE_API_KEY` は **GitHub Secretのみ**（本番用）。**ローカル`.env`にはキー無し→ローカルビルド不可・本番はOK**
+- クォータ: 1ビルド約14ユニット／無料枠1万/日に十分余裕（消費は Google Cloud のダッシュボードで随時確認可）
+- 同時に Phase 1 デザイン（明朝/OGP/トップ作り込み）の保留6コミットも公開された
+- テスト33件パス／差分レビュー済み（重大なし）
 
 **BOOTH/グッズの結論**:
 - **BOOTH RSS は提供終了【確定】**: `items.rss` は **ユーザーの実ブラウザでも HTTP 406**＝BOOTHがRSSを提供していない。外部サイト向け公式埋め込みウィジェットも無し → **「BOOTH自動掲載」は実現不可能**（構成図の前提がBOOTH仕様変更で失効）。
@@ -43,8 +45,11 @@
 - **DORMANT（現在未使用・次の判断で整理）**: `src/lib/booth.ts`(parseBoothFeed) / `loadGoods.ts` / `fetcher.ts`の`fetchTextAsBrowser` / `components/GoodsList.astro` / `tests/booth.test.ts` / `fixtures/sample-booth.rss`。→ 手動掲載なら Goods型＋GoodsList を再利用、リンクのみなら全削除。
 - **公式リンク**: `site.links.youtube`(チャンネルURL) と `booth`(実ショップ) を実値に更新済み。**`site.links.x` はプレースホルダのまま＝本人のXユーザー名が必要**。
 
-**残作業・状態**:
-- **commit/push 未実施**（YOUTUBE_API_KEY設定→実データ確認後にpush予定）。※Phase 1デザインの未pushコミットも残存。
+**残・補足**:
+- ✅ push済み（commit 421280f）。Phase 1デザインの保留6コミットも同時公開済み。
+- デザイン作業の**未コミット4ファイル**（public/og.jpg, scripts/make-og.mjs, public/IMG_5833.png, src/pages/design-preview.astro）はローカル未コミットで残存（Phase 2とは別件。`design-preview.astro` は公開可否を要判断＝現状リポジトリに無いので本番未公開）。
+- グッズは「保留＝リンクのみ」。将来 手動カード掲載なら休眠コードの Goods型＋GoodsList を再利用、リンクのみ確定なら booth.ts/loadGoods/GoodsList/booth.test/fixture を削除。
+- ライブ中バッジ・YouTube連携の**ライブ時実挙動**は、本人が次に配信したときに /（トップ）で要目視。
 
 ## Phase 2以降で実装予定（ユーザー承認済み 2026-06-13・構成図外の追加機能）
 - Discordから予定登録: `/予定 6/15 21:00 タイトル` 等のテンプレ書式/スラッシュコマンドでGoogleカレンダーに書き込む。ユーザーが「必要」と判断し実装決定。Phase 2で用意するカレンダー書き込み（サービスアカウント）に相乗りして作る。Phase 2のプランモードで正式にスコープへ入れること。代替（暫定）: Googleカレンダー公式アプリの音声入力。

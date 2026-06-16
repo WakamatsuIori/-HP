@@ -13,3 +13,6 @@ dist/
 # OS・エディタ
 Thumbs.db
 .DS_Store
+
+# ローカル確認用スクショ（撮影成果物・共有不要）
+.shots/

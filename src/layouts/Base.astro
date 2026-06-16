@@ -54,6 +54,8 @@ const nav = [
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#1b110a" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
@@ -90,7 +92,7 @@ const nav = [
   <body>
     <header class="site-header">
       <a class="brand" href="/">{site.name}</a>
-      <nav>
+      <nav aria-label="メインメニュー">
         <ul>
           {nav.map((item) => (
             <li>
@@ -156,7 +158,7 @@ const nav = [
   :root {
     --bg: #faf9f6;
     --text: #423f38;
-    --muted: #8a8474;
+    --muted: #6e6855; /* 二次テキスト：白/帯/地色いずれでもWCAG AA(4.5:1)以上を満たす濃さ */
     --accent: #9c8f6b;        /* くすみ金：見出し装飾・大きいアクセント用 */
     --accent-strong: #6f6444; /* 濃い金：本文リンク等の小さい文字用（白背景でAAコントラスト確保） */
     --line: #e7e3d9;
@@ -179,6 +181,23 @@ const nav = [
     overflow-x: clip;
   }
   a { color: var(--accent-strong); }
+
+  /* テキスト選択：既定の青ではなく、ブランドのくすみ金トーンで上品に */
+  ::selection { background: rgba(156, 143, 107, 0.28); color: var(--text); }
+
+  /* キーボード操作時のフォーカス表示（マウス操作には出ない）。
+     金の細いリングで、世界観を崩さずアクセシビリティを担保。 */
+  :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* 日本語の不自然な改行を抑える：文節区切りで改行（auto-phrase・対応ブラウザ）＋
+     孤立行/短い末行を避ける（pretty）／短い見出し・リード文は行頭末を均す（balance）。
+     未対応ブラウザは従来の折返しに無害劣化。 */
+  p, li, dd { text-wrap: pretty; word-break: auto-phrase; }
+  h1, h2, h3, .sec-lead, .guide-text, .about__catch { text-wrap: balance; word-break: auto-phrase; }
+
   main {
     max-width: 720px;
     margin: 0 auto;
@@ -235,19 +254,38 @@ const nav = [
     list-style: none;
   }
   .site-header nav a {
+    position: relative;
+    display: inline-block;
     text-decoration: none;
     color: var(--muted);
     font-size: 0.9rem;
-    padding-bottom: 2px;
-    border-bottom: 1.5px solid transparent;
-    transition: color 0.15s ease, border-color 0.15s ease;
+    padding: 0.4rem 0.15rem; /* タップ領域を確保（指で押しやすく） */
+    transition: color 0.15s ease;
   }
-  .site-header nav a:hover {
-    color: var(--text);
+  /* 金の下線が左から伸びるリビール（ホバー／現在ページ）。下線は文字幅に合わせて内側に */
+  .site-header nav a::after {
+    content: '';
+    position: absolute;
+    left: 0.15rem;
+    right: 0.15rem;
+    bottom: 0.2rem;
+    height: 1.5px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
   }
-  .site-header nav a[aria-current='page'] {
-    color: var(--text);
-    border-bottom-color: var(--accent);
+  .site-header nav a:hover { color: var(--text); }
+  .site-header nav a:hover::after,
+  .site-header nav a[aria-current='page']::after { transform: scaleX(1); }
+  .site-header nav a[aria-current='page'] { color: var(--text); }
+  @media (prefers-reduced-motion: reduce) {
+    .site-header nav a::after { transition: none; }
+  }
+  /* スマホはタップ領域を最低44px相当まで広げる（誤タップ防止・WCAG 2.5.5） */
+  @media (max-width: 640px) {
+    .site-header nav a { padding-block: 0.62rem; }
+    .site-header nav a::after { bottom: 0.42rem; }
   }
 
   .site-footer {
