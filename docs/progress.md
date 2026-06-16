@@ -1,60 +1,60 @@
 # 進捗メモ（フェーズ間の引き継ぎ用）
 
-## Phase 1（完了・本番公開 2026-06-13）
-- **公開URL: https://vtuber-hp.pages.dev/** で稼働中
-- 自動更新: GitHub Actions が15分ごと＋push時にビルド→Cloudflare Pagesへデプロイ
-- 中身: Astro雛形・IA通り8ページ骨格・.icsスケジュール連動表示（テスト16件）・立ち絵主役トップ＋次の配信カウントダウン・テイスト「シンプル上品」（オフホワイト＋くすみ金＋見出し明朝）・Discord故障通知（連続失敗で@everyone）・手順書01〜04・最終レビュー済み
-- 表示名「和香松庵」（src/config/site.ts の name）。立ち絵は仮シルエット（public/hero-silhouette.svg）。本物ができたら public に画像を置き heroImage パスを差し替え
-- リポジトリ: github.com/WakamatsuIori/-HP（Public）。Cloudflare Pagesプロジェクト名: vtuber-hp
-- 注意点:
-  - GitHub仕様: リポジトリに60日間コミットが無いと schedule 実行が自動停止（止まると故障通知も鳴らない）。対策（定期空コミット等）は未実装・要検討
-  - 独自ドメインは未取得（pages.dev の無料URLで運用中）。取得したら astro.config.mjs の site と Pages のカスタムドメイン設定を更新
-  - 秘密情報は全てGitHub Secrets（ICS_URL / DISCORD_WEBHOOK_URL / CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID）。ローカルは .env（gitignore済み）
+> 最終棚卸し: 2026-06-17。本番: **https://wakamatsu-iori.com**（Cloudflare Pages / push＋15分ごと自動デプロイ）。
+> 詳細な決定ログ（DEC-番号・リファクタPhase番号）は **`refactor-instructions.md`** と各コミットを参照。
 
-## デザイン作り込み（完了 2026-06-13・見た目専用、機能は不変）
-- 見出し・ロゴを **Zen Old Mincho のサブセット woff2**（約50KB・public/fonts/）でセルフホスト。@font-face＋preload、--font-serif 先頭に追加。本文はシステムフォント維持。再生成は `python scripts/subset_fonts.py`（見出しに新しい漢字を足したら HEADINGS に追記して再実行）。OFL.txt 同梱。
-- **OGP画像** public/og.jpg（1200×630・横長KV IMG_5834＝黒地。`node scripts/make-og.mjs` で生成、背景色は支配色から決定）＋ Base.astro head に og:/twitter:/canonical meta。※JSON-LD 等の本格SEOは Phase 3。
-- トップ立ち絵：背後に静止グロー、レスポンシブ画像(widths/sizes)でモバイル軽量、ローマ字ロゴ追加。
-- 配色：本文リンク用に `--accent-strong`（濃い金）で AA コントラスト確保。h2 に金アクセント、ナビ現在地に金下線。
-- 生成ツール(fonttools/sharp)はローカルのみ＝**npm run build / CI に新依存なし**。成果物(woff2/og.jpg)はリポジトリ同梱。
-- コミット: 4cb063b(font) / b6b29c4(ogp) / 331b5ff(hero) / 684a7dd(type) / e5c13d5(ogp背景修正)。**push 未実施**（公開は承認後）。
+## 公開・インフラ
+- 独自ドメイン **wakamatsu-iori.com** に切替済み（`astro.config.mjs` の site／robots.txt／llms.txt／sitemap.xml に反映）。旧 pages.dev も有効。
+- リポジトリ: github.com/WakamatsuIori/-HP（Public）。Cloudflare Pages プロジェクト名 `vtuber-hp`。
+- `build.yml`: push時＋15分ごと cron → `npm test` → `npm run build` → wrangler deploy。失敗時 Discord 通知（連続失敗で @everyone）。
+- `poster.yml`: 日曜18:00 JST に週間スケジュールのポスター画像を生成→Discord投稿（`scripts/make-poster.mjs` ＋ Puppeteer）。
+- Secrets（GitHub）: ICS_URL / DISCORD_WEBHOOK_URL / CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID / YOUTUBE_API_KEY / Discord・カレンダー書き込み系（サービスアカウント・GITHUB_DISPATCH_TOKEN 等）。ローカルは `.env`（gitignore）。
+- **注意**: ローカル `.env` に `YOUTUBE_API_KEY` は未設定 → ローカルの全ビルドは /videos で失敗する（本番は GitHub Secret でOK）。ローカルで動画/トップを確認したい時は .env にキーを入れる。
+- **GitHub仕様**: 60日コミットが無いと schedule 自動停止（活動中は問題ないが対策は未実装）。
 
-## Phase 2（コア）実装状況（2026-06-13・コードはレビュー/テスト/コンパイル済み。本番反映は資格情報待ち）
-ユーザー選択は「コアまで」。実装済み:
-- **グッズ(BOOTH)**: `src/lib/booth.ts`(RSS純パース) / `loadGoods.ts` / `components/GoodsList.astro` / `pages/goods.astro`
-- **動画(YouTube)**: `src/lib/youtube.ts`(純パース) / `loadVideos.ts`(クォータ節約=search.list不使用・約14u/build) / `components/VideoList.astro` / `pages/videos.astro`(最新＋公開再生リストのミラー仕分け) / `pages/index.astro`(最新動画枠)
-- **ライブ中バッジ**: ビルド時 `liveBroadcastContent=="live"` 検知。`components/LiveBadge.astro` をトップに表示
-- **fetch層**: `src/lib/fetcher.ts` に `fetchJson`(YouTube用・URLのkey=をマスク) / `fetchTextAsBrowser`(BOOTH用・ブラウザ相当ヘッダ) 追加
-- **テスト**: `tests/booth.test.ts` `tests/youtube.test.ts`（+fixtures）。全33パス
-- **CI/設定**: `build.yml` のビルドstepに `YOUTUBE_API_KEY` 注入。`.env.example` 追記。`src/config/site.ts` に `sources.{youtubeChannelId, boothFeedUrl}`（空=設定待ち）
-- **手順書**: `docs/setup/05-youtube-api.md`(APIキー+チャンネルID) / `06-booth-feed.md`(フィードURL)
-- 設計判断(レビュー反映): 再生リスト取得は `Promise.allSettled`（1リスト失敗で全体を巻き込まない）/ ライブ判定取得失敗は非ライブ扱いで継続 / dev中もキャッシュ（クォータ・BOOTH制限対策）。**中核データ（uploads最新動画・設定欠落）失敗はビルド失敗を維持**（§4）。
+## ロードマップ（構成図§5）状態
 
-**✅ 本番公開済み・検証済み（2026-06-13）**: commit 421280f を main にpush → GitHub Actionsビルド成功 → Cloudflare Pagesデプロイ。https://vtuber-hp.pages.dev/ で実機確認:
-- `/videos`: 実動画50件超＋公開再生リストのミラー仕分け（最新動画 / short!!✨️ / NTE / アークナイツ：エンドフィールド / 同時視聴 / 雑談配信 / 鳴潮 / SANDTRIX / エルデンリング）。サムネ(i.ytimg)・watch リンク正常
-- `/`(トップ): 最新動画 実データ表示。ライブ中バッジは非ライブ時は非表示（正常）＝**ライブ時の実表示は次回配信で要目視**
-- `/goods`: BOOTHショップへのリンクページ（クリーン、エラーなし）
-- 設定: `youtubeChannelId=UC_7ehPcs0J67P-5k-qJmjmA`／公式リンク youtube(チャンネルURL)・x=Wakamatsu_VT・booth=実ショップ。`YOUTUBE_API_KEY` は **GitHub Secretのみ**（本番用）。**ローカル`.env`にはキー無し→ローカルビルド不可・本番はOK**
-- クォータ: 1ビルド約14ユニット／無料枠1万/日に十分余裕（消費は Google Cloud のダッシュボードで随時確認可）
-- 同時に Phase 1 デザイン（明朝/OGP/トップ作り込み）の保留6コミットも公開された
-- テスト33件パス／差分レビュー済み（重大なし）
+### Phase 1 土台 … ✅ 完了
+ドメイン/ホスティング/SSL・Astro雛形・.icsスケジュール・15分ビルド＋Discord故障通知。
 
-**BOOTH/グッズの結論**:
-- **BOOTH RSS は提供終了【確定】**: `items.rss` は **ユーザーの実ブラウザでも HTTP 406**＝BOOTHがRSSを提供していない。外部サイト向け公式埋め込みウィジェットも無し → **「BOOTH自動掲載」は実現不可能**（構成図の前提がBOOTH仕様変更で失効）。
-- **グッズ方針＝ユーザー選択「保留」**: グッズページは当面 **BOOTHショップへのリンク（静的・fetchなし）** で公開（`src/pages/goods.astro` を更新済み）。将来 (a)手動カード掲載 / (b)リンクのみ確定 を選ぶ。
-- **DORMANT（現在未使用・次の判断で整理）**: `src/lib/booth.ts`(parseBoothFeed) / `loadGoods.ts` / `fetcher.ts`の`fetchTextAsBrowser` / `components/GoodsList.astro` / `tests/booth.test.ts` / `fixtures/sample-booth.rss`。→ 手動掲載なら Goods型＋GoodsList を再利用、リンクのみなら全削除。
-- **公式リンク**: `site.links.youtube`(チャンネルURL) と `booth`(実ショップ) を実値に更新済み。**`site.links.x` はプレースホルダのまま＝本人のXユーザー名が必要**。
+### Phase 2 自動更新コア … 🔶 ほぼ完了
+- **#5 YouTube最新動画＋公開再生リストのミラー仕分け … ✅**（commit 421280f。`lib/youtube.ts`/`loadVideos.ts`/`VideoList.astro`/`videos.astro`＋トップ最新動画。search.list不使用のクォータ節約）
+- **#6 ライブ判定の窓方式 / 確定枠の埋め込み / カレンダー書き戻し … 🔶**
+  - 済: ライブ中バッジ（ビルド時 `liveBroadcastContent=="live"` 検知。`LiveBadge.astro`、トップに表示）
+  - **未: ①1分間隔の窓方式ワーカー ②確定枠（YouTube枠↔カレンダー予定）の埋め込み表示 ③カレンダー書き戻し（説明欄へPATCH追記）**。※`functions/_lib/google.ts` は現状 insert/delete のみ（書き戻しPATCHは無い）
+- **#7 BOOTHグッズ … 🔶** BOOTHがRSS提供終了（実ブラウザでも HTTP 406）→ 自動掲載は不可。現状は**ショップへのリンクのみ**（`goods.astro`、静的・fetchなし）。休眠コード（手動カード化なら再利用／リンク確定なら削除）: `lib/booth.ts`・`loadGoods.ts`・`GoodsList.astro`・`fetcher.ts`の`fetchTextAsBrowser`・`booth.test.ts`・`fixtures/sample-booth.rss`
+- **#8 フォールバック（最終更新時刻）＋冪等性 … ✅**
 
-**残・補足**:
-- ✅ push済み（commit 421280f）。Phase 1デザインの保留6コミットも同時公開済み。
-- デザイン作業の**未コミット4ファイル**（public/og.jpg, scripts/make-og.mjs, public/IMG_5833.png, src/pages/design-preview.astro）はローカル未コミットで残存（Phase 2とは別件。`design-preview.astro` は公開可否を要判断＝現状リポジトリに無いので本番未公開）。
-- グッズは「保留＝リンクのみ」。将来 手動カード掲載なら休眠コードの Goods型＋GoodsList を再利用、リンクのみ確定なら booth.ts/loadGoods/GoodsList/booth.test/fixture を削除。
-- ライブ中バッジ・YouTube連携の**ライブ時実挙動**は、本人が次に配信したときに /（トップ）で要目視。
+### Phase 3 HPの存在意義 … 🔶 一部
+- **#9 お仕事依頼ページ … ⬜** `work.astro` はプレースホルダ（**フォーム未設置**・X DM誘導のみ）。←案件導線＝最優先
+- **#10 ガイドライン/プロフィール/プライバシー … 🔶** ガイドラインはトップに集約（独立ページ廃止）／`privacy.astro` は仮文言／プロフィールは `config/profile.ts` に構造化済（文言は仮）
+- **#11 SEO … 🔶** JSON-LD(Person+WebSite)・`llms.txt`・`sitemap.xml` は実装済（`Base.astro`／`pages/*.ts`）／**GA4・Search Console は未設置**／FAQPage・VideoObject・Event は据え置き
 
-## Phase 2以降で実装予定（ユーザー承認済み 2026-06-13・構成図外の追加機能）
-- Discordから予定登録: `/予定 6/15 21:00 タイトル` 等のテンプレ書式/スラッシュコマンドでGoogleカレンダーに書き込む。ユーザーが「必要」と判断し実装決定。Phase 2で用意するカレンダー書き込み（サービスアカウント）に相乗りして作る。Phase 2のプランモードで正式にスコープへ入れること。代替（暫定）: Googleカレンダー公式アプリの音声入力。
+### Phase 4 半自動の頭脳 … 🔶 / ⬜
+- **#12 AI告知文生成→Notion承認 … ⬜**（`prompts/`・`docs/persona.md` 未作成）
+- **#13 緊急キルスイッチ … ⬜** 未実装（炎上/訃報時の安全装置＝設計上の要対応）
+- **#14 デザイン作り込み … 🔶** 大半完了（明朝/OGP/ヒーロー/フッター刷新/LP各セクション）。GALLERY=Coming soon。Cinzelフォント・favicon 導入中
 
-## 次フェーズ（Phase 2: 自動更新コア）の入口メモ
-- 構成図§5 Phase 2: YouTube API（最新動画＋再生リスト自動分類）/ ライブ判定の窓方式＋確定枠埋め込み＋カレンダー書き戻し / BOOTHフィード→グッズ / フォールバック・冪等性
-- 事前にユーザー準備が要るもの: YouTube Data API v3 キー、対象YouTubeチャンネルID、（書き戻し用）Googleサービスアカウント＋対象カレンダーへの書き込み共有、BOOTHショップのフィードURL
-- 開始時は必ずプランモードで計画提示→承認後に実装（CLAUDE.md §1）
+### Phase 5 任意 … ⬜ 未着手（X自動投稿/ニュースレター/多配信/専用承認画面）
+
+## 構成図外の追加機能（承認のもと実装・稼働中）
+- **Discordから予定操作**: `/予定`・`/予定消去`・`/予定表`（`functions/discord/interactions.ts`／`functions/_lib/{google,discord,datetime}.ts`。サービスアカウントで Google Calendar insert/delete。認可は fail-closed＋オーナー専用）。コマンド登録は `scripts/register-discord-commands.mjs`。
+- **週間ポスター自動生成・投稿**（上記 poster.yml）
+- **llms.txt 自動生成**（AEO対応）／**お知らせ一覧ページ** `news.astro`
+
+## 並行リファクタ（完了・別系統の Phase/DEC 番号）
+安全網テスト追加・重複集約・境界型付け・定数一元化・`SectionHead.astro` 抽出・profile/information/featured の config 化・sharp 直接依存化・loader層のfetcher注入テスト 等。**詳細は `refactor-instructions.md` と該当コミット**。
+
+## いま公開前（未コミット/未push）
+- main は origin より先行（未pushコミットあり）＝反映待ちが出ることがある。デザイン調整中（Cinzelフォント・favicon・Prettier設定・フォント再サブセット）。
+- `docs/research/`：フォント/エフェクト/和あしらいの研究カタログ（選定資料）。
+
+## 次にやるべき優先（ロードマップ順）
+1. **#9 お仕事依頼フォーム**（Googleフォーム埋め込み＋ハニーポット＋実績/メディアキット）＝HP最大の価値
+2. **#11 GA4 / Search Console**（効果測定が現状ゼロ）
+3. **#6 カレンダー書き戻し＋確定枠埋め込み**（Discordの書き込み基盤に相乗り可）
+4. **#13 緊急キルスイッチ**
+5. **#10 プライバシーポリシー正式版**（GA4/フォーム導入と同時）
+
+## 進め方
+- 各フェーズ着手は CLAUDE.md §1：プランモードで計画→承認→実装→`/code-review`→停止。
