@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 40" width="400" height="40">
+  <!-- 花の区切り罫／金 #c2a86b（見出し下のあしらい） -->
+  <g stroke="#c2a86b" stroke-width="1.4">
+    <line x1="0" y1="20" x2="165" y2="20"/>
+    <line x1="235" y1="20" x2="400" y2="20"/>
+    <circle cx="178" cy="20" r="2.2" fill="#c2a86b" stroke="none"/>
+    <circle cx="222" cy="20" r="2.2" fill="#c2a86b" stroke="none"/>
+  </g>
+  <g transform="translate(200,20)" fill="#c2a86b" stroke="#c2a86b" stroke-width="1.2">
+    <path d="M0 -11 L9 0 L0 11 L-9 0 Z"/>
+    <circle cx="0" cy="0" r="2.5" fill="#1b110a" stroke="none"/>
+  </g>
+</svg>

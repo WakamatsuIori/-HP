@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- コーナー飾り（右下＝左上を180°回転）／金 #c2a86b・極薄 -->
+  <g opacity="0.34" transform="translate(120,120) scale(-1,-1)">
+    <g fill="none" stroke="#c2a86b" stroke-width="2" stroke-linecap="round">
+      <path d="M12 116 L12 34 Q12 12 34 12 L116 12"/>
+      <path d="M24 116 L24 40 Q24 24 40 24 L116 24" opacity="0.5"/>
+      <path d="M12 34 Q34 34 34 56"/>
+      <path d="M34 12 Q34 34 56 34"/>
+    </g>
+    <circle cx="24" cy="24" r="3.2" fill="#c2a86b"/>
+  </g>
+</svg>

@@ -1074,6 +1074,20 @@ const featured = latestTop.slice(0, 3);
     .lp-section--tint::before { animation: bokehDrift 22s ease-in-out infinite alternate; animation-play-state: paused; }
     .lp-section--tint.in-view::before { animation-play-state: running; }
   }
+  /* 和あしらい（控えめ）：署名セクション SCHEDULE だけ、対角の隅に極薄のコーナー飾り。
+     セクション背景画像として配置＝文字の背面・base色(#f3f0e7)は維持。全帯には付けない（過剰回避）。 */
+  #schedule.lp-section--tint {
+    background-image: url('/ornaments/corner-tl.svg'), url('/ornaments/corner-br.svg');
+    background-repeat: no-repeat, no-repeat;
+    background-position: left 14px top 14px, right 14px bottom 14px;
+    background-size: 60px, 60px;
+  }
+  @media (max-width: 640px) {
+    #schedule.lp-section--tint {
+      background-size: 38px, 38px;
+      background-position: left 8px top 8px, right 8px bottom 8px;
+    }
+  }
   @keyframes bokehDrift {
     from { transform: translate3d(0, 0, 0) scale(1); }
     to { transform: translate3d(2.5%, -2%, 0) scale(1.08); }

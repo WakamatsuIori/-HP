@@ -21,27 +21,17 @@ const { kicker, title } = Astro.props;
     padding-bottom: 0.95rem;
     line-height: 1;
   }
-  /* アールデコ調の区切り（金の細線＋中央のひし形） */
+  /* 和の区切りあしらい：花の区切り罫（SVG・中央配置・金 #c2a86b）。
+     従来の「細線＋ひし形」を、同じ意匠を含むより繊細な花罫に格上げ。 */
   .section-head::after {
     content: '';
     position: absolute;
     left: 50%;
-    bottom: 0.35rem;
+    bottom: 0.1rem;
     transform: translateX(-50%);
-    width: 76px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent) 50%, transparent);
-  }
-  .section-head::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: calc(0.35rem - 3.5px);
-    transform: translateX(-50%) rotate(45deg);
-    width: 7px;
-    height: 7px;
-    background: var(--accent);
-    z-index: 1;
+    width: 172px;
+    height: 17px;
+    background: url('/ornaments/divider-hana.svg') center / contain no-repeat;
   }
   .section-kicker {
     margin: 0;
