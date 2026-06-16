@@ -471,9 +471,10 @@ const featured = latestTop.slice(0, 3);
     text-shadow: 0 1px 18px rgba(250, 249, 246, 0.78);
   }
   .hero2__romaji {
+    font-family: var(--font-logo); /* Cinzel：碑文体でロゴの格を上げる */
     margin: 0.55rem 0 1.25rem;
-    font-size: 0.82rem;
-    letter-spacing: 0.44em;
+    font-size: 0.9rem;
+    letter-spacing: 0.4em;
     color: rgba(58, 53, 45, 0.55);
   }
   .hero2__tag {
@@ -995,7 +996,7 @@ const featured = latestTop.slice(0, 3);
     gap: 0.35rem;
     padding: clamp(1.4rem, 4vw, 2.4rem);
   }
-  .goods-banner__en { font-family: var(--font-serif); letter-spacing: 0.22em; font-size: 0.82rem; color: #e2c98e; }
+  .goods-banner__en { font-family: var(--font-logo); letter-spacing: 0.22em; font-size: 0.82rem; color: #e2c98e; }
   .goods-banner__jp { font-family: var(--font-serif); font-size: clamp(1.4rem, 4vw, 2.1rem); color: #fffdf8; font-weight: 700; }
   .goods-banner__btn {
     position: absolute;
@@ -1086,7 +1087,7 @@ const featured = latestTop.slice(0, 3);
   /* PROFILE/ABOUT で単独で使う大英字キッカー（section-head 本体は components/SectionHead.astro に移設） */
   .section-kicker {
     margin: 0;
-    font-family: var(--font-serif);
+    font-family: var(--font-logo);
     font-size: clamp(2.6rem, 9vw, 4.6rem);
     font-weight: 500;
     letter-spacing: 0.1em;

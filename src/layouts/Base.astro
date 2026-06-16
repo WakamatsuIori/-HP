@@ -88,6 +88,14 @@ const nav = [
       type="font/woff2"
       crossorigin="anonymous"
     />
+    {/* 欧文ロゴ用 Cinzel（サブセット 7.6KB・ヒーロー/見出しの英字に使うため先読み） */}
+    <link
+      rel="preload"
+      href="/fonts/cinzel-500.subset.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
   </head>
   <body>
     <header class="site-header">
@@ -155,6 +163,15 @@ const nav = [
     font-style: normal;
     font-display: swap; /* 読み込み中はシステム明朝で即表示→差し替え（描画ブロックなし） */
   }
+  /* 欧文ロゴ専用の Cinzel（基本ラテンだけのサブセット woff2・約7.6KB）。
+     ローマ字ロゴ・英字ディスプレイ見出しに使用。和文は持たないので明朝にフォールバック。 */
+  @font-face {
+    font-family: 'Cinzel';
+    src: url('/fonts/cinzel-500.subset.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
   :root {
     --bg: #faf9f6;
     --text: #423f38;
@@ -164,6 +181,7 @@ const nav = [
     --line: #e7e3d9;
     --card: #ffffff;
     --font-serif: 'Zen Old Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+    --font-logo: 'Cinzel', var(--font-serif); /* 欧文ロゴ・英字ディスプレイ用（未読込時は明朝へ） */
   }
   * { box-sizing: border-box; }
   html { color-scheme: light; overflow-x: clip; } /* 100vwのフルブリードで横スクロールを出さない（縦は保持） */
@@ -343,7 +361,7 @@ const nav = [
     color: var(--text);
   }
   .foot-brand__en {
-    font-family: var(--font-serif);
+    font-family: var(--font-logo);
     font-size: 0.72rem;
     letter-spacing: 0.34em;
     color: var(--accent-strong);
