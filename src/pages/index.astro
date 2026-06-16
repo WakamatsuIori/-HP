@@ -517,7 +517,7 @@ const featured = latestTop.slice(0, 3);
   .btn-gold { position: relative; overflow: hidden; background: #6f6444; color: #faf9f6; }
   .btn-gold:hover { background: #847650; transform: translateY(-1px); }
   /* シャイン一閃：ホバーで斜めの光が一度サッと走る（マウス環境のみ） */
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .btn-gold::before {
       content: '';
       position: absolute;
@@ -766,7 +766,7 @@ const featured = latestTop.slice(0, 3);
   }
   .pickup-card a { display: block; text-decoration: none; color: var(--text); }
   /* カードのリフト：ホバーでふわっと浮く＋柔らかい影（マウス環境のみ） */
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .pickup-card a, .info-card a {
       transition: transform 0.25s ease, filter 0.25s ease;
     }
