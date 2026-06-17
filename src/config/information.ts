@@ -21,7 +21,7 @@ export const information: InfoItem[] = [
     category: 'goods',
     title: 'グッズ制作！？ 6/19(金)の配信でいっしょに考えよう！',
     url: '/schedule',
-    image: '/info/goods.svg',
+    image: '/info/goods.png',
   },
   {
     date: '2026.06.18',
