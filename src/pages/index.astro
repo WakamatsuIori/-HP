@@ -93,7 +93,7 @@ const featured = latestTop.slice(0, 3);
     <p class="hero2__vertical" aria-hidden="true">和香松庵</p>
     <div class="hero2__content">
       <div class="hero2__text">
-        <p class="kicker">個人勢VTuber ・ Cafe &amp; Bar</p>
+        <p class="kicker">Cafe &amp; Bar の店長 ・ 個人勢VTuber</p>
         <h1 class="hero2__name">{site.name}</h1>
         <p class="hero2__romaji">WAKAMATSU IORI</p>
         <p class="hero2__tag">雑談とゲームを肴に、ゆるりと楽しい夜を。<br />ようこそ、隠れ家カフェ＆バーへ。</p>
@@ -283,13 +283,13 @@ const featured = latestTop.slice(0, 3);
 
   <section class="lp-section lp-section--tint" id="goods">
     <div class="lp-inner reveal">
-      <SectionHead kicker="GOODS" title="グッズ" />
-      <p class="sec-lead">オフィシャルストアではオリジナルグッズを販売中。画像から BOOTH へ。</p>
-      <a class="goods-banner" href={site.links.booth} rel="me noopener" target="_blank" aria-label="BOOTHでグッズを見る">
+      <SectionHead kicker="STORE" title="ストア" />
+      <p class="sec-lead">配信に使える自作のOBSウィジェットなどを BOOTH で販売中。オリジナルグッズも順次追加していく予定です。画像から BOOTH へ。</p>
+      <a class="goods-banner" href={site.links.booth} rel="me noopener" target="_blank" aria-label="BOOTHストアを見る">
         <Image class="goods-banner__bg" src={keyVisual} widths={[480, 768, 1024]} sizes="(min-width: 760px) 760px, 100vw" alt="" loading="lazy" />
         <span class="goods-banner__text">
           <span class="goods-banner__en">OFFICIAL STORE</span>
-          <span class="goods-banner__jp">和香松庵 グッズ</span>
+          <span class="goods-banner__jp">和香松庵 STORE</span>
         </span>
         <span class="goods-banner__btn">BOOTH ▸</span>
       </a>
@@ -331,7 +331,7 @@ const featured = latestTop.slice(0, 3);
   <section class="lp-section" id="guideline">
     <div class="lp-inner reveal">
       <SectionHead kicker="GUIDELINE" title="ガイドライン" />
-      <p class="sec-lead">みなさんに安心して楽しんでもらえるよう、二次創作・切り抜き・応援についてのお願いをまとめました。みんなで心地よく過ごすためのささやかな約束ごとです。</p>
+      <p class="sec-lead sec-lead--guideline">みなさんに安心して楽しんでもらえるよう、二次創作・切り抜き・応援についてのお願いをまとめました。<br class="gl-br" />みんなで心地よく過ごすためのささやかな約束ごとです。</p>
 
       <div class="guide-block">
         <h3 class="guide-h">切り抜き動画</h3>
@@ -1142,6 +1142,12 @@ const featured = latestTop.slice(0, 3);
   }
 
   .sec-lead { text-align: center; margin: 0 auto 0.9rem; max-width: 34rem; line-height: 1.7; }
+  /* ガイドライン導入文：PC幅では1文ずつ＝2行に。スマホは自然折り返し（brは無効）。 */
+  .sec-lead--guideline .gl-br { display: none; }
+  @media (min-width: 900px) {
+    .sec-lead--guideline { width: max-content; max-width: 92vw; }
+    .sec-lead--guideline .gl-br { display: inline; }
+  }
   .sec-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; }
 
   /* ===== 控えめな登場アニメ（トップのみ・reduced-motionで無効） ===== */
