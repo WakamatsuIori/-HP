@@ -12,12 +12,11 @@
   <rect width="1280" height="720" fill="url(#bg)"/>
   <rect width="1280" height="720" fill="url(#glow)"/>
   <rect x="44" y="44" width="1192" height="632" rx="12" fill="none" stroke="#cda14e" stroke-opacity="0.55" stroke-width="2"/>
-  <g fill="none" stroke="#d8b56f" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M566 196 h148 l-58 78 v92"/>
-    <path d="M566 196 l90 78"/>
-    <path d="M610 374 h92"/>
+  <g fill="#e7d5a8">
+    <path d="M640 178 c10 60 26 76 86 86 -60 10 -76 26 -86 86 -10 -60 -26 -76 -86 -86 60 -10 76 -26 86 -86 z"/>
+    <path d="M512 250 c5 30 13 38 43 43 -30 5 -38 13 -43 43 -5 -30 -13 -38 -43 -43 30 -5 38 -13 43 -43 z" opacity="0.85"/>
+    <path d="M772 256 c4 24 10 30 34 34 -24 4 -30 10 -34 34 -4 -24 -10 -30 -34 -34 24 -4 30 -10 34 -34 z" opacity="0.8"/>
   </g>
-  <circle cx="700" cy="214" r="11" fill="#e7d5a8"/>
   <text x="640" y="468" text-anchor="middle" font-family="'Cinzel','Shippori Mincho',serif" font-size="62" letter-spacing="16" fill="#e9d6a6">STORE</text>
   <text x="640" y="536" text-anchor="middle" font-family="'Shippori Mincho','Yu Mincho',serif" font-size="34" letter-spacing="8" fill="#cdb886">グッズ制作、はじめます</text>
   <g fill="#cda14e">

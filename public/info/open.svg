@@ -12,8 +12,11 @@
   <rect width="1280" height="720" fill="url(#bg)"/>
   <rect width="1280" height="720" fill="url(#glow)"/>
   <rect x="44" y="44" width="1192" height="632" rx="12" fill="none" stroke="#cda14e" stroke-opacity="0.55" stroke-width="2"/>
-  <circle cx="640" cy="262" r="86" fill="none" stroke="#d8b56f" stroke-width="3"/>
-  <text x="640" y="262" text-anchor="middle" dominant-baseline="central" font-family="'Shippori Mincho','Yu Mincho',serif" font-size="92" fill="#e7d5a8">庵</text>
+  <g fill="#e7d5a8">
+    <path d="M640 178 c10 60 26 76 86 86 -60 10 -76 26 -86 86 -10 -60 -26 -76 -86 -86 60 -10 76 -26 86 -86 z"/>
+    <path d="M512 250 c5 30 13 38 43 43 -30 5 -38 13 -43 43 -5 -30 -13 -38 -43 -43 30 -5 38 -13 43 -43 z" opacity="0.85"/>
+    <path d="M772 256 c4 24 10 30 34 34 -24 4 -30 10 -34 34 -4 -24 -10 -30 -34 -34 24 -4 30 -10 34 -34 z" opacity="0.8"/>
+  </g>
   <text x="640" y="430" text-anchor="middle" font-family="'Cinzel','Shippori Mincho',serif" font-size="62" letter-spacing="14" fill="#e9d6a6">GRAND OPEN</text>
   <text x="640" y="500" text-anchor="middle" font-family="'Shippori Mincho','Yu Mincho',serif" font-size="34" letter-spacing="8" fill="#cdb886">公式サイト公開</text>
   <g fill="#cda14e">
