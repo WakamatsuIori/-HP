@@ -1,19 +1,229 @@
 ---
 import Base from '../layouts/Base.astro';
 import { site } from '../config/site';
+
+// Googleフォームの埋め込みURL。作成手順: docs/setup/07-contact-form.md
+// 形式: https://docs.google.com/forms/d/e/〇〇/viewform?embedded=true
+const FORM_URL = '';
 ---
 
-<Base title="お仕事依頼" description={`${site.name}へのお仕事のご依頼について。`}>
+<Base title="お仕事依頼" description={`${site.name}へのお仕事のご依頼・コラボ等のご相談はこちら。`}>
   <h1>お仕事のご依頼</h1>
 
-  <h2>お受けできる内容</h2>
-  <p class="placeholder-note">
-    ここに対応可能なお仕事の種類（案件配信・ボイス出演・イラスト利用許諾など）と実績が入ります。
-    お問い合わせフォームとメディアキットは後で設置します。
+  <p class="work-intro">
+    案件配信・ボイス出演・イラスト利用許諾など、お仕事に関するご相談をお受けしています。
+    内容を確認のうえ、必ずご返答いたします（数日いただく場合あり）。
   </p>
 
-  <h2>ご連絡方法</h2>
-  <p class="placeholder-note">
-    お問い合わせフォーム設置までは、<a href={site.links.x} rel="me noopener" target="_blank">X</a> のDMにてご連絡ください。
-  </p>
+  <h2>お受けできる内容</h2>
+  <ul class="work-list">
+    <li class="work-item">
+      <span class="work-item__icon" aria-hidden="true">✦</span>
+      <div>
+        <strong class="work-item__title">案件配信・PR</strong>
+        <p class="work-item__desc">ゲーム紹介・商品PR・タイアップ配信など。事前にご相談のうえ、配信形式・スケジュールを決定します。</p>
+      </div>
+    </li>
+    <li class="work-item">
+      <span class="work-item__icon" aria-hidden="true">✦</span>
+      <div>
+        <strong class="work-item__title">ボイス出演・収録</strong>
+        <p class="work-item__desc">ゲーム・動画・音声作品等へのボイス収録。対応可否・条件等は内容により異なります。</p>
+      </div>
+    </li>
+    <li class="work-item">
+      <span class="work-item__icon" aria-hidden="true">✦</span>
+      <div>
+        <strong class="work-item__title">イラスト素材・肖像利用許諾</strong>
+        <p class="work-item__desc">公式素材の二次利用・商用利用はガイドラインをご確認のうえご相談ください。</p>
+      </div>
+    </li>
+    <li class="work-item">
+      <span class="work-item__icon" aria-hidden="true">✦</span>
+      <div>
+        <strong class="work-item__title">その他・コラボ</strong>
+        <p class="work-item__desc">記載のない内容もお気軽にご相談ください。お断りする場合も必ずご連絡いたします。</p>
+      </div>
+    </li>
+  </ul>
+
+  <h2>メディアキット</h2>
+  <div class="media-kit">
+    <dl class="kit-stats">
+      <div class="kit-stat">
+        <dt>活動開始</dt>
+        <dd class="placeholder-val">——</dd>
+      </div>
+      <div class="kit-stat">
+        <dt>YouTube 登録者数</dt>
+        <dd class="placeholder-val">——</dd>
+      </div>
+      <div class="kit-stat">
+        <dt>平均視聴数</dt>
+        <dd class="placeholder-val">——</dd>
+      </div>
+      <div class="kit-stat">
+        <dt>配信頻度</dt>
+        <dd class="placeholder-val">——</dd>
+      </div>
+      <div class="kit-stat">
+        <dt>主な配信ジャンル</dt>
+        <dd>ゲーム実況・雑談・歌枠</dd>
+      </div>
+      <div class="kit-stat">
+        <dt>視聴者層</dt>
+        <dd class="placeholder-val">——</dd>
+      </div>
+    </dl>
+    <p class="kit-note">詳細な資料はご相談時に別途ご提供できます。</p>
+  </div>
+
+  <h2>お問い合わせ</h2>
+  {FORM_URL ? (
+    <div class="form-wrap">
+      <iframe
+        src={FORM_URL}
+        width="100%"
+        height="820"
+        frameborder="0"
+        marginheight="0"
+        marginwidth="0"
+        title="お問い合わせフォーム"
+        loading="lazy"
+      >読み込んでいます…</iframe>
+    </div>
+  ) : (
+    <div class="form-placeholder">
+      <p>現在フォームを準備中です。</p>
+      <p>お急ぎの場合は <a href={site.links.x} rel="me noopener" target="_blank">X の DM</a> にてご連絡ください。</p>
+    </div>
+  )}
+
+  <aside class="work-note">
+    <p>
+      フォームのほか、<a href={site.links.x} rel="me noopener" target="_blank">X の DM</a> でもご相談を受け付けています。
+      営業・勧誘目的のご連絡はお断りしております。
+    </p>
+    <p><a href="/#guideline">ガイドライン</a> も併せてご確認ください。</p>
+  </aside>
 </Base>
+
+<style>
+  .work-intro {
+    margin-top: 0.5rem;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
+  /* お受けできる内容リスト */
+  .work-list {
+    list-style: none;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .work-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.1rem 1.25rem;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+  }
+  @media (prefers-reduced-motion: reduce) { .work-item { transition: none; } }
+  .work-item:hover { border-color: var(--accent); }
+  .work-item__icon {
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    color: var(--accent);
+    margin-top: 0.2rem;
+  }
+  .work-item__title {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+  }
+  .work-item__desc {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+
+  /* メディアキット */
+  .media-kit {
+    margin-top: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  .kit-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 1.1rem 2rem;
+    margin: 0;
+  }
+  .kit-stat dt {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+  }
+  .kit-stat dd {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    letter-spacing: 0.04em;
+    color: var(--text);
+  }
+  .placeholder-val { color: var(--muted); }
+  .kit-note {
+    margin: 1.1rem 0 0;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  /* フォーム */
+  .form-wrap {
+    margin-top: 1.25rem;
+  }
+  .form-wrap iframe {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+  .form-placeholder {
+    margin-top: 1.25rem;
+    padding: 1.75rem 1.5rem;
+    background: var(--card);
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    text-align: center;
+    color: var(--muted);
+    line-height: 2;
+  }
+  .form-placeholder p { margin: 0.25rem 0; }
+
+  /* 注記 */
+  .work-note {
+    margin-top: 2.5rem;
+    padding: 1rem 1.25rem;
+    border-left: 2px solid var(--accent);
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.85;
+  }
+  .work-note p { margin: 0.3rem 0; }
+  .work-note p:first-child { margin-top: 0; }
+  .work-note p:last-child { margin-bottom: 0; }
+</style>
