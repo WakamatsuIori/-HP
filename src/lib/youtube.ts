@@ -126,6 +126,26 @@ export function parsePlaylistItems(json: unknown): Video[] {
   return dedupeVideos(videos);
 }
 
+/** videos.list(part=snippet) を Video[] に変換（item.id が動画ID）。削除/非公開・無題は除外・重複排除。 */
+export function parseVideosById(json: unknown): Video[] {
+  const videos: Video[] = [];
+  for (const item of asList(json)) {
+    const id = item.id;
+    if (!id) continue;
+    const sn = item.snippet;
+    const title = (sn?.title ?? '').trim();
+    if (!title || PLACEHOLDER_TITLES.has(title)) continue; // 削除/非公開動画を除外
+    videos.push({
+      id,
+      title,
+      url: videoUrl(id),
+      thumbnailUrl: pickThumbnail(id, sn?.thumbnails),
+      publishedAt: parseDate(sn?.publishedAt),
+    });
+  }
+  return dedupeVideos(videos);
+}
+
 /** playlists.list(part=snippet) を {id,title}[] に変換（タイトルのある公開リストのみ） */
 export function parsePlaylists(json: unknown): { id: string; title: string }[] {
   const out: { id: string; title: string }[] = [];

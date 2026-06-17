@@ -12,12 +12,14 @@ import {
   parsePlaylistItems,
   parsePlaylists,
   parseLiveStatus,
+  parseVideosById,
   sortByNewest,
   type Video,
   type VideoPlaylist,
   type LiveStatus,
 } from './youtube';
 import { site } from '../config/site';
+import { featuredVideoIds } from '../config/featured';
 
 /** トップ/動画ページに出す最新動画の最大件数 */
 export const MAX_LATEST = 12;
@@ -34,7 +36,12 @@ export interface VideosData {
   latest: Video[];
   playlists: VideoPlaylist[];
   live: LiveStatus;
+  /** おすすめ（PICK UP）に出す動画。固定指定があればその順、無ければ最新上位3本。 */
+  featured: Video[];
 }
+
+/** おすすめ固定動画の最大数（暴走防止のキャップ） */
+const MAX_FEATURED = 5;
 
 function apiKey(): string {
   const k = import.meta.env?.YOUTUBE_API_KEY ?? process.env.YOUTUBE_API_KEY;
@@ -122,7 +129,22 @@ export async function loadVideosWith(fetcher: JsonFetcher): Promise<VideosData> 
     }
   }
 
-  return { latest, playlists, live };
+  // 6. おすすめ（PICK UP）。固定指定があれば指定IDを取得し設定順に並べる（videos.list=1ユニット）。
+  //    PICK UPは補助表示なので、取得失敗・一部欠落時は最新上位3本にフォールバック（ビルドは落とさない）。
+  let featured: Video[] = latest.slice(0, 3);
+  if (featuredVideoIds.length > 0) {
+    try {
+      const ids = featuredVideoIds.slice(0, MAX_FEATURED);
+      const videosJson = await fetcher(apiUrl('videos', { part: 'snippet', id: ids.join(',') }, key));
+      const byId = new Map(parseVideosById(videosJson).map((v) => [v.id, v]));
+      const picked = ids.map((id) => byId.get(id)).filter((v): v is Video => v !== undefined);
+      if (picked.length > 0) featured = picked;
+    } catch {
+      // フォールバック（latest上位3本のまま）
+    }
+  }
+
+  return { latest, playlists, live, featured };
 }
 
 // トップと動画ページの両方から呼ばれるため結果を使い回す（取得は1回だけ）。

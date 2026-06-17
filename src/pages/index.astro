@@ -52,16 +52,16 @@ const nextWeekData = showSample ? null : buildWeek(events, nowDate, 1);
 // （/videos ページは従来どおり厳格＝設定漏れはビルド失敗のまま。CLAUDE.md §4）
 let latestTop: Video[] = [];
 let live: LiveStatus = { isLive: false, liveVideo: null };
+// おすすめ（PICK UP）：固定指定があればその動画、無ければ最新上位3本（loadVideos側で決定）
+let featured: Video[] = [];
 try {
   const v = await loadVideos();
   latestTop = v.latest.slice(0, 4);
   live = v.live;
+  featured = v.featured;
 } catch (err) {
   console.warn('[index] 動画の取得に失敗。トップは動画枠を準備中にして継続:', err instanceof Error ? err.message : err);
 }
-
-// おすすめ（PICK UP）：いまは最新動画の上位3本に吹き出しラベルを付けて表示
-const featured = latestTop.slice(0, 3);
 ---
 
 <Base>

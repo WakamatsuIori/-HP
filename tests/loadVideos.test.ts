@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadVideosWith } from '../src/lib/loadVideos';
+import { featuredVideoIds } from '../src/config/featured';
 
 function fx(name: string): unknown {
   return JSON.parse(readFileSync(join(__dirname, 'fixtures', name), 'utf-8'));
@@ -69,5 +70,46 @@ describe('loadVideosWith（fetcher注入・オーケストレーション）', (
     const data = await loadVideosWith(fetcher);
     expect(data.live).toEqual({ isLive: false, liveVideo: null });
     expect(data.latest.length).toBeGreaterThan(0);
+  });
+
+  it('おすすめ固定動画は指定IDを設定順に並べ直して返す（APIが順不同でも）', async () => {
+    expect(featuredVideoIds.length).toBeGreaterThan(0); // 固定運用が前提のテスト
+    // APIはわざと逆順で返す → loaderが featuredVideoIds の順へ並べ直すことを検証
+    const scrambled = [...featuredVideoIds].reverse();
+    const fetcher = async (url: string): Promise<unknown> => {
+      const u = new URL(url);
+      const path = u.pathname;
+      const id = u.searchParams.get('id') ?? '';
+      if (path.endsWith('/channels')) return fx('youtube-channels.json');
+      if (path.endsWith('/playlists')) return fx('youtube-playlists.json');
+      if (path.endsWith('/playlistItems')) return fx('youtube-playlist-items.json');
+      if (path.endsWith('/videos')) {
+        if (id.includes(featuredVideoIds[0]!)) {
+          return { items: scrambled.map((vid) => ({ id: vid, snippet: { title: `pinned-${vid}` } })) };
+        }
+        return fx('youtube-videos-live.json'); // ライブ判定用
+      }
+      throw new Error(`unexpected url: ${url}`);
+    };
+    const data = await loadVideosWith(fetcher);
+    expect(data.featured.map((v) => v.id)).toEqual(featuredVideoIds);
+  });
+
+  it('固定動画の取得失敗時は最新上位3本にフォールバックする', async () => {
+    const fetcher = async (url: string): Promise<unknown> => {
+      const u = new URL(url);
+      const path = u.pathname;
+      const id = u.searchParams.get('id') ?? '';
+      if (path.endsWith('/channels')) return fx('youtube-channels.json');
+      if (path.endsWith('/playlists')) return fx('youtube-playlists.json');
+      if (path.endsWith('/playlistItems')) return fx('youtube-playlist-items.json');
+      if (path.endsWith('/videos')) {
+        if (id.includes(featuredVideoIds[0]!)) throw new Error('boom: featured');
+        return fx('youtube-videos-live.json');
+      }
+      throw new Error(`unexpected url: ${url}`);
+    };
+    const data = await loadVideosWith(fetcher);
+    expect(data.featured).toEqual(data.latest.slice(0, 3));
   });
 });

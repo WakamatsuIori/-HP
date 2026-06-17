@@ -6,6 +6,7 @@ import {
   parsePlaylistItems,
   parsePlaylists,
   parseLiveStatus,
+  parseVideosById,
   sortByNewest,
 } from '../src/lib/youtube';
 
@@ -54,6 +55,31 @@ describe('parsePlaylists', () => {
       { id: 'PL_game', title: 'ゲーム実況' },
       { id: 'PL_song', title: '歌枠アーカイブ' },
     ]);
+  });
+});
+
+describe('parseVideosById', () => {
+  it('videos.list の item.id を動画IDとして Video[] に変換する', () => {
+    const videos = parseVideosById({
+      items: [
+        { id: 'aaa', snippet: { title: 'A', publishedAt: '2026-06-10T00:00:00Z' } },
+        { id: 'bbb', snippet: { title: 'B', thumbnails: { high: { url: 'https://x/b.jpg' } } } },
+      ],
+    });
+    expect(videos.map((v) => v.id)).toEqual(['aaa', 'bbb']);
+    expect(videos[0]!.url).toBe('https://www.youtube.com/watch?v=aaa');
+    expect(videos[1]!.thumbnailUrl).toBe('https://x/b.jpg');
+  });
+  it('無題・削除/非公開・id欠落は除外する', () => {
+    const videos = parseVideosById({
+      items: [
+        { id: 'ok', snippet: { title: 'OK' } },
+        { snippet: { title: 'no id' } },
+        { id: 'empty', snippet: { title: '   ' } },
+        { id: 'del', snippet: { title: 'Deleted video' } },
+      ],
+    });
+    expect(videos.map((v) => v.id)).toEqual(['ok']);
   });
 });
 
