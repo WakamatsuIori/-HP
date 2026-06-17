@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="公式サイト公開">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a2017"/>
+      <stop offset="1" stop-color="#13100a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.32" r="0.62">
+      <stop offset="0" stop-color="#e8d09a" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#e8d09a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect width="1280" height="720" fill="url(#glow)"/>
+  <rect x="44" y="44" width="1192" height="632" rx="12" fill="none" stroke="#cda14e" stroke-opacity="0.55" stroke-width="2"/>
+  <circle cx="640" cy="262" r="86" fill="none" stroke="#d8b56f" stroke-width="3"/>
+  <text x="640" y="262" text-anchor="middle" dominant-baseline="central" font-family="'Shippori Mincho','Yu Mincho',serif" font-size="92" fill="#e7d5a8">庵</text>
+  <text x="640" y="430" text-anchor="middle" font-family="'Cinzel','Shippori Mincho',serif" font-size="62" letter-spacing="14" fill="#e9d6a6">GRAND OPEN</text>
+  <text x="640" y="500" text-anchor="middle" font-family="'Shippori Mincho','Yu Mincho',serif" font-size="34" letter-spacing="8" fill="#cdb886">公式サイト公開</text>
+  <g fill="#cda14e">
+    <path d="M560 560 l10 -10 10 10 -10 10 z"/>
+    <path d="M640 560 l13 -13 13 13 -13 13 z"/>
+    <path d="M720 560 l10 -10 10 10 -10 10 z"/>
+  </g>
+</svg>

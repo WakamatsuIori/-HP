@@ -15,7 +15,27 @@ export interface InfoItem {
 }
 
 export const information: InfoItem[] = [
-  // お知らせは未掲載。0件のときトップのINFORMATIONセクションは非表示、/news は「まだありません」。
-  // 下の形式で追加すると、トップのお知らせカードと /news に反映される（新しい順に上から）。
-  // { date: '2026.06.20', category: 'info', title: 'タイトル', url: 'https://example.com/...' },
+  // 新しい順に上から。1件でも書くとトップのお知らせカードと /news に反映される。
+  {
+    date: '2026.06.18',
+    category: 'goods',
+    title: 'グッズ制作！？ 6/19(金)の配信でいっしょに考えよう！',
+    url: '/schedule',
+    image: '/info/goods.svg',
+  },
+  {
+    date: '2026.06.18',
+    category: 'costume',
+    title: '新衣装計画、進行中…！',
+    url: 'https://x.com/WakamatsuIori',
+    image: '/info/costume.svg',
+  },
+  {
+    date: '2026.06.18',
+    category: 'info',
+    title: '公式サイトを公開しました！',
+    url: '/about',
+    image: '/info/open.svg',
+  },
+  // 追加例: { date: '2026.06.20', category: 'info', title: 'タイトル', url: 'https://example.com/...' },
 ];
