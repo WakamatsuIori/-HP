@@ -170,6 +170,39 @@ try {
     </div>
   </section>
 
+  {
+    information.length > 0 && (
+      <section class="lp-section" id="information">
+        <div class="lp-inner reveal">
+          <SectionHead kicker="INFORMATION" title="お知らせ" />
+          <ul class="info-grid">
+            {information.map((item) => (
+              <li class="info-card">
+                <a href={item.url} {...externalAttrs(item.url)}>
+                  <span class="info-thumb">
+                    {item.image ? (
+                      <img src={item.image} alt="" loading="lazy" decoding="async" />
+                    ) : (
+                      <span class="info-thumb__ph">{item.category}</span>
+                    )}
+                  </span>
+                  <span class="info-meta">
+                    <time>{item.date}</time>
+                    <span class="info-cat">{item.category}</span>
+                  </span>
+                  <span class="info-title">{item.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div class="sec-cta">
+            <a class="btn btn-ghost-dark sm" href="/news">過去のおしらせ一覧 →</a>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   <section class="lp-section lp-section--tint" id="schedule">
     <div class="lp-inner reveal">
       <SectionHead kicker="SCHEDULE" title="今週の予定" />
@@ -248,39 +281,6 @@ try {
     </div>
   </section>
 
-  {
-    information.length > 0 && (
-      <section class="lp-section" id="information">
-        <div class="lp-inner reveal">
-          <SectionHead kicker="INFORMATION" title="お知らせ" />
-          <ul class="info-grid">
-            {information.map((item) => (
-              <li class="info-card">
-                <a href={item.url} {...externalAttrs(item.url)}>
-                  <span class="info-thumb">
-                    {item.image ? (
-                      <img src={item.image} alt="" loading="lazy" decoding="async" />
-                    ) : (
-                      <span class="info-thumb__ph">{item.category}</span>
-                    )}
-                  </span>
-                  <span class="info-meta">
-                    <time>{item.date}</time>
-                    <span class="info-cat">{item.category}</span>
-                  </span>
-                  <span class="info-title">{item.title}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-          <div class="sec-cta">
-            <a class="btn btn-ghost-dark sm" href="/news">過去のおしらせ一覧 →</a>
-          </div>
-        </div>
-      </section>
-    )
-  }
-
   <section class="lp-section lp-section--tint" id="goods">
     <div class="lp-inner reveal">
       <SectionHead kicker="STORE" title="ストア" />
@@ -317,16 +317,19 @@ try {
     </div>
   </section>
 
-  <section class="lp-section lp-section--tint" id="discography">
-    <div class="lp-inner reveal">
-      <SectionHead kicker="DISCOGRAPHY" title="活動実績" />
-      <p class="sec-lead">これまでの活動実績・お仕事情報をこちらに掲載予定です。</p>
-      <div class="gallery-soon">Coming soon …</div>
-      <div class="sec-cta">
-        <a class="btn btn-ghost-dark sm" href="/work">お仕事のご依頼はこちら →</a>
+  {/* 活動実績は中身が揃うまで一旦非表示（指示 2026-06-18）。掲載するときは false を true に戻す。 */}
+  {false && (
+    <section class="lp-section lp-section--tint" id="discography">
+      <div class="lp-inner reveal">
+        <SectionHead kicker="DISCOGRAPHY" title="活動実績" />
+        <p class="sec-lead">これまでの活動実績・お仕事情報をこちらに掲載予定です。</p>
+        <div class="gallery-soon">Coming soon …</div>
+        <div class="sec-cta">
+          <a class="btn btn-ghost-dark sm" href="/work">お仕事のご依頼はこちら →</a>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  )}
 
   <section class="lp-section" id="guideline">
     <div class="lp-inner reveal">
