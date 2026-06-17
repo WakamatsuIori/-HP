@@ -12,17 +12,21 @@ import { externalAttrs } from '../lib/links';
       <p class="placeholder-note">お知らせはまだありません。</p>
     ) : (
       <ul class="news-list">
-        {information.map((item) => (
-          <li class="news-item">
-            <a href={item.url} {...externalAttrs(item.url)}>
-              <span class="news-meta">
-                <time>{item.date}</time>
-                <span class="news-cat">{item.category}</span>
-              </span>
-              <span class="news-title">{item.title}</span>
-            </a>
-          </li>
-        ))}
+        {information.map((item) => {
+          const Tag = item.url ? 'a' : 'div';
+          const linkProps = item.url ? { href: item.url, ...externalAttrs(item.url) } : {};
+          return (
+            <li class="news-item">
+              <Tag class="news-item__inner" {...linkProps}>
+                <span class="news-meta">
+                  <time>{item.date}</time>
+                  <span class="news-cat">{item.category}</span>
+                </span>
+                <span class="news-title">{item.title}</span>
+              </Tag>
+            </li>
+          );
+        })}
       </ul>
     )
   }
@@ -40,7 +44,7 @@ import { externalAttrs } from '../lib/links';
   .news-item:last-child {
     border-bottom: 1px solid var(--line);
   }
-  .news-item a {
+  .news-item__inner {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;

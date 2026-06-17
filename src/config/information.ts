@@ -8,8 +8,8 @@ export interface InfoItem {
   /** 自由なラベル（例 info / goods / stream / song） */
   category: string;
   title: string;
-  /** リンク先（外部URL or サイト内パス /schedule など） */
-  url: string;
+  /** リンク先（外部URL or サイト内パス /schedule など）。省略すると「表示だけ（リンク無し）」になる。 */
+  url?: string;
   /** バナー画像URL（任意）。public/配下のパスや外部URL。無ければ既定デザイン */
   image?: string;
 }
@@ -27,14 +27,12 @@ export const information: InfoItem[] = [
     date: '2026.06.18',
     category: 'costume',
     title: '新衣装計画、進行中…！',
-    url: 'https://x.com/WakamatsuIori',
     image: '/info/costume.svg',
   },
   {
     date: '2026.06.18',
     category: 'info',
     title: '公式サイトを公開しました！',
-    url: '/about',
     image: '/info/open.svg',
   },
   // 追加例: { date: '2026.06.20', category: 'info', title: 'タイトル', url: 'https://example.com/...' },

@@ -176,24 +176,28 @@ try {
         <div class="lp-inner reveal">
           <SectionHead kicker="INFORMATION" title="お知らせ" />
           <ul class="info-grid">
-            {information.map((item) => (
-              <li class="info-card">
-                <a href={item.url} {...externalAttrs(item.url)}>
-                  <span class="info-thumb">
-                    {item.image ? (
-                      <img src={item.image} alt="" loading="lazy" decoding="async" />
-                    ) : (
-                      <span class="info-thumb__ph">{item.category}</span>
-                    )}
-                  </span>
-                  <span class="info-meta">
-                    <time>{item.date}</time>
-                    <span class="info-cat">{item.category}</span>
-                  </span>
-                  <span class="info-title">{item.title}</span>
-                </a>
-              </li>
-            ))}
+            {information.map((item) => {
+              const Tag = item.url ? 'a' : 'div';
+              const linkProps = item.url ? { href: item.url, ...externalAttrs(item.url) } : {};
+              return (
+                <li class="info-card">
+                  <Tag class="info-card__inner" {...linkProps}>
+                    <span class="info-thumb">
+                      {item.image ? (
+                        <img src={item.image} alt="" loading="lazy" decoding="async" />
+                      ) : (
+                        <span class="info-thumb__ph">{item.category}</span>
+                      )}
+                    </span>
+                    <span class="info-meta">
+                      <time>{item.date}</time>
+                      <span class="info-cat">{item.category}</span>
+                    </span>
+                    <span class="info-title">{item.title}</span>
+                  </Tag>
+                </li>
+              );
+            })}
           </ul>
           <div class="sec-cta">
             <a class="btn btn-ghost-dark sm" href="/news">過去のおしらせ一覧 →</a>
@@ -951,7 +955,7 @@ try {
     padding: 0;
     list-style: none;
   }
-  .info-card a { display: block; text-decoration: none; color: var(--text); }
+  .info-card__inner { display: block; text-decoration: none; color: var(--text); }
   .info-thumb {
     position: relative;
     display: block;
