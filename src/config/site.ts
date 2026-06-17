@@ -9,8 +9,8 @@ export const site = {
   description: 'VTuber・和香松庵の公式サイト。配信予定・動画・グッズ・お仕事のご依頼はこちらから。',
   /** 公式リンク（なりすまし対策として全ページから参照する） */
   links: {
-    youtube: 'https://www.youtube.com/channel/UC_7ehPcs0J67P-5k-qJmjmA',
-    x: 'https://x.com/Wakamatsu_VT',
+    youtube: 'https://www.youtube.com/@Wakamatsu-Iori',
+    x: 'https://x.com/WakamatsuIori',
     booth: 'https://wakamatsu-iori.booth.pm/',
     /** マシュマロ（匿名で質問・メッセージを受け取る） */
     marshmallow: 'https://marshmallow-qa.com/wakamatsu_vt',
