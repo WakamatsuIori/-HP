@@ -7,6 +7,11 @@ export const site = {
   name: '和香松庵',
   /** サイトの1行説明 */
   description: 'VTuber・和香松庵の公式サイト。配信予定・動画・グッズ・お仕事のご依頼はこちらから。',
+  /**
+   * トップページの <title>（検索集客用）。下層ページは「ページ名 | name」だが、
+   * トップは name だけだと弱いので、読み仮名＋肩書を含めて検索ヒット率を上げる。
+   */
+  homeTitle: '和香松庵（わかまつ いおり）｜個人勢VTuber・Cafe&Barの店長',
   /** 公式リンク（なりすまし対策として全ページから参照する） */
   links: {
     youtube: 'https://www.youtube.com/@Wakamatsu-Iori',

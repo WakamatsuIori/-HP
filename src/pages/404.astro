@@ -1,0 +1,81 @@
+---
+import Base from '../layouts/Base.astro';
+
+// Astroが 404.html を生成 → Cloudflare Pages が存在しないURLに自動で HTTP 404 を返す（ソフト404の解消）。
+// このページ自体は検索結果に出す意味がないので noindex（slot="head" で robots メタを差し込む）。
+---
+
+<Base title="ページが見つかりません" description="お探しのページは見つかりませんでした。">
+  <meta name="robots" content="noindex, follow" slot="head" />
+
+  <section class="nf">
+    <p class="nf__code">404</p>
+    <h1 class="nf__title">ページが見つかりません</h1>
+    <p class="nf__lead">
+      お探しのページは、移動または削除された可能性があります。<br />
+      お手数ですが、下記からお戻りください。
+    </p>
+    <div class="nf__cta">
+      <a class="nf__btn nf__btn--gold" href="/">トップへ戻る</a>
+      <a class="nf__btn nf__btn--ghost" href="/#schedule">今週の予定を見る</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    text-align: center;
+    padding: clamp(2rem, 8vw, 4.5rem) 0;
+  }
+  .nf__code {
+    margin: 0;
+    font-family: var(--font-logo);
+    font-size: clamp(4rem, 18vw, 7rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+  }
+  .nf__title {
+    margin: 0.6rem 0 0;
+    border: none;
+    padding: 0;
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+    color: var(--text);
+  }
+  .nf__title::after { content: none; }
+  .nf__lead {
+    margin: 1rem auto 0;
+    max-width: 28rem;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+  .nf__cta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-top: 1.8rem;
+  }
+  .nf__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.72rem 1.6rem;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+  }
+  .nf__btn--gold { background: #6f6444; color: #faf9f6; }
+  .nf__btn--gold:hover { background: #847650; transform: translateY(-1px); }
+  .nf__btn--ghost {
+    border: 1px solid var(--accent);
+    color: var(--accent-strong);
+    background: var(--card);
+  }
+  .nf__btn--ghost:hover { background: rgba(156, 143, 107, 0.1); transform: translateY(-1px); }
+  @media (prefers-reduced-motion: reduce) {
+    .nf__btn { transition: none; }
+  }
+</style>

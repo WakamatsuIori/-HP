@@ -7,7 +7,7 @@ interface Props {
   description?: string;
 }
 const { title, description = site.description } = Astro.props;
-const pageTitle = title ? `${title} | ${site.name}` : site.name;
+const pageTitle = title ? `${title} | ${site.name}` : site.homeTitle;
 
 // OGP/正規URL用の絶対URL（Astro.site = astro.config.mjs の site から生成）
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);

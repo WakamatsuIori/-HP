@@ -28,7 +28,7 @@
 ### Phase 3 HPの存在意義 … 🔶 一部
 - **#9 お仕事依頼ページ … ⬜** `work.astro` はプレースホルダ（**フォーム未設置**・X DM誘導のみ）。←案件導線＝最優先
 - **#10 ガイドライン/プロフィール/プライバシー … 🔶** ガイドラインはトップに集約（独立ページ廃止）／`privacy.astro` は仮文言／プロフィールは `config/profile.ts` に構造化済（文言は仮）
-- **#11 SEO … 🔶** JSON-LD(Person+WebSite)・`llms.txt`・`sitemap.xml` は実装済（`Base.astro`／`pages/*.ts`）／**GA4・Search Console は未設置**／FAQPage・VideoObject・Event は据え置き
+- **#11 SEO … 🔶** JSON-LD(Person+WebSite)・`llms.txt`・`sitemap.xml` は実装済（`Base.astro`／`pages/*.ts`）／GA4・Search Console 設置済／**トップ`<title>`を集客向けに強化**（`site.ts`の`homeTitle`・2026-06-19）／**404ページ追加**（`src/pages/404.astro`＝`noindex`・Cloudflareが存在しないURLにHTTP404を返す＝ソフト404解消・2026-06-19）／VideoObject・Event は据え置き
 
 ### Phase 4 半自動の頭脳 … 🔶 / ⬜
 - **#12 AI告知文生成→Notion承認 … ⬜**（`prompts/`・`docs/persona.md` 未作成）
