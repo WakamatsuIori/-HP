@@ -1,0 +1,28 @@
+# GitHub Actions の schedule は60日間コミットがないと自動停止する。
+# このワークフローが毎月タイムスタンプを更新してその問題を防ぐ。
+# [skip ci] を付けているので本番ビルド（build.yml）はトリガーされない。
+name: keepalive
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'  # 毎月1日 UTC 0:00（約30日ごと → 60日制限に十分余裕）
+  workflow_dispatch:       # 手動実行も可（動作確認用）
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: タイムスタンプを更新してコミット
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          date -u "+%Y-%m-%dT%H:%MZ" > .github/keepalive
+          git add .github/keepalive
+          git diff --cached --quiet \
+            && echo "変更なし（スキップ）" \
+            || git commit -m "chore: keepalive [skip ci]" && git push
