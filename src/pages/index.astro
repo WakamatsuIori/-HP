@@ -124,6 +124,18 @@ try {
     </div>
   </section>
 
+  {/* ヒーロー直下：最新お知らせ1件の細いバー（押すと下のお知らせ欄へスクロール） */}
+  {
+    information.length > 0 && (
+      <a class="newsbar" href="#information">
+        <span class="newsbar__tag">✦ NEW</span>
+        <time class="newsbar__date">{information[0]?.date}</time>
+        <span class="newsbar__title">{information[0]?.title}</span>
+        <span class="newsbar__more">お知らせへ <span aria-hidden="true">→</span></span>
+      </a>
+    )
+  }
+
   {/* ===== PROFILE：プロフィール項目（表）＋ごあいさつ（テキスト左＋立ち絵右） ===== */}
   <section class="lp-section" id="profile">
     {/* プロフィール項目（立ち絵左＋表右） */}
@@ -171,43 +183,6 @@ try {
       </div>
     </div>
   </section>
-
-  {
-    information.length > 0 && (
-      <section class="lp-section" id="information">
-        <div class="lp-inner reveal">
-          <SectionHead kicker="INFORMATION" title="お知らせ" />
-          <ul class="info-grid">
-            {information.map((item) => {
-              const Tag = item.url ? 'a' : 'div';
-              const linkProps = item.url ? { href: item.url, ...externalAttrs(item.url) } : {};
-              return (
-                <li class="info-card">
-                  <Tag class="info-card__inner" {...linkProps}>
-                    <span class="info-thumb">
-                      {item.image ? (
-                        <img src={item.image} alt="" loading="lazy" decoding="async" />
-                      ) : (
-                        <span class="info-thumb__ph">{item.category}</span>
-                      )}
-                    </span>
-                    <span class="info-meta">
-                      <time>{item.date}</time>
-                      <span class="info-cat">{item.category}</span>
-                    </span>
-                    <span class="info-title">{item.title}</span>
-                  </Tag>
-                </li>
-              );
-            })}
-          </ul>
-          <div class="sec-cta">
-            <a class="btn btn-ghost-dark sm" href="/news">過去のおしらせ一覧 →</a>
-          </div>
-        </div>
-      </section>
-    )
-  }
 
   <section class="lp-section lp-section--tint" id="schedule">
     <div class="lp-inner reveal">
@@ -278,6 +253,43 @@ try {
       }
     </div>
   </section>
+
+  {
+    information.length > 0 && (
+      <section class="lp-section" id="information">
+        <div class="lp-inner lp-inner--info reveal">
+          <SectionHead kicker="INFORMATION" title="お知らせ" />
+          <ul class="info-grid">
+            {information.slice(0, 3).map((item) => {
+              const Tag = item.url ? 'a' : 'div';
+              const linkProps = item.url ? { href: item.url, ...externalAttrs(item.url) } : {};
+              return (
+                <li class="info-card">
+                  <Tag class="info-card__inner" {...linkProps}>
+                    <span class="info-thumb">
+                      {item.image ? (
+                        <img src={item.image} alt="" loading="lazy" decoding="async" />
+                      ) : (
+                        <span class="info-thumb__ph">{item.category}</span>
+                      )}
+                    </span>
+                    <span class="info-meta">
+                      <time>{item.date}</time>
+                      <span class="info-cat">{item.category}</span>
+                    </span>
+                    <span class="info-title">{item.title}</span>
+                  </Tag>
+                </li>
+              );
+            })}
+          </ul>
+          <div class="sec-cta">
+            <a class="btn btn-ghost-dark sm" href="/news">過去のおしらせ一覧 →</a>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   <section class="lp-section" id="gallery">
     <div class="lp-inner reveal">
@@ -951,11 +963,41 @@ try {
   /* ===== INFORMATION（お知らせ） ===== */
   .info-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: 1fr;
     gap: 1.4rem;
     margin: 1.3rem 0 0;
     padding: 0;
     list-style: none;
+  }
+  @media (min-width: 600px) { .info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 900px) { .info-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  /* お知らせは最新3枚を1行に並べたいので、この帯だけ内側幅を広げる */
+  @media (min-width: 900px) { .lp-inner.lp-inner--info { max-width: 1040px; } }
+
+  /* ヒーロー直下の「最新お知らせ」細いバー（押すと #information へ） */
+  .newsbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0.62rem 1.25rem;
+    border-top: 1px solid var(--line, rgba(58, 53, 45, 0.14));
+    border-bottom: 1px solid var(--line, rgba(58, 53, 45, 0.14));
+    background: #f4efe4;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.92rem;
+  }
+  .newsbar__tag { flex-shrink: 0; color: var(--accent-strong); font-weight: 600; letter-spacing: 0.08em; font-size: 0.8rem; }
+  .newsbar__date { flex-shrink: 0; color: var(--muted); font-size: 0.8rem; }
+  .newsbar__title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .newsbar__more { flex-shrink: 0; color: var(--accent-strong); font-size: 0.82rem; white-space: nowrap; }
+  @media (hover: hover) { .newsbar:hover .newsbar__more { text-decoration: underline; text-underline-offset: 2px; } }
+  @media (max-width: 640px) {
+    .newsbar { font-size: 0.86rem; gap: 0.5rem; padding: 0.55rem 1rem; }
+    .newsbar__date { display: none; }
+    .newsbar__more { font-size: 0.78rem; }
   }
   .info-card__inner { display: block; text-decoration: none; color: var(--text); }
   .info-thumb {
