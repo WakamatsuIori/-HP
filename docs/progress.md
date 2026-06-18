@@ -22,7 +22,7 @@
 - **#6 ライブ判定の窓方式 / 確定枠の埋め込み / カレンダー書き戻し … 🔶**
   - 済: ライブ中バッジ（ビルド時 `liveBroadcastContent=="live"` 検知。`LiveBadge.astro`、トップに表示）
   - **未: ①1分間隔の窓方式ワーカー ②確定枠（YouTube枠↔カレンダー予定）の埋め込み表示 ③カレンダー書き戻し（説明欄へPATCH追記）**。※`functions/_lib/google.ts` は現状 insert/delete のみ（書き戻しPATCHは無い）
-- **#7 BOOTHグッズ … 🔶** BOOTHがRSS提供終了（実ブラウザでも HTTP 406）→ 自動掲載は不可。現状は**ショップへのリンクのみ**（`goods.astro`、静的・fetchなし）。休眠コード（手動カード化なら再利用／リンク確定なら削除）: `lib/booth.ts`・`loadGoods.ts`・`GoodsList.astro`・`fetcher.ts`の`fetchTextAsBrowser`・`booth.test.ts`・`fixtures/sample-booth.rss`
+- **#7 BOOTHグッズ … ✅（リンクのみで方針確定・2026-06-19）** BOOTHがRSS提供終了（実ブラウザでも HTTP 406）→ 自動掲載は不可。**HPはショーケースに徹し購入はBOOTHへのリンクで誘導**（`goods.astro`、静的・fetchなし）。方針確定に伴い旧BOOTH取得コードは**削除済み**: `lib/booth.ts`・`loadGoods.ts`・`GoodsList.astro`・`fetcher.ts`の`fetchTextAsBrowser`・`site.ts`の`boothFeedUrl`・`booth.test.ts`・`fixtures/sample-booth.rss`・`docs/setup/06-booth-feed.md`（必要時はgit履歴から復活可）。※手動カード掲載は「後回し」
 - **#8 フォールバック（最終更新時刻）＋冪等性 … ✅**
 
 ### Phase 3 HPの存在意義 … 🔶 一部

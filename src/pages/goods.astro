@@ -2,10 +2,10 @@
 import Base from '../layouts/Base.astro';
 import { site } from '../config/site';
 
-// グッズ方針は「保留」（ユーザー選択 2026-06-13）。
+// グッズ方針は「リンクのみで確定」（ユーザー選択 2026-06-19）。
 // BOOTHはRSS提供を停止しており（実ブラウザでも items.rss が HTTP 406）、外部サイト向けの
-// 公式埋め込みウィジェットも無いため「自動掲載」は不可能。当面はショップへのリンク表示にする。
-// ※将来 (a)手動カード掲載 or (b)リンクのみ確定 を決める。BOOTH取得コードは休眠保存（docs/progress.md）。
+// 公式埋め込みウィジェットも無いため「自動掲載」は不可能。HPはショーケースに徹し、購入はBOOTHへのリンクで誘導する。
+// ※旧BOOTH取得コード（booth.ts/loadGoods.ts/GoodsList.astro 等）は方針確定に伴い削除済み（必要時はgit履歴から復活可）。
 ---
 
 <Base title="ストア" description="BOOTHストアでは、配信に使える自作のOBSウィジェットなどを販売中。オリジナルグッズも順次追加予定です。">

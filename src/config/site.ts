@@ -22,7 +22,5 @@ export const site = {
   sources: {
     /** YouTubeチャンネルID（UCで始まる24文字）。動画一覧・ライブ検知に使用。取得: docs/setup/05-youtube-api.md */
     youtubeChannelId: 'UC_7ehPcs0J67P-5k-qJmjmA',
-    /** BOOTHショップのRSSフィードURL（例: https://〇〇.booth.pm/items.rss）。取得: docs/setup/06-booth-feed.md */
-    boothFeedUrl: 'https://wakamatsu-iori.booth.pm/items.rss',
   },
 } as const;
