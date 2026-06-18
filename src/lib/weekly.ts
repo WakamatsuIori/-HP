@@ -1,6 +1,6 @@
 /**
  * カレンダーの予定（StreamEvent[]）を「今週(月〜日)」の週間ボード用データに変換する純関数。
- * 日時はすべて日本時間(JST)で扱う。空き日は「本日休業」になる。
+ * 日時はすべて日本時間(JST)で扱う。空き日は「休業」になる。
  */
 // 相対importは拡張子(.ts)付き：Node 24 がこの .ts を直接実行（型ストリッピング）する際、
 // 拡張子なしの相対指定は解決できないため（ポスター生成 scripts/make-poster.mjs 経由で読まれる）。
@@ -54,7 +54,7 @@ export function buildWeek(events: StreamEvent[], now: Date = new Date(), weekOff
       ja: JA[dd.getUTCDay()],
       date: `${dd.getUTCMonth() + 1}/${dd.getUTCDate()}`,
       time: off ? '' : jstTime(ev.start),
-      title: ev ? ev.title : '本日休業',
+      title: ev ? ev.title : '休業',
       featured: !off && (ev.description ?? '').includes(FEATURED_MARK),
     });
   }

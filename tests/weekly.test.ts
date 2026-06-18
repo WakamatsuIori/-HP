@@ -28,10 +28,10 @@ describe('buildWeek', () => {
     expect(wk.range).toBe('6/15 〜 6/21');
   });
 
-  it('予定が無い日は「本日休業」・時刻空・featuredなし', () => {
+  it('予定が無い日は「休業」・時刻空・featuredなし', () => {
     const wk = buildWeek([], NOW_WED);
     for (const d of wk.days) {
-      expect(d.title).toBe('本日休業');
+      expect(d.title).toBe('休業');
       expect(d.time).toBe('');
       expect(d.featured).toBe(false);
     }
