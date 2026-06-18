@@ -40,3 +40,26 @@ export function loadSchedule(): Promise<StreamEvent[]> {
   }
   return loadScheduleWith(fetchText, new Date());
 }
+
+/**
+ * 週間ボード（今週/来週）専用の読み込み。
+ * upcomingEvents の「これから先だけ」絞りを掛けず、今週の月曜〜来週の日曜を確実に含む広めの窓で読む。
+ * → 過ぎた日の予定もボードに残る（消化済みが「休業」に化けない）。一覧/カウントダウンは従来どおり loadSchedule を使う。
+ */
+export async function loadWeekEventsWith(fetcher: TextFetcher, now: Date): Promise<StreamEvent[]> {
+  const icsText = await fetcher(icsUrl());
+  // 今週の月曜は最大で6日前、来週の日曜は最大で13日後。余白込みで [-8日, +16日] なら必ず両週を含む。
+  const windowStart = new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000);
+  const windowEnd = new Date(now.getTime() + 16 * 24 * 60 * 60 * 1000);
+  return parseIcsEvents(icsText, windowStart, windowEnd);
+}
+
+let weekCache: Promise<StreamEvent[]> | null = null;
+
+export function loadWeekEvents(): Promise<StreamEvent[]> {
+  if (import.meta.env.PROD) {
+    weekCache ??= loadWeekEventsWith(fetchText, new Date());
+    return weekCache;
+  }
+  return loadWeekEventsWith(fetchText, new Date());
+}

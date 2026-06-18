@@ -6,7 +6,7 @@ import LiveBadge from '../components/LiveBadge.astro';
 import WeeklyBoard from '../components/WeeklyBoard.astro';
 import SectionHead from '../components/SectionHead.astro';
 import { site } from '../config/site';
-import { loadSchedule } from '../lib/loadSchedule';
+import { loadSchedule, loadWeekEvents } from '../lib/loadSchedule';
 import { loadVideos } from '../lib/loadVideos';
 import type { LiveStatus, Video } from '../lib/youtube';
 import type { StreamEvent } from '../lib/ics';
@@ -36,17 +36,19 @@ function buildSampleEvents(): StreamEvent[] {
   ];
 }
 
+// カウントダウン「次の配信」用＝これから先の予定だけ（従来どおり）。
 const events = await loadSchedule();
 const previewEvents = import.meta.env.DEV && events.length === 0 ? buildSampleEvents() : [];
 const allEvents = events.length ? events : previewEvents;
 const next = allEvents[0] ?? null;
 
-// 週間ボード用データ：本番＝今週/来週(月〜日)の実データ。devで実データが空のときだけ
-// ボードの既定サンプルを表示してレイアウト確認できるようにする。
-const showSample = import.meta.env.DEV && events.length === 0;
+// 週間ボード用＝今週の月曜〜来週の日曜の全予定（過去日も残す＝消化済みが「休業」に化けない）。
+const weekEvents = await loadWeekEvents();
+// devで実データが空のときだけ、ボードの既定サンプルでレイアウト確認できるようにする。
+const showSample = import.meta.env.DEV && weekEvents.length === 0;
 const nowDate = new Date();
-const weekData = showSample ? null : buildWeek(events, nowDate, 0);
-const nextWeekData = showSample ? null : buildWeek(events, nowDate, 1);
+const weekData = showSample ? null : buildWeek(weekEvents, nowDate, 0);
+const nextWeekData = showSample ? null : buildWeek(weekEvents, nowDate, 1);
 
 // 動画(YouTube)はトップの主役ではないので、未設定・取得失敗でもトップ全体は表示を続ける。
 // （/videos ページは従来どおり厳格＝設定漏れはビルド失敗のまま。CLAUDE.md §4）
