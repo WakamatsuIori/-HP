@@ -13,10 +13,13 @@ const pageTitle = title ? `${title} | ${site.name}` : site.name;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageURL = new URL('/og.jpg', Astro.site); // SNSシェアカードの画像（横長キービジュアル）
 
-// GA4 計測ID（PUBLIC_GA4_ID が設定されているページのみスクリプトを出力）
-// CI(GitHub Actions)では env が process.env 経由で渡るため import.meta.env をフォールバックする
-// （YOUTUBE_API_KEY 等と同じ二段構え）。|| で空文字も次へ流す。
-const ga4Id = import.meta.env.PUBLIC_GA4_ID || process.env.PUBLIC_GA4_ID || '';
+// GA4 計測ID。GA4の測定IDはクライアントHTMLに必ず露出する「公開ID」（秘密ではない）。
+// このサイトは GitHub Actions でビルドするが、CIでは env が import.meta.env に載らず
+// 計測タグが出ない問題があったため、本番ビルド時は公開IDを直接埋め込む。
+// import.meta.env.PROD は astro build で true / astro dev で false（Vite組み込み・確実）。
+// → 本番のみ計測、ローカルdevでは出さないので自分のアクセスでGAを汚さない。
+const GA4_ID = 'G-ZKZMY31TTQ';
+const ga4Id = import.meta.env.PROD ? GA4_ID : '';
 
 // 構造化データ（AEO/SEO）。sameAs で公式SNSを相互リンクし「ここが一次情報源」とAIに認識させる。
 const homeURL = new URL('/', Astro.site).toString();
