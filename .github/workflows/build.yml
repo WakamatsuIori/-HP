@@ -20,7 +20,9 @@ permissions:
   actions: read # 失敗通知で「直前の実行も失敗していたか」を確認するため
 
 env:
-  PAGES_PROJECT_NAME: vtuber-hp
+  # 独自ドメイン(wakamatsu-iori.com)が紐づく Pages プロジェクト名。
+  # 以前は別プロジェクト "vtuber-hp"(vtuber-hp-2gu.pages.dev) に配っていてドメインに反映されなかった。
+  PAGES_PROJECT_NAME: wakamatsu-iori-hp
 
 jobs:
   build-and-deploy:
@@ -44,11 +46,6 @@ jobs:
         env:
           ICS_URL: ${{ secrets.ICS_URL }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-
-      - name: GAタグがdistに入ったか確認（暫定デバッグ・後で削除）
-        run: |
-          echo "GA tag count in dist/index.html:"
-          grep -c 'G-ZKZMY31TTQ' dist/index.html || echo "0 (見つからず)"
 
       - name: Cloudflare Pagesプロジェクトを用意（初回のみ作成・既存ならスキップ）
         run: npx wrangler@3 pages project create ${{ env.PAGES_PROJECT_NAME }} --production-branch=main || echo "プロジェクトは既に存在します（スキップ）"
