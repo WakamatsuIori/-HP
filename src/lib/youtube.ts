@@ -48,6 +48,10 @@ interface RawItem {
     videoPublishedAt?: string;
     relatedPlaylists?: { uploads?: string };
   };
+  statistics?: {
+    subscriberCount?: string;
+    hiddenSubscriberCount?: boolean;
+  };
 }
 interface RawListResponse {
   items?: RawItem[];
@@ -87,6 +91,18 @@ export function parseUploadsPlaylistId(json: unknown): string | null {
     if (id) return id;
   }
   return null;
+}
+
+/** channels.list(part=statistics) から登録者数を取り出す（非公開・不正値は null） */
+export function parseChannelStats(json: unknown): { subscriberCount: number | null } {
+  for (const item of asList(json)) {
+    const st = item.statistics;
+    if (!st) continue;
+    if (st.hiddenSubscriberCount) return { subscriberCount: null };
+    const n = Number(st.subscriberCount);
+    return { subscriberCount: Number.isFinite(n) && n > 0 ? n : null };
+  }
+  return { subscriberCount: null };
 }
 
 /** 動画IDで重複排除（入力順を保持） */

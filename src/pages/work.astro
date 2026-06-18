@@ -1,10 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
 import { site } from '../config/site';
+import { loadChannelStats } from '../lib/loadVideos';
 
 // Googleフォームの埋め込みURL。作成手順: docs/setup/07-contact-form.md
 // 形式: https://docs.google.com/forms/d/e/〇〇/viewform?embedded=true
 const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdV7Q2d-qkEJYaD11tSFmCIget_amkYShhPh44HAhBd4rU1ew/viewform?embedded=true';
+
+// YouTube登録者数を自動取得（最新値）。取得失敗・非公開時は行を出さない＝お仕事ページは落とさない。
+let subscriberCount: number | null = null;
+try {
+  subscriberCount = (await loadChannelStats()).subscriberCount;
+} catch {
+  subscriberCount = null;
+}
+const subscribersText = subscriberCount != null ? `${subscriberCount.toLocaleString('ja-JP')}人` : null;
 ---
 
 <Base title="お仕事依頼" description={`${site.name}へのお仕事のご依頼・コラボ等のご相談はこちら。`}>
@@ -50,32 +60,18 @@ const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdV7Q2d-qkEJYaD11tSFm
   <h2>メディアキット</h2>
   <div class="media-kit">
     <dl class="kit-stats">
-      <div class="kit-stat">
-        <dt>活動開始</dt>
-        <dd class="placeholder-val">——</dd>
-      </div>
-      <div class="kit-stat">
-        <dt>YouTube 登録者数</dt>
-        <dd class="placeholder-val">——</dd>
-      </div>
-      <div class="kit-stat">
-        <dt>平均視聴数</dt>
-        <dd class="placeholder-val">——</dd>
-      </div>
-      <div class="kit-stat">
-        <dt>配信頻度</dt>
-        <dd class="placeholder-val">——</dd>
-      </div>
+      {subscribersText && (
+        <div class="kit-stat">
+          <dt>YouTube 登録者数</dt>
+          <dd>{subscribersText}</dd>
+        </div>
+      )}
       <div class="kit-stat">
         <dt>主な配信ジャンル</dt>
-        <dd>ゲーム実況・雑談・歌枠</dd>
-      </div>
-      <div class="kit-stat">
-        <dt>視聴者層</dt>
-        <dd class="placeholder-val">——</dd>
+        <dd>ゲーム実況・雑談・作業配信</dd>
       </div>
     </dl>
-    <p class="kit-note">詳細な資料はご相談時に別途ご提供できます。</p>
+    <p class="kit-note">登録者数・視聴データ等の詳しい資料は、ご相談時に別途ご提供できます。</p>
   </div>
 
   <h2>お問い合わせ</h2>

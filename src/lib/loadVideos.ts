@@ -13,6 +13,7 @@ import {
   parsePlaylists,
   parseLiveStatus,
   parseVideosById,
+  parseChannelStats,
   sortByNewest,
   type Video,
   type VideoPlaylist,
@@ -155,4 +156,24 @@ let cache: Promise<VideosData> | null = null;
 export function loadVideos(): Promise<VideosData> {
   cache ??= loadVideosWith(fetchJson);
   return cache;
+}
+
+export interface ChannelStats {
+  /** 登録者数（非公開・取得不可は null） */
+  subscriberCount: number | null;
+}
+
+/** メディアキット用：チャンネルの登録者数を取得（channels.list=1ユニット）。fetcher差し替え可。 */
+export async function loadChannelStatsWith(fetcher: JsonFetcher): Promise<ChannelStats> {
+  const key = apiKey();
+  const cid = channelId();
+  const json = await fetcher(apiUrl('channels', { part: 'statistics', id: cid }, key));
+  return parseChannelStats(json);
+}
+
+let statsCache: Promise<ChannelStats> | null = null;
+
+export function loadChannelStats(): Promise<ChannelStats> {
+  statsCache ??= loadChannelStatsWith(fetchJson);
+  return statsCache;
 }

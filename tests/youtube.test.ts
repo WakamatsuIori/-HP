@@ -7,6 +7,7 @@ import {
   parsePlaylists,
   parseLiveStatus,
   parseVideosById,
+  parseChannelStats,
   sortByNewest,
 } from '../src/lib/youtube';
 
@@ -80,6 +81,19 @@ describe('parseVideosById', () => {
       ],
     });
     expect(videos.map((v) => v.id)).toEqual(['ok']);
+  });
+});
+
+describe('parseChannelStats', () => {
+  it('登録者数を数値で返す', () => {
+    expect(parseChannelStats({ items: [{ statistics: { subscriberCount: '1230' } }] })).toEqual({ subscriberCount: 1230 });
+  });
+  it('非公開(hidden)・0・不正値・無しは null', () => {
+    expect(parseChannelStats({ items: [{ statistics: { hiddenSubscriberCount: true, subscriberCount: '5' } }] })).toEqual({ subscriberCount: null });
+    expect(parseChannelStats({ items: [{ statistics: { subscriberCount: '0' } }] })).toEqual({ subscriberCount: null });
+    expect(parseChannelStats({ items: [{ statistics: { subscriberCount: 'x' } }] })).toEqual({ subscriberCount: null });
+    expect(parseChannelStats({ items: [{}] })).toEqual({ subscriberCount: null });
+    expect(parseChannelStats({})).toEqual({ subscriberCount: null });
   });
 });
 
