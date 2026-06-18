@@ -13,6 +13,9 @@ const pageTitle = title ? `${title} | ${site.name}` : site.name;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageURL = new URL('/og.jpg', Astro.site); // SNSシェアカードの画像（横長キービジュアル）
 
+// GA4 計測ID（PUBLIC_GA4_ID が設定されているページのみスクリプトを出力）
+const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? '';
+
 // 構造化データ（AEO/SEO）。sameAs で公式SNSを相互リンクし「ここが一次情報源」とAIに認識させる。
 const homeURL = new URL('/', Astro.site).toString();
 const personLd = {
@@ -71,8 +74,20 @@ const nav = [
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
 
-    {/* OGP / Twitter カード（SNSシェア時のカード表示。画像は全ページ共通のキービジュアル）
-        ※ 構造化データ(JSON-LD)・GA等の本格SEOは Phase 3 で実装 */}
+    {/* Google Analytics 4（PUBLIC_GA4_ID が設定されている場合のみ出力） */}
+    {ga4Id && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} />
+        <script define:vars={{ ga4Id }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', ga4Id);
+        </script>
+      </>
+    )}
+
+    {/* OGP / Twitter カード（SNSシェア時のカード表示。画像は全ページ共通のキービジュアル） */}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={pageTitle} />
@@ -90,6 +105,8 @@ const nav = [
     {/* 構造化データ（JSON-LD）：人物＋サイト。AI/検索に「公式の一次情報」と認識させる */}
     <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
     <script type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
+    {/* ページ個別の JSON-LD（FAQPage等）を各ページから slot="head" で差し込む受け口 */}
+    <slot name="head" />
 
     {/* 見出し・ロゴ用の明朝（サブセット済み・全ページのヘッダーで使うため先読み）。
         現在の見出しは しっぽり明朝。Zen Old Mincho はフォールバックとして @font-face のみ保持。 */}

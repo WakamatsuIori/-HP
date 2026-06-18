@@ -1,24 +1,156 @@
 ---
 import Base from '../layouts/Base.astro';
 import { site } from '../config/site';
+import { profile, intro } from '../config/profile';
+
+const faqs = [
+  {
+    q: '和香松庵（わかまつ いおり）とはどんなVTuberですか？',
+    a: `カフェ＆バー「Bar Bluebell」の店長を務める個人勢VTuberです。雑談・ゲーム実況・作業配信など、夜のひとときを一緒に過ごせるゆるやかな配信を届けています。`,
+  },
+  {
+    q: 'どんな配信をしていますか？',
+    a: `雑談・ゲーム実況・作業配信が中心です。根っからの笑い上戸で、ゆったりとした雰囲気の隠れ家的な配信を目指しています。`,
+  },
+  {
+    q: 'ファンネームやハッシュタグはありますか？',
+    a: `ファンネームは現在募集中です。配信ハッシュタグは「#和香松庵」、ファンアートは「#ほろ酔い庵」をご使用ください。`,
+  },
+  {
+    q: 'お仕事の依頼はどこから連絡すればいいですか？',
+    a: `お仕事依頼ページのフォーム、またはXのDMにてご連絡ください。案件配信・ボイス出演・イラスト利用許諾などをお受けしています。`,
+  },
+  {
+    q: 'グッズはどこで買えますか？',
+    a: `BOOTHのストアで取り扱っています。自作OBSウィジェット等の販売中アイテムのほか、グッズも順次追加予定です。`,
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+};
 ---
 
-<Base title="About" description={`${site.name}のプロフィール・設定・自己紹介。`}>
+<Base title="About" description={`${site.name}のプロフィール・配信内容・よくある質問。`}>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqLd)} />
+
   <h1>About</h1>
 
   <h2>プロフィール</h2>
-  <p class="placeholder-note">
-    ここに本人のプロフィール（名前の読み・誕生日・好きなもの・配信ジャンルなど）が入ります。
-    内容が確定したらこのページを書き換えます。
-  </p>
+  <dl class="profile-list">
+    {profile.rows.map(({ label, value }) => (
+      <div class="profile-row">
+        <dt>{label}</dt>
+        <dd>{value}</dd>
+      </div>
+    ))}
+  </dl>
 
   <h2>世界観・設定</h2>
-  <p class="placeholder-note">ここにキャラクター設定・世界観の紹介が入ります。</p>
+  <p class="placeholder-note">ここにキャラクター設定・世界観の紹介が入ります（本人確定後に更新）。</p>
+
+  <h2>よくある質問</h2>
+  <dl class="faq-list">
+    {faqs.map(({ q, a }) => (
+      <div class="faq-item">
+        <dt class="faq-q">{q}</dt>
+        <dd class="faq-a">{a}</dd>
+      </div>
+    ))}
+  </dl>
 
   <h2>リンク</h2>
-  <ul>
+  <ul class="link-list">
     <li><a href={site.links.youtube} rel="me noopener" target="_blank">YouTube</a></li>
     <li><a href={site.links.x} rel="me noopener" target="_blank">X</a></li>
-    <li><a href={site.links.booth} rel="me noopener" target="_blank">BOOTH</a></li>
+    <li><a href={site.links.booth} rel="me noopener" target="_blank">BOOTH（ストア）</a></li>
+    <li><a href={site.links.marshmallow} rel="noopener" target="_blank">マシュマロ（匿名メッセージ）</a></li>
   </ul>
 </Base>
+
+<style>
+  /* プロフィール一覧 */
+  .profile-list {
+    margin: 1.25rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--card);
+  }
+  .profile-row {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    align-items: baseline;
+    gap: 0.5rem 1rem;
+    padding: 0.7rem 1.1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .profile-row:last-child { border-bottom: none; }
+  .profile-row dt {
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .profile-row dd {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  @media (max-width: 480px) {
+    .profile-row { grid-template-columns: 6.5rem 1fr; }
+  }
+
+  /* FAQ */
+  .faq-list {
+    margin: 1.25rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .faq-item {
+    padding: 1rem 1.25rem;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  .faq-q {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .faq-q::before {
+    content: 'Q. ';
+    color: var(--accent);
+    font-family: var(--font-logo);
+    font-size: 0.85rem;
+  }
+  .faq-a {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.8;
+    padding-left: 1.2rem;
+    border-left: 2px solid var(--line);
+  }
+
+  /* リンク */
+  .link-list {
+    margin: 1rem 0 0;
+    padding: 0 0 0 1.2rem;
+    line-height: 2.2;
+  }
+</style>
