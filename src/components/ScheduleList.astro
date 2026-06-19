@@ -55,7 +55,8 @@ const days = groupByJstDay(events);
   }
   .schedule-day .time {
     font-variant-numeric: tabular-nums;
-    color: var(--accent);
+    /* 配信時刻＝重要情報。白地で淡い金だとAA未達(3.2)のため濃い金でAA確保(5.86) */
+    color: var(--accent-strong);
     font-weight: 600;
     flex-shrink: 0;
   }
