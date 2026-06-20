@@ -5,17 +5,22 @@ interface Props {
   live: LiveStatus;
 }
 const { live } = Astro.props;
+// ビルド時点の状態を初期表示に使う（JS無効/AIクローラーでもこの状態が見える＝AEO維持）。
+// 訪問後すぐに下の<script>が /api/live で最新状態に上書きする。
+const initial = live.isLive && live.liveVideo ? live.liveVideo : null;
 ---
 
-{
-  live.isLive && live.liveVideo && (
-    <a class="live-badge" href={live.liveVideo.url} rel="noopener" target="_blank">
-      <span class="live-dot" aria-hidden="true" />
-      <span class="live-now">配信中</span>
-      <span class="live-title">{live.liveVideo.title}</span>
-    </a>
-  )
-}
+<a
+  class="live-badge"
+  href={initial?.url ?? '#'}
+  rel="noopener"
+  target="_blank"
+  hidden={initial === null}
+>
+  <span class="live-dot" aria-hidden="true"></span>
+  <span class="live-now">配信中</span>
+  <span class="live-title">{initial?.title ?? ''}</span>
+</a>
 
 <style>
   .live-badge {
@@ -32,6 +37,10 @@ const { live } = Astro.props;
     color: var(--text);
     font-size: 0.9rem;
     box-shadow: 0 1px 4px rgba(66, 63, 56, 0.06);
+  }
+  /* hidden属性をdisplay:inline-flexより優先させて確実に隠す（[hidden]＞.live-badge の詳細度） */
+  .live-badge[hidden] {
+    display: none;
   }
   .live-dot {
     flex-shrink: 0;
@@ -73,3 +82,33 @@ const { live } = Astro.props;
     }
   }
 </style>
+
+<script>
+  // 訪問時に /api/live（120秒キャッシュ・サーバー側でYouTube確認）を読み、
+  // ビルド時の表示を最新の配信状態に上書きする。
+  // ・配信開始 → バッジ点灯（ビルドを待たず即時）
+  // ・配信終了 → バッジ消灯（「終わったのに点きっぱなし」を防ぐ）
+  // 失敗時は何もしない＝ビルド時の表示のまま（ページは壊さない）。
+  (async () => {
+    const badges = Array.from(document.querySelectorAll<HTMLAnchorElement>('.live-badge'));
+    if (badges.length === 0) return;
+    try {
+      const res = await fetch('/api/live', { headers: { accept: 'application/json' } });
+      if (!res.ok) return;
+      const data = (await res.json()) as { isLive?: boolean; liveVideo?: { url?: string; title?: string } | null };
+      const live = data?.isLive === true && data.liveVideo && typeof data.liveVideo.url === 'string' ? data.liveVideo : null;
+      for (const el of badges) {
+        if (live) {
+          el.href = live.url as string;
+          const t = el.querySelector('.live-title');
+          if (t) t.textContent = live.title ?? ''; // 外部由来のタイトルはtextContentで挿入＝XSS回避
+          el.hidden = false;
+        } else {
+          el.hidden = true;
+        }
+      }
+    } catch {
+      /* ネットワーク失敗時はビルド時の表示を維持 */
+    }
+  })();
+</script>
