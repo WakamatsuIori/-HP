@@ -1,5 +1,5 @@
 /**
- * Discordスラッシュコマンド `/予定` の受け口（Cloudflare Pages Function）。
+ * Discordスラッシュコマンド（/予定・/予定表・/予定消去・/更新）の受け口（Cloudflare Pages Function）。
  * 公開URL: https://<サイト>/discord/interactions
  *
  * 流れ：署名検証 → コマンド解析 → （3秒制限を避けるため）いったん「考え中」を返し、
@@ -25,7 +25,7 @@ interface Env {
   GOOGLE_SA_EMAIL: string;
   GOOGLE_SA_PRIVATE_KEY: string;
   GOOGLE_CALENDAR_ID: string;
-  /** /ポスター 用：GitHub Actions を起動するためのトークンと対象リポジトリ（owner/repo） */
+  /** /予定表（ポスター生成）・/更新（サイト再ビルド）用：GitHub Actions を起動するためのトークンと対象リポジトリ（owner/repo） */
   GITHUB_DISPATCH_TOKEN?: string;
   GITHUB_REPO?: string;
   /** 任意：1日の書き込み上限ガード用（KVをバインドしたときだけ有効） */
@@ -133,6 +133,11 @@ export async function onRequestPost(ctx: {
       const range = dayRange(String(opts['日付'] ?? ''), new Date());
       if ('error' in range) return reply(`⚠️ ${range.error}`);
       ctx.waitUntil(handleDelete(env, body, range));
+      return json({ type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data: { flags: EPHEMERAL } });
+    }
+
+    if (body.data?.name === '更新') {
+      ctx.waitUntil(handleRebuild(env, body));
       return json({ type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data: { flags: EPHEMERAL } });
     }
 
@@ -245,5 +250,35 @@ async function handlePoster(env: Env, interaction: { token: string }, week: stri
   } catch (e) {
     console.error('[/予定表] 生成の起動に失敗', e);
     await edit(`⚠️ 生成の起動に失敗しました：${e instanceof Error ? e.message : String(e)}`);
+  }
+}
+
+/** /更新：GitHub Actions(repository_dispatch)を起動してサイトを今すぐ再ビルドする */
+async function handleRebuild(env: Env, interaction: { token: string }): Promise<void> {
+  const edit = makeEditor(env, interaction.token);
+
+  if (!env.GITHUB_DISPATCH_TOKEN || !env.GITHUB_REPO) {
+    await edit('⚠️ 再ビルドの設定（GitHubトークン）が未完了です。手順書 08 を確認してください。');
+    return;
+  }
+  try {
+    const res = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/dispatches`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${env.GITHUB_DISPATCH_TOKEN}`,
+        accept: 'application/vnd.github+json',
+        'user-agent': 'wakamatsu-hp-bot',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ event_type: 'rebuild-site' }),
+    });
+    if (!res.ok) {
+      await edit(`⚠️ 再ビルドの起動に失敗しました：${res.status} ${await res.text()}`);
+      return;
+    }
+    await edit('🔄 サイトの再ビルドを開始しました。数分（目安2〜3分）で最新の予定・動画が反映されます。');
+  } catch (e) {
+    console.error('[/更新] 再ビルドの起動に失敗', e);
+    await edit(`⚠️ 再ビルドの起動に失敗しました：${e instanceof Error ? e.message : String(e)}`);
   }
 }

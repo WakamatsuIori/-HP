@@ -58,6 +58,11 @@ const commands = [
       { name: '日付', description: '消したい日（例：6/18 または 2026/6/18）', type: 3, required: true },
     ],
   },
+  {
+    name: '更新',
+    description: 'サイトを今すぐ再ビルドして最新の予定・動画を反映します',
+    type: 1, // CHAT_INPUT
+  },
 ];
 
 const url = GUILD

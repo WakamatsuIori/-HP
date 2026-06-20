@@ -1,5 +1,6 @@
 # 土台の定期ビルド（構成図 §0）:
-# 15分ごとにカレンダー等の最新データでサイトを再生成し、Cloudflare Pagesへ公開する。
+# 1時間ごとにカレンダー等の最新データでサイトを再生成し、Cloudflare Pagesへ公開する。
+# 即時反映したいときは Discord の /更新（repository_dispatch）で随時ビルドできる。
 # 失敗時はDiscordへ通知。ビルドが失敗しても前回の正常なデプロイがそのまま残る。
 name: build-and-deploy
 
@@ -7,8 +8,10 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '0 * * * *' # 毎時0分（1時間ごと）。YouTube/カレンダーの取りこぼし防止の保険。
   workflow_dispatch: # 手動実行も可能にしておく（動作確認用）
+  repository_dispatch: # Discord /更新 から「今すぐ再ビルド」を起動する受け口
+    types: [rebuild-site]
 
 # 同時に2つ走らないようにする（追い越しによる古いデータの上書き防止）
 concurrency:
