@@ -11,10 +11,21 @@ import {
   InteractionType,
   InteractionResponseType,
   EPHEMERAL,
+  ButtonStyle,
+  button,
+  actionRow,
+  previewEmbed,
   json,
 } from '../_lib/discord';
 import { getAccessToken, insertEvent, listEvents, deleteEvent } from '../_lib/google';
-import { buildWhen, dayRange, type ParsedWhen } from '../_lib/datetime';
+import {
+  buildWhenFromParts,
+  dayRange,
+  encodePendingId,
+  decodePendingId,
+  DEFAULT_PLATFORM,
+  type ParsedWhen,
+} from '../_lib/datetime';
 import { FEATURED_MARK } from '../../src/lib/featured';
 
 interface Env {
@@ -43,10 +54,15 @@ interface InteractionOption {
 interface DiscordInteraction {
   type: number;
   token: string;
-  data?: { name?: string; options?: InteractionOption[] };
+  data?: { name?: string; options?: InteractionOption[]; custom_id?: string };
+  /** ボタン押下時に元メッセージ（確認カード）が入る。title からスケジュール名を読み戻す。 */
+  message?: { embeds?: Array<{ title?: string }> };
   member?: { user?: { id?: string } };
   user?: { id?: string };
 }
+
+/** 確認カードの「やり直す」ボタンの custom_id（確定側は encodePendingId が 'yt:c|…' を生成する） */
+const CANCEL_ID = 'yt:x';
 
 function optMap(options: InteractionOption[] | undefined): Record<string, unknown> {
   const out: Record<string, unknown> = {};
@@ -61,11 +77,24 @@ function reply(content: string) {
   });
 }
 
-/** deferred応答の後追い編集（元メッセージをPATCH）を行う関数を作る。3コマンドで共通。 */
-function makeEditor(env: Env, interactionToken: string): (content: string) => Promise<Response> {
+/** 後追い編集（元メッセージをPATCH）。文字列なら content のみ、オブジェクトなら components/embeds も送れる。 */
+type EditPayload = string | { content?: string; components?: unknown[]; embeds?: unknown[] };
+function makeEditor(env: Env, interactionToken: string): (payload: EditPayload) => Promise<Response> {
   const url = `https://discord.com/api/v10/webhooks/${env.DISCORD_APP_ID}/${interactionToken}/messages/@original`;
-  return (content: string) =>
-    fetch(url, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content }) });
+  return (payload: EditPayload) => {
+    const body = typeof payload === 'string' ? { content: payload } : payload;
+    return fetch(url, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  };
+}
+
+/** オーナー本人のDiscordユーザーIDだけ通す（許可リスト未設定/空なら全員拒否＝fail-closed）。 */
+function isOwner(env: Env, interaction: DiscordInteraction): boolean {
+  const userId = interaction.member?.user?.id ?? interaction.user?.id;
+  const allow = (env.DISCORD_ALLOWED_USER_IDS ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return Boolean(allow.length && userId && allow.includes(userId));
 }
 
 export async function onRequestPost(ctx: {
@@ -94,31 +123,43 @@ export async function onRequestPost(ctx: {
     // コマンド本体が無いペイロードは不正として弾く（想定外の入力への防御）
     if (!body.data?.name) return reply('不明なコマンドです。');
 
-    // 実行できる人をオーナー本人のDiscordユーザーIDに限定（書き込みの第一ガード）。
-    // 許可リストが未設定/空なら全員拒否（fail-closed）。事故防止のため明示的に許可した人だけ通す。
-    const userId = body.member?.user?.id ?? body.user?.id;
-    const allow = (env.DISCORD_ALLOWED_USER_IDS ?? '')
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-    if (!allow.length || !userId || !allow.includes(userId)) {
-      return reply('⚠️ このコマンドを使う権限がありません。');
-    }
+    // 実行できる人をオーナー本人に限定（fail-closed）。書き込みの第一ガード。
+    if (!isOwner(env, body)) return reply('⚠️ このコマンドを使う権限がありません。');
 
     if (body.data?.name === '予定') {
       const opts = optMap(body.data.options);
-      const dateStr = String(opts['日付'] ?? '');
-      const timeStr = opts['時間'] != null ? String(opts['時間']) : '';
+      const month = Number(opts['月']);
+      const day = Number(opts['日']);
       const title = String(opts['タイトル'] ?? '').trim();
+      const timeChoice = opts['時間'] != null ? String(opts['時間']) : undefined;
+      const platform = opts['プラットフォーム'] != null ? String(opts['プラットフォーム']) : DEFAULT_PLATFORM;
       const featured = Boolean(opts['おすすめ']);
 
       if (!title) return reply('⚠️ タイトルを入力してください。');
-      const when = buildWhen(dateStr, timeStr, new Date());
+      const when = buildWhenFromParts(month, day, timeChoice, new Date());
       if ('error' in when) return reply(`⚠️ ${when.error}`);
 
-      // 3秒以内に確実に応答するため「考え中」を返し、登録は裏で行う。
-      ctx.waitUntil(handleSchedule(env, body, when, title, featured));
-      return json({ type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data: { flags: EPHEMERAL } });
+      // ここでは書き込まず、本人だけに見える「確認カード」を即時に返す（外部通信なし＝3秒制限内）。
+      // 登録は［確定］ボタン押下（MESSAGE_COMPONENT）で行う。日時/タイトルは確定側に持ち回す。
+      const timed = Boolean(when.startDateTime);
+      const description = `📅 **${when.label}**` + (timed ? `　・　${platform}` : '') + '\n\nこの内容で登録しますか？';
+      return json({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          flags: EPHEMERAL,
+          embeds: [previewEmbed({ title, description })],
+          components: [
+            actionRow([
+              button({
+                label: '✓ 確定して登録',
+                customId: encodePendingId(when, platform, featured),
+                style: ButtonStyle.SUCCESS,
+              }),
+              button({ label: '✕ やり直す', customId: CANCEL_ID, style: ButtonStyle.DANGER }),
+            ]),
+          ],
+        },
+      });
     }
 
     if (body.data?.name === '予定表') {
@@ -144,38 +185,75 @@ export async function onRequestPost(ctx: {
     return reply('不明なコマンドです。');
   }
 
+  if (body.type === InteractionType.MESSAGE_COMPONENT) {
+    // ボタン押下も同じオーナー制限を再チェック（多層防御）。
+    if (!isOwner(env, body)) return reply('⚠️ この操作をする権限がありません。');
+
+    const customId = String(body.data?.custom_id ?? '');
+    if (customId === CANCEL_ID) {
+      // 取消：その場で書き換え（ボタン除去・未保存）。
+      return json({
+        type: InteractionResponseType.UPDATE_MESSAGE,
+        data: { flags: EPHEMERAL, content: 'キャンセルしました。もう一度 /予定 でどうぞ。', embeds: [], components: [] },
+      });
+    }
+
+    const pending = decodePendingId(customId);
+    const title = body.message?.embeds?.[0]?.title ?? '';
+    if (!pending || !title) {
+      return json({
+        type: InteractionResponseType.UPDATE_MESSAGE,
+        data: {
+          flags: EPHEMERAL,
+          content: '⚠️ 情報を読み取れませんでした。もう一度 /予定 でやり直してください。',
+          embeds: [],
+          components: [],
+        },
+      });
+    }
+
+    // 確定：押した瞬間にボタンを消して実用上の二重登録を防ぐ（厳密な重複排除はKV未導入のため非対応＝
+    // 超高速連打の理論的余地は残るが、間違って2件入ったら /予定消去 で消せる）。裏で登録→元メッセージを結果に書き換える。
+    ctx.waitUntil(handleConfirm(env, body, pending, title));
+    return json({
+      type: InteractionResponseType.UPDATE_MESSAGE,
+      data: { flags: EPHEMERAL, content: '⏳ 登録中です…', embeds: [], components: [] },
+    });
+  }
+
   return json({ type: InteractionResponseType.PONG });
 }
 
-/** カレンダーへ1件追加し、結果をDiscordの元メッセージに反映する（deferredの後追い編集） */
-async function handleSchedule(
+/** 確認カードの「確定」後：カレンダーへ1件追加し、元メッセージを結果に書き換える（ボタンは消す）。 */
+async function handleConfirm(
   env: Env,
   interaction: { token: string },
-  when: ParsedWhen,
+  pending: { when: ParsedWhen; platform: string; featured: boolean },
   title: string,
-  featured: boolean,
 ): Promise<void> {
   const edit = makeEditor(env, interaction.token);
+  const clear = { embeds: [] as unknown[], components: [] as unknown[] };
 
   try {
-    // 1日の書き込み上限ガード（KVがバインドされているときだけ）
+    // 1日の書き込み上限ガード（KVがバインドされているときだけ。CLAUDE.md §3）
     if (env.SCHED_KV) {
       const key = `wcount:${new Date().toISOString().slice(0, 10)}`;
       const cur = Number((await env.SCHED_KV.get(key)) ?? '0');
       if (cur >= DAILY_WRITE_CAP) {
-        await edit(`⚠️ 本日の登録上限（${DAILY_WRITE_CAP}件）に達しました。明日また試してください。`);
+        await edit({ content: `⚠️ 本日の登録上限（${DAILY_WRITE_CAP}件）に達しました。明日また試してください。`, ...clear });
         return;
       }
       await env.SCHED_KV.put(key, String(cur + 1), { expirationTtl: 60 * 60 * 36 });
     }
 
+    const { when, platform, featured } = pending;
     const token = await getAccessToken(
       { clientEmail: env.GOOGLE_SA_EMAIL, privateKey: env.GOOGLE_SA_PRIVATE_KEY.replace(/\\n/g, '\n') },
       Math.floor(Date.now() / 1000),
     );
     await insertEvent(token, env.GOOGLE_CALENDAR_ID, {
       summary: title,
-      description: featured ? FEATURED_MARK : undefined,
+      description: buildDescription(featured, platform),
       startDateTime: when.startDateTime,
       endDateTime: when.endDateTime,
       startDate: when.startDate,
@@ -184,11 +262,22 @@ async function handleSchedule(
 
     const star = featured ? '（◆おすすめ）' : '';
     const kind = when.startDateTime ? '配信予定' : '休業';
-    await edit(`✅ ${kind}を登録しました：\n**${when.label}　${title}**${star}\nHPの週間ボードには次回更新（最大15分）で反映されます。`);
+    await edit({
+      content: `✅ ${kind}を登録しました：\n**${when.label}　${title}**${star}\nHPの週間ボードには次回更新（最大1時間）で反映されます。`,
+      ...clear,
+    });
   } catch (e) {
-    console.error('[/予定] 登録に失敗', e);
-    await edit(`⚠️ 登録に失敗しました：${e instanceof Error ? e.message : String(e)}`);
+    console.error('[/予定:確定] 登録に失敗', e);
+    await edit({ content: `⚠️ 登録に失敗しました：${e instanceof Error ? e.message : String(e)}`, ...clear });
   }
+}
+
+/** カレンダーの description（◆おすすめ印＋プラットフォーム）。週間ボードは FEATURED_MARK の有無だけ見る。 */
+function buildDescription(featured: boolean, platform: string): string | undefined {
+  const parts: string[] = [];
+  if (featured) parts.push(FEATURED_MARK);
+  if (platform) parts.push(platform);
+  return parts.length ? parts.join(' ') : undefined;
 }
 
 /** /予定消去：指定日のその日の予定をすべて削除する */
