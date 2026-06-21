@@ -37,13 +37,17 @@ export async function verifyDiscordSignature(
 }
 
 /** Discord interaction の種類 */
-export const InteractionType = { PING: 1, APPLICATION_COMMAND: 2 } as const;
+export const InteractionType = { PING: 1, APPLICATION_COMMAND: 2, MESSAGE_COMPONENT: 3 } as const;
 
 /** Discord へ返すレスポンスの種類 */
 export const InteractionResponseType = {
   PONG: 1,
   CHANNEL_MESSAGE_WITH_SOURCE: 4,
   DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: 5,
+  /** コンポーネント用：即ACKし、元メッセージはあとで編集（ローディング表示なし） */
+  DEFERRED_UPDATE_MESSAGE: 6,
+  /** コンポーネント用：ボタンが付いたメッセージをその場で書き換える */
+  UPDATE_MESSAGE: 7,
 } as const;
 
 /** 本人だけに見えるメッセージのフラグ */
@@ -54,4 +58,25 @@ export function json(body: unknown, status = 200): Response {
     status,
     headers: { 'content-type': 'application/json' },
   });
+}
+
+/** ボタンの見た目（Discordのbutton style）。3=緑(確定)・4=赤(取消)。 */
+export const ButtonStyle = { PRIMARY: 1, SECONDARY: 2, SUCCESS: 3, DANGER: 4 } as const;
+
+/** ボタン1つ（component type 2）。依存追加なしのプレーンオブジェクトを返すだけ。 */
+export function button(opts: { label: string; customId: string; style?: number }): Record<string, unknown> {
+  return { type: 2, style: opts.style ?? ButtonStyle.SECONDARY, label: opts.label, custom_id: opts.customId };
+}
+
+/** アクション行（component type 1）。1行に最大5ボタン。 */
+export function actionRow(buttons: Array<Record<string, unknown>>): Record<string, unknown> {
+  return { type: 1, components: buttons };
+}
+
+/**
+ * 確認カード用の最小Embed。title にスケジュール名を入れる（ボタン押下時に message.embeds[0].title で読み戻すため）。
+ * color はサイトのくすみ金に寄せる。
+ */
+export function previewEmbed(opts: { title: string; description: string; color?: number }): Record<string, unknown> {
+  return { title: opts.title, description: opts.description, color: opts.color ?? 0xc9a86a };
 }
