@@ -24,12 +24,39 @@ if (!APP_ID || !TOKEN) {
 const commands = [
   {
     name: '予定',
-    description: '配信予定をカレンダーに登録します',
+    description: '配信予定をカレンダーに登録します（選ぶ→確認→確定）',
     type: 1, // CHAT_INPUT
+    // Discordは「必須」オプションを先に並べる必要がある。日付は手打ちをやめ、月/日を数値で選ぶ（入力ミス防止）。
     options: [
-      { name: '日付', description: '例：6/20 または 2026/6/20', type: 3, required: true },
-      { name: 'タイトル', description: '配信枠の名前（例：雑談配信）', type: 3, required: true },
-      { name: '時間', description: '例：21:00（空のまま送ると休業として登録）', type: 3, required: false },
+      { name: '月', description: '配信する月（1〜12）', type: 4, required: true, min_value: 1, max_value: 12 }, // INTEGER
+      { name: '日', description: '配信する日（1〜31）', type: 4, required: true, min_value: 1, max_value: 31 }, // INTEGER
+      { name: 'タイトル', description: '配信枠の名前（例：雑談配信）', type: 3, required: true, max_length: 100 }, // embed.title 256字上限より十分短く
+
+      {
+        name: '時間',
+        description: '開始時刻（省略すると21:00）。お休みの日は「休業」を選ぶ',
+        type: 3, // STRING
+        required: false,
+        choices: [
+          { name: '19:00', value: '19:00' },
+          { name: '20:00', value: '20:00' },
+          { name: '21:00', value: '21:00' },
+          { name: '21:30', value: '21:30' },
+          { name: '22:00', value: '22:00' },
+          { name: '休業（お休み）', value: '休業' }, // ← functions/_lib/datetime.ts の REST_VALUE と一致させること
+        ],
+      },
+      {
+        name: 'プラットフォーム',
+        description: '配信する場所（省略するとYouTube）',
+        type: 3, // STRING
+        required: false,
+        choices: [
+          { name: 'YouTube', value: 'YouTube' },
+          { name: 'Twitch', value: 'Twitch' },
+          { name: 'その他', value: 'その他' },
+        ],
+      },
       { name: 'おすすめ', description: '週間ボードで金色強調＋◆を付ける', type: 5, required: false }, // BOOLEAN
     ],
   },

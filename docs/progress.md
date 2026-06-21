@@ -21,7 +21,7 @@
 - **#5 YouTube最新動画＋公開再生リストのミラー仕分け … ✅**（commit 421280f。`lib/youtube.ts`/`loadVideos.ts`/`VideoList.astro`/`videos.astro`＋トップ最新動画。search.list不使用のクォータ節約）
 - **#6 ライブ判定（→訪問時チェックで実装済み） / 確定枠の埋め込み / カレンダー書き戻し … 🔶**
   - 済: ライブ中バッジ（ビルド時 `liveBroadcastContent=="live"` 検知。`LiveBadge.astro`、トップに表示）
-  - **✅ ライブバッジのリアルタイム化（訪問時チェック方式・2026-06-20）**：窓方式ワーカーは不採用。訪問時にブラウザJSが受け口 `functions/api/live.ts` をfetch→サーバー側でYouTube確認→バッジ点灯/消灯/タイトル差替。判定は `src/lib/live.ts`(`loadLiveStatusWith`/`resolveLiveStatus`・既存`parseLiveStatus`再利用)。edge **s-maxage 120秒**キャッシュ＝クォータ安全(最大2,880u/日)、失敗・キー未設定時は非ライブ短TTLでページを壊さない。タイトルは`textContent`挿入でXSS回避。**要：Cloudflare Pages env に `YOUTUBE_API_KEY` 追加（GitHub Secretと別。未設定だとバッジが点かないだけ）**。tests/live.test.ts 追加。構成図§3後回し→着手・§5#6に注記済み
+  - **✅ ライブバッジのリアルタイム化（訪問時チェック方式・2026-06-20）**：窓方式ワーカーは不採用。訪問時にブラウザJSが受け口 `functions/api/live.ts` をfetch→サーバー側でYouTube確認→バッジ点灯/消灯/タイトル差替。判定は `src/lib/live.ts`(`loadLiveStatusWith`/`resolveLiveStatus`・既存`parseLiveStatus`再利用)。edge **s-maxage 120秒**キャッシュ＝クォータ安全(最大2,880u/日)、失敗・キー未設定時は非ライブ短TTLでページを壊さない。タイトルは`textContent`挿入でXSS回避。tests/live.test.ts 追加。構成図§3後回し→着手・§5#6に注記済み。**✅デプロイ＋本番検証済み（2026-06-20、commit da0fff3）**：Cloudflare Pages env に `YOUTUBE_API_KEY` 追加済→`/api/live`が`s-maxage=120`返却＝キー有効確認。`/更新`も本番で実動作確認済み（repository_dispatch→rebuild-site 成功）
   - **未: ①確定枠（YouTube枠↔カレンダー予定）の埋め込み表示 ②カレンダー書き戻し（説明欄へPATCH追記）**。※`functions/_lib/google.ts` は現状 insert/delete のみ（書き戻しPATCHは無い）
 - **#7 BOOTHグッズ … ✅（リンクのみで方針確定・2026-06-19）** BOOTHがRSS提供終了（実ブラウザでも HTTP 406）→ 自動掲載は不可。**HPはショーケースに徹し購入はBOOTHへのリンクで誘導**（`goods.astro`、静的・fetchなし）。方針確定に伴い旧BOOTH取得コードは**削除済み**: `lib/booth.ts`・`loadGoods.ts`・`GoodsList.astro`・`fetcher.ts`の`fetchTextAsBrowser`・`site.ts`の`boothFeedUrl`・`booth.test.ts`・`fixtures/sample-booth.rss`・`docs/setup/06-booth-feed.md`（必要時はgit履歴から復活可）。※手動カード掲載は「後回し」
 - **#8 フォールバック（最終更新時刻）＋冪等性 … ✅**
@@ -40,6 +40,7 @@
 
 ## 構成図外の追加機能（承認のもと実装・稼働中）
 - **Discordから予定操作**: `/予定`・`/予定消去`・`/予定表`・**`/更新`（サイト即時再ビルド・2026-06-20追加）**（`functions/discord/interactions.ts`／`functions/_lib/{google,discord,datetime}.ts`。サービスアカウントで Google Calendar insert/delete。認可は fail-closed＋オーナー専用）。コマンド登録は `scripts/register-discord-commands.mjs`。※`/更新`はデプロイ＋**Discordへのコマンド登録（global）も完了済み（2026-06-20）**。登録時にBotトークンも再発行（スクショ流出分の安全化）済み。
+  - **`/予定` 入力改善 Step1（2026-06-22）🔶実装済・要再登録**：日付の手打ちを廃止し **月・日を数値選択＋時間/プラットフォームを選択肢化**、**年は自動**（過ぎた月日は翌年送り）、存在しない日付(2/30等)を拒否、**登録前に確認カード（[✓確定]/[✕やり直す]）** を表示。確認データは ephemeral の embed.title＋ボタン custom_id で往復＝**KV不要**。実装＝`functions/_lib/datetime.ts`(`buildWhenFromParts`/`encode・decodePendingId`)・`discord.ts`(MESSAGE_COMPONENT/ボタン)・`interactions.ts`(確認→確定の2段フロー)。仕様は `docs/discord-予定コマンド改善_仕様.md`。**⚠️本番デプロイ後に `scripts/register-discord-commands.mjs` を再実行**（コマンド選択肢を変えたため）。Step2(相対えらび)・Step3(その他時刻/重複・過去警告)は未着手。
 - **週間ポスター自動生成・投稿**（上記 poster.yml）
 - **llms.txt 自動生成**（AEO対応）／**お知らせ一覧ページ** `news.astro`
 
