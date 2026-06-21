@@ -1,0 +1,40 @@
+# Discordスラッシュコマンド（/予定 など）の定義をDiscordに登録/更新する。
+# scripts/register-discord-commands.mjs の中身（コマンドの選択肢）を変えたら、ここから手動で1回実行する。
+# 必要な秘密情報は GitHub Secrets に置く（コード/リポジトリには書かない）:
+#   DISCORD_APP_ID    … Discordアプリの Application ID
+#   DISCORD_BOT_TOKEN … Bot のトークン（登録APIの認証に使う秘密の値）
+name: Discordコマンドを登録
+
+on:
+  workflow_dispatch:
+    inputs:
+      guild_id:
+        description: '特定サーバーに即時反映したい場合はサーバーID。空ならグローバル登録（反映まで最大1時間）。'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+# 同時に2つ走らせない（登録の競合を防ぐ）
+concurrency:
+  group: register-discord-commands
+  cancel-in-progress: false
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # 依存なしの単一スクリプト（node:process と組み込み fetch のみ）。npm install は不要。
+      - name: コマンドを登録（Discord APIへPUT）
+        run: node scripts/register-discord-commands.mjs
+        env:
+          DISCORD_APP_ID: ${{ secrets.DISCORD_APP_ID }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_GUILD_ID: ${{ github.event.inputs.guild_id }}
