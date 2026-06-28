@@ -235,6 +235,11 @@ const nav = [
     --accent-strong: #6f6444; /* 濃い金：本文リンク等の小さい文字用（白背景でAAコントラスト確保） */
     --line: #e7e3d9;
     --card: #ffffff;
+    /* レイアウト幅トークン（全画面寄せ：広いコンテナ＋長文だけ可読幅で据え置き） */
+    --content: 1180px;       /* 標準コンテナ最大幅 */
+    --content-wide: 1320px;  /* スケジュール等の特に広い帯 */
+    --content-prose: 720px;  /* 長文の可読幅（従来踏襲） */
+    --gutter: 1.25rem;       /* 本文の左右最小余白 */
     --font-serif: 'Shippori Mincho', 'Zen Old Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
     --font-logo: 'Cinzel', var(--font-serif); /* 欧文ロゴ・英字ディスプレイ用（未読込時は明朝へ） */
   }
@@ -316,9 +321,9 @@ const nav = [
   h1, h2, h3, .sec-lead, .guide-text, .about__catch { text-wrap: balance; word-break: auto-phrase; }
 
   main {
-    max-width: 720px;
+    max-width: var(--content-prose);
     margin: 0 auto;
-    padding: 1.75rem 1.25rem 3.5rem;
+    padding: 1.75rem var(--gutter) 3.5rem;
   }
   h1, h2, h3 {
     font-family: var(--font-serif);

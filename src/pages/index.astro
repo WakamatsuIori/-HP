@@ -304,7 +304,7 @@ try {
       <SectionHead kicker="STORE" title="ストア" />
       <p class="sec-lead">配信に使える自作のOBSウィジェットなどを BOOTH で販売中。オリジナルグッズも順次追加していく予定です。画像から BOOTH へ。</p>
       <a class="goods-banner" href={site.links.booth} rel="me noopener" target="_blank" aria-label="BOOTHストアを見る">
-        <Image class="goods-banner__bg" src={keyVisual} widths={[480, 768, 1024]} sizes="(min-width: 760px) 760px, 100vw" alt="" loading="lazy" />
+        <Image class="goods-banner__bg" src={keyVisual} widths={[480, 768, 1180]} sizes="(min-width: 1200px) 1180px, 100vw" alt="" loading="lazy" />
         <span class="goods-banner__text">
           <span class="goods-banner__en">OFFICIAL STORE</span>
           <span class="goods-banner__jp">和香松庵 STORE</span>
@@ -409,7 +409,7 @@ try {
     --pf-art: 660px; /* 立ち絵の最大幅 */
     --pf-drop: 3.75rem; /* 立ち絵の頭からプロフィールを下げる量 */
     --pf-gap: 1.5rem; /* 立ち絵⇄文章の間隔 */
-    --pf-max: 1260px; /* プロフィール全体の最大幅 */
+    --pf-max: var(--content); /* プロフィール全体の最大幅（幅トークンに統一） */
     --pf-heading: 3.5rem; /* 「ようこそ」見出し */
     --pf-lead: 1.44rem; /* 紹介文 */
     --pf-label: 1.26rem; /* プロフィール項目のラベル */
@@ -470,7 +470,7 @@ try {
     position: relative;
     z-index: 2;
     width: 100%;
-    max-width: 1120px;
+    max-width: var(--content);
     margin: 0 auto;
     padding: clamp(2rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 4rem);
   }
@@ -686,7 +686,7 @@ try {
     flex-wrap: wrap;
     justify-content: center;
     gap: 1.5rem;
-    max-width: 1360px;
+    max-width: var(--content-wide);
     margin-inline: auto;
     padding-inline: 1.1rem;
   }
@@ -796,7 +796,7 @@ try {
       align-items: center;
       text-align: left;
       gap: 3rem;
-      max-width: 1080px;
+      max-width: var(--content);
       margin-inline: auto;
     }
     .about__body { flex: 1 1 0; min-width: 0; }
@@ -811,7 +811,7 @@ try {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.7rem 1.25rem;
     margin: 1.5rem auto 0;
-    max-width: 1120px;
+    max-width: var(--content);
     padding-inline: 1.25rem;
     list-style: none;
   }
@@ -973,14 +973,14 @@ try {
   @media (min-width: 600px) { .info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 900px) { .info-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   /* お知らせは最新3枚を1行に並べたいので、この帯だけ内側幅を広げる */
-  @media (min-width: 900px) { .lp-inner.lp-inner--info { max-width: 1040px; } }
+  @media (min-width: 900px) { .lp-inner.lp-inner--info { max-width: var(--content); } }
 
   /* ヒーロー直下の「最新お知らせ」細いバー（押すと #information へ） */
   .newsbar {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    max-width: 1040px;
+    max-width: var(--content);
     margin: 0 auto;
     padding: 0.62rem 1.25rem;
     border-top: 1px solid var(--line, rgba(58, 53, 45, 0.14));
@@ -1177,7 +1177,7 @@ try {
     to { transform: translate3d(2.5%, -2%, 0) scale(1.08); }
   }
   .lp-inner {
-    max-width: 760px;
+    max-width: var(--content);
     margin-inline: auto;
     padding-inline: 1.25rem;
   }
