@@ -8,6 +8,8 @@ interface Props {
   title: string;  // 日本語サブ（例: 今週の予定）
 }
 const { kicker, title } = Astro.props;
+// 区切り線の金グラデ用に、セクションごとに一意なグラデIDを作る（同一ページ内のid重複を回避）
+const gradId = `dl-gold-${kicker.replace(/[^a-zA-Z0-9]/g, '') || 'x'}`;
 ---
 
 <div class="section-head">
@@ -15,12 +17,20 @@ const { kicker, title } = Astro.props;
   <h2>{title}</h2>
   <span class="section-divider-wrap" aria-hidden="true">
     <svg class="section-divider" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 40">
+      <defs>
+        <!-- 金グラデ罫：中央が濃く、外へ向かうほど淡く溶ける（上品な底上げ・両モード共通） -->
+        <linearGradient id={gradId} x1="0" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#c2a86b" stop-opacity="0.12"/>
+          <stop offset="0.5" stop-color="#cda14e"/>
+          <stop offset="1" stop-color="#c2a86b" stop-opacity="0.12"/>
+        </linearGradient>
+      </defs>
       <!-- 左線：x1=165→x2=0 で中央から外へ描画 -->
       <line class="dl" x1="165" y1="20" x2="0" y2="20"
-            stroke="#c2a86b" stroke-width="1.4" pathLength="1"/>
+            stroke={`url(#${gradId})`} stroke-width="1.4" pathLength="1"/>
       <!-- 右線：x1=235→x2=400 で中央から外へ描画 -->
       <line class="dl" x1="235" y1="20" x2="400" y2="20"
-            stroke="#c2a86b" stroke-width="1.4" pathLength="1"/>
+            stroke={`url(#${gradId})`} stroke-width="1.4" pathLength="1"/>
       <!-- 中央装飾：少し遅れてフェードイン -->
       <g class="dl-center">
         <circle cx="178" cy="20" r="2.2" fill="#c2a86b"/>

@@ -79,6 +79,18 @@ const nav = [
         addEventListener('load', () => setTimeout(() => document.getElementById('splash')?.classList.add('done'), 1000));
       }
     </script>
+    <script is:inline>
+      // ?fx=dramatic でトップの華やか演出を確認できる比較用フラグ（既定=refined・静か）。
+      // 静/動を決めたら、この1本と未採用の dramatic CSS を削除する使い捨て配線。
+      (function () {
+        try {
+          var fx = new URLSearchParams(location.search).get('fx');
+          document.documentElement.dataset.fx = fx === 'dramatic' ? 'dramatic' : 'refined';
+        } catch (e) {
+          document.documentElement.dataset.fx = 'refined';
+        }
+      })();
+    </script>
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
