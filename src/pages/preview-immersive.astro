@@ -577,6 +577,14 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       .ed__btn--p { color: #14100b; background: #cda14e; border-color: #cda14e; font-weight: 600; }
       .ed__msg { font-size: 0.72rem; color: #9bc77f; min-height: 1em; margin: 0; word-break: break-word; }
       @media (max-width: 640px) { .ed { width: 210px; right: 8px; bottom: 8px; } }
+
+      /* 配置編集：ドラッグで移動・ホイールで拡縮（保存され通常表示にも反映） */
+      [data-edit] { transform: translate(var(--ex, 0px), var(--ey, 0px)) scale(var(--es, 1)); }
+      html.is-editing [data-edit] { outline: 1px dashed rgba(201, 168, 105, 0.6); outline-offset: 5px; cursor: grab; }
+      html.is-editing [data-edit]:hover { outline-color: #e8cf95; }
+      html.is-editing [data-edit].is-grab { cursor: grabbing; }
+      .ed__edit { width: 100%; }
+      .ed__edit.is-on { background: #cda14e; color: #14100b; border-color: #cda14e; font-weight: 600; }
     </style>
   </head>
   <body>
@@ -606,7 +614,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       <div class="ihero__scrim" aria-hidden="true"></div>
       <div class="ihero__glow" aria-hidden="true"></div>
       <div class="ihero__content">
-        <div class="ihero__inner intro">
+        <div class="ihero__inner intro" data-edit="hero">
           <p class="ihero__kicker">Cafe &amp; Bar の店長 ・ 個人勢VTuber</p>
           <h1 class="ihero__name">{site.name}</h1>
           <p class="ihero__romaji">WAKAMATSU IORI</p>
@@ -628,7 +636,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
           <span class="ihead__rule" aria-hidden="true"></span>
         </div>
         <div class="iprofile reveal">
-          <div class="iprofile__art">
+          <div class="iprofile__art" data-edit="art-prof">
             <Image
               src={standArt}
               widths={[360, 540, 760]}
@@ -637,7 +645,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
               loading="lazy"
             />
           </div>
-          <div class="iprofile__body">
+          <div class="iprofile__body" data-edit="txt-prof">
             <dl class="iprofile__list">
               {profile.rows.map((row) => (
                 <div class="iprofile__row">
@@ -657,7 +665,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
     <section class="isec" id="about">
       <div class="isec__inner">
         <div class="iabout reveal">
-          <div class="iabout__body">
+          <div class="iabout__body" data-edit="txt-about">
             <h2 class="iabout__catch">{intro.catchLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</h2>
             <p class="iabout__en">{intro.catchEn}</p>
             <span class="iabout__rule" aria-hidden="true"></span>
@@ -665,7 +673,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
               {intro.story.map((para) => <p>{para}</p>)}
             </div>
           </div>
-          <div class="iabout__art">
+          <div class="iabout__art" data-edit="art-about">
             <Image
               src={barArt}
               widths={[360, 540, 760]}
@@ -715,6 +723,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
     <aside class="ed" id="ed" aria-label="プレビュー調整パネル">
       <button class="ed__handle" type="button" data-ed-toggle aria-expanded="true">⚙ 調整パネル（あなたが調整できます）</button>
       <div class="ed__body">
+        <button class="ed__btn ed__edit" type="button" data-ed-edit aria-pressed="false">🖐 配置を動かす（ドラッグ＝移動 / ホイール＝拡縮）</button>
         <div class="ed__tones">
           <button class="ed__tone" type="button" data-tone="cream">明クリーム</button>
           <button class="ed__tone" type="button" data-tone="dark">黒×金</button>
@@ -802,6 +811,8 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         const cs = getComputedStyle(document.documentElement);
         const lines = EDITOR_KEYS.map((k) => `${k}: ${cs.getPropertyValue(k).trim()};`);
         lines.push('form: ' + document.documentElement.dataset.form);
+        const lay = layRead();
+        Object.keys(lay).forEach((k) => { const s = lay[k]; lines.push('[' + k + '] x:' + (s.x || 0) + ' y:' + (s.y || 0) + ' scale:' + (s.s || 1)); });
         const text = lines.join('\n');
         const msg = document.querySelector('[data-ed-msg]');
         if (navigator.clipboard) {
@@ -812,9 +823,61 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         } else if (msg) { msg.textContent = text; }
       });
       document.querySelector('[data-ed-reset]')?.addEventListener('click', () => {
-        try { localStorage.removeItem('immersive-editor'); } catch (e) {}
-        EDITOR_KEYS.forEach((k) => document.documentElement.style.removeProperty(k));
+        try { localStorage.removeItem('immersive-editor'); localStorage.removeItem('immersive-layout'); } catch (e) {}
         location.reload();
+      });
+
+      // ===== 配置編集（ドラッグ移動／ホイール拡縮・保存） =====
+      const LAYOUT_KEY = 'immersive-layout';
+      const layRead = () => { try { return JSON.parse(localStorage.getItem(LAYOUT_KEY) || '{}'); } catch (e) { return {}; } };
+      const laySave = (o) => { try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(o)); } catch (e) {} };
+      const layout = layRead();
+      const editables = document.querySelectorAll('[data-edit]');
+      const applyEl = (el, st) => {
+        el.style.setProperty('--ex', (st.x || 0) + 'px');
+        el.style.setProperty('--ey', (st.y || 0) + 'px');
+        el.style.setProperty('--es', st.s || 1);
+      };
+      editables.forEach((el) => { const k = el.dataset.edit; if (layout[k]) applyEl(el, layout[k]); });
+
+      let editing = false;
+      const editBtn = document.querySelector('[data-ed-edit]');
+      editBtn?.addEventListener('click', () => {
+        editing = !editing;
+        document.documentElement.classList.toggle('is-editing', editing);
+        editBtn.classList.toggle('is-on', editing);
+        editBtn.setAttribute('aria-pressed', String(editing));
+      });
+
+      let drag = null;
+      editables.forEach((el) => {
+        el.addEventListener('pointerdown', (e) => {
+          if (!editing) return;
+          e.preventDefault();
+          const st = layout[el.dataset.edit] || { x: 0, y: 0, s: 1 };
+          layout[el.dataset.edit] = st;
+          drag = { el, sx: e.clientX, sy: e.clientY, ox: st.x || 0, oy: st.y || 0, st };
+          el.classList.add('is-grab');
+          try { el.setPointerCapture && el.setPointerCapture(e.pointerId); } catch (err) {}
+        });
+        el.addEventListener('pointermove', (e) => {
+          if (!drag || drag.el !== el) return;
+          drag.st.x = Math.round(drag.ox + (e.clientX - drag.sx));
+          drag.st.y = Math.round(drag.oy + (e.clientY - drag.sy));
+          applyEl(el, drag.st);
+        });
+        const endDrag = () => { if (drag && drag.el === el) { laySave(layout); el.classList.remove('is-grab'); drag = null; } };
+        el.addEventListener('pointerup', endDrag);
+        el.addEventListener('pointercancel', endDrag);
+        el.addEventListener('wheel', (e) => {
+          if (!editing) return;
+          e.preventDefault();
+          const st = layout[el.dataset.edit] || { x: 0, y: 0, s: 1 };
+          st.s = Math.round(Math.min(2.6, Math.max(0.4, (st.s || 1) + (e.deltaY < 0 ? 0.04 : -0.04))) * 100) / 100;
+          layout[el.dataset.edit] = st;
+          applyEl(el, st);
+          laySave(layout);
+        }, { passive: false });
       });
 
       // スクロール登場（ブラー＋立ち上がり）
