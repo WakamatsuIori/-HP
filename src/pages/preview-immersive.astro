@@ -420,8 +420,8 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         display: grid;
         grid-template-columns: 6.6rem 1fr;
         align-items: baseline;
-        gap: 0.3rem 1.2rem;
-        padding: 0.72rem 0;
+        gap: 0.3rem 1.1rem;
+        padding: 0.5rem 0;
         border-bottom: 1px solid var(--card-line);
       }
       .iprofile__row dt { position: relative; margin: 0; padding-left: 1.15rem; color: var(--muted); font-size: 0.82rem; letter-spacing: 0.08em; white-space: nowrap; }
@@ -439,7 +439,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       @media (min-width: 860px) {
         .iprofile { flex-direction: row; align-items: flex-start; gap: 3rem; max-width: 1080px; margin: 0 auto; }
         .iprofile__art { flex-shrink: 0; width: calc(min(48%, 462px) * var(--art-scale)); }
-        .iprofile__body { flex: 1 1 0; min-width: 0; max-width: none; margin-top: 1rem; }
+        .iprofile__body { flex: 1 1 0; min-width: 0; max-width: 30rem; margin-top: 1rem; }
       }
 
       /* ===== ABOUT（ごあいさつ） ===== */
@@ -584,8 +584,8 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       /* ▼ 本人が調整した配置を既定に焼き込み（デスクトップのみ。モバイルは縦並びのため無補正） */
       @media (min-width: 860px) {
         [data-edit='hero'] { --ex: -157px; --ey: -46px; --es: 1.04; }
-        [data-edit='art-prof'] { --ex: -155px; --ey: -76px; --es: 1.08; }
-        [data-edit='txt-prof'] { --ex: 3px; --ey: 92px; --es: 1.36; }
+        [data-edit='art-prof'] { --ex: -156px; --ey: -75px; --es: 1.24; }
+        [data-edit='txt-prof'] { --ex: 6px; --ey: 107px; --es: 1.48; }
         [data-edit='txt-about'] { --ex: -89px; --ey: -50px; --es: 1.36; }
         [data-edit='art-about'] { --es: 1.04; }
       }
@@ -641,7 +641,6 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       <div class="isec__inner">
         <div class="ihead reveal">
           <p class="ihead__kicker">PROFILE</p>
-          <p class="ihead__title">和香松庵 とは</p>
           <span class="ihead__rule" aria-hidden="true"></span>
         </div>
         <div class="iprofile reveal">
