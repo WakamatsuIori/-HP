@@ -418,14 +418,15 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       .iprofile__list { margin: 0 0 1.2rem; }
       .iprofile__row {
         display: grid;
-        grid-template-columns: 7.5rem 1fr;
+        grid-template-columns: 6.6rem 1fr;
+        align-items: baseline;
         gap: 0.3rem 1.2rem;
-        padding: 0.85rem 0;
+        padding: 0.72rem 0;
         border-bottom: 1px solid var(--card-line);
       }
-      .iprofile__row dt { position: relative; margin: 0; padding-left: 1.2rem; color: var(--muted); font-size: 0.96rem; white-space: nowrap; }
-      .iprofile__row dt::before { content: '◆'; position: absolute; left: 0; top: 0.12em; color: var(--gold); font-size: 0.58rem; }
-      .iprofile__row dd { margin: 0; color: var(--ink); font-size: 1rem; }
+      .iprofile__row dt { position: relative; margin: 0; padding-left: 1.15rem; color: var(--muted); font-size: 0.82rem; letter-spacing: 0.08em; white-space: nowrap; }
+      .iprofile__row dt::before { content: '◆'; position: absolute; left: 0; top: 0.2em; color: var(--gold); font-size: 0.52rem; }
+      .iprofile__row dd { margin: 0; color: var(--ink); font-size: 1.04rem; line-height: 1.5; }
       .iprofile__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; }
       .iprofile__chips li {
         padding: 0.4rem 1.2rem;
