@@ -21,7 +21,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
 ---
 
 <!doctype html>
-<html lang="ja" data-form="cream">
+<html lang="ja" data-form="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -39,7 +39,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       (function () {
         try {
           var q = new URLSearchParams(location.search).get('form');
-          var f = q || localStorage.getItem('immersive-form') || 'cream';
+          var f = q || localStorage.getItem('immersive-form') || 'dark';
           document.documentElement.dataset.form = f === 'dark' ? 'dark' : 'cream';
           var saved = JSON.parse(localStorage.getItem('immersive-editor') || '{}');
           for (var k in saved) document.documentElement.style.setProperty(k, saved[k]);
@@ -56,10 +56,10 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         --gothic: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', system-ui, sans-serif;
         /* ▼ 調整パネルのスライダーで動かす値（既定）。localStorage に保存される。 */
         --art-scale: 1;
-        --spotlight: 0.8;
-        --cursor-size: 260px;
-        --vignette: 0.45;
-        --glow-strength: 1;
+        --spotlight: 0.3;
+        --cursor-size: 170px;
+        --vignette: 0.25;
+        --glow-strength: 0.85;
       }
 
       /* ===== トーン①：明クリーム×金（世界観キープ） ===== */
@@ -580,6 +580,14 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
 
       /* 配置編集：ドラッグで移動・ホイールで拡縮（保存され通常表示にも反映） */
       [data-edit] { transform: translate(var(--ex, 0px), var(--ey, 0px)) scale(var(--es, 1)); }
+      /* ▼ 本人が調整した配置を既定に焼き込み（デスクトップのみ。モバイルは縦並びのため無補正） */
+      @media (min-width: 860px) {
+        [data-edit='hero'] { --ex: -157px; --ey: -46px; --es: 1.04; }
+        [data-edit='art-prof'] { --ex: -155px; --ey: -76px; --es: 1.08; }
+        [data-edit='txt-prof'] { --ex: 3px; --ey: 92px; --es: 1.36; }
+        [data-edit='txt-about'] { --ex: -89px; --ey: -50px; --es: 1.36; }
+        [data-edit='art-about'] { --es: 1.04; }
+      }
       html.is-editing [data-edit] { outline: 1px dashed rgba(201, 168, 105, 0.6); outline-offset: 5px; cursor: grab; }
       html.is-editing [data-edit]:hover { outline-color: #e8cf95; }
       html.is-editing [data-edit].is-grab { cursor: grabbing; }
@@ -733,20 +741,20 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
           <input type="range" min="0.7" max="1.5" step="0.02" value="1" data-var="--art-scale" />
         </label>
         <label class="ed__field">
-          <span class="ed__lab">光のプール（立ち絵） <b data-out="--spotlight">0.80</b></span>
-          <input type="range" min="0" max="1.6" step="0.05" value="0.8" data-var="--spotlight" />
+          <span class="ed__lab">光のプール（立ち絵） <b data-out="--spotlight">0.30</b></span>
+          <input type="range" min="0" max="1.6" step="0.05" value="0.3" data-var="--spotlight" />
         </label>
         <label class="ed__field">
-          <span class="ed__lab">カーソルの光 <b data-out="--cursor-size">260</b><span class="ed__u">px</span></span>
-          <input type="range" min="120" max="520" step="10" value="260" data-var="--cursor-size" data-unit="px" />
+          <span class="ed__lab">カーソルの光 <b data-out="--cursor-size">170</b><span class="ed__u">px</span></span>
+          <input type="range" min="120" max="520" step="10" value="170" data-var="--cursor-size" data-unit="px" />
         </label>
         <label class="ed__field">
-          <span class="ed__lab">縁の暗さ（黒トーン） <b data-out="--vignette">0.45</b></span>
-          <input type="range" min="0" max="0.85" step="0.05" value="0.45" data-var="--vignette" />
+          <span class="ed__lab">縁の暗さ（黒トーン） <b data-out="--vignette">0.25</b></span>
+          <input type="range" min="0" max="0.85" step="0.05" value="0.25" data-var="--vignette" />
         </label>
         <label class="ed__field">
-          <span class="ed__lab">全体グロー <b data-out="--glow-strength">1.00</b></span>
-          <input type="range" min="0" max="1.8" step="0.05" value="1" data-var="--glow-strength" />
+          <span class="ed__lab">全体グロー <b data-out="--glow-strength">0.85</b></span>
+          <input type="range" min="0" max="1.8" step="0.05" value="0.85" data-var="--glow-strength" />
         </label>
         <div class="ed__btns">
           <button class="ed__btn ed__btn--p" type="button" data-ed-copy>設定をコピー</button>
@@ -854,7 +862,12 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         el.addEventListener('pointerdown', (e) => {
           if (!editing) return;
           e.preventDefault();
-          const st = layout[el.dataset.edit] || { x: 0, y: 0, s: 1 };
+          const csd = getComputedStyle(el);
+          const st = layout[el.dataset.edit] || {
+            x: parseFloat(csd.getPropertyValue('--ex')) || 0,
+            y: parseFloat(csd.getPropertyValue('--ey')) || 0,
+            s: parseFloat(csd.getPropertyValue('--es')) || 1,
+          };
           layout[el.dataset.edit] = st;
           drag = { el, sx: e.clientX, sy: e.clientY, ox: st.x || 0, oy: st.y || 0, st };
           el.classList.add('is-grab');
@@ -872,7 +885,12 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         el.addEventListener('wheel', (e) => {
           if (!editing) return;
           e.preventDefault();
-          const st = layout[el.dataset.edit] || { x: 0, y: 0, s: 1 };
+          const csw = getComputedStyle(el);
+          const st = layout[el.dataset.edit] || {
+            x: parseFloat(csw.getPropertyValue('--ex')) || 0,
+            y: parseFloat(csw.getPropertyValue('--ey')) || 0,
+            s: parseFloat(csw.getPropertyValue('--es')) || 1,
+          };
           st.s = Math.round(Math.min(2.6, Math.max(0.4, (st.s || 1) + (e.deltaY < 0 ? 0.04 : -0.04))) * 100) / 100;
           layout[el.dataset.edit] = st;
           applyEl(el, st);
