@@ -57,10 +57,10 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         --gothic: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', system-ui, sans-serif;
         /* ▼ 調整パネルのスライダーで動かす値（既定）。localStorage に保存される。 */
         --art-scale: 1;
-        --spotlight: 0.3;
-        --cursor-size: 170px;
-        --vignette: 0.25;
-        --glow-strength: 0.85;
+        --spotlight: 0.4;
+        --cursor-size: 120px;
+        --vignette: 0.2;
+        --glow-strength: 0;
       }
 
       /* ===== トーン①：明クリーム×金（世界観キープ） ===== */
@@ -267,6 +267,40 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         margin-bottom: 2rem;
       }
       .ihero__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; }
+      /* YouTubeライブ中バッジ：検知時に heroReveal（ブラー＋translateY 複合入場）で点灯 */
+      .ilive {
+        position: absolute;
+        top: clamp(4.4rem, 11vh, 7rem);
+        left: clamp(1.3rem, 5vw, 4rem);
+        z-index: 4;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        max-width: min(86vw, 30rem);
+        padding: 0.45rem 1rem;
+        border-radius: 999px;
+        text-decoration: none;
+        background: rgba(28, 16, 14, 0.66);
+        border: 1px solid rgba(229, 90, 90, 0.6);
+        color: #ffe3de;
+        font-size: 0.84rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+      }
+      .ilive[hidden] { display: none; } /* [hidden]を確実に優先 */
+      .ilive.is-live { animation: heroReveal 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+      .ilive__dot { flex-shrink: 0; width: 0.62rem; height: 0.62rem; border-radius: 50%; background: #ff5252; box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.6); animation: livePulse 1.8s ease-out infinite; }
+      .ilive__now { flex-shrink: 0; color: #ff8a80; }
+      .ilive__title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ink-soft); font-weight: 500; }
+      @keyframes heroReveal { from { opacity: 0; transform: translateY(-16px); filter: blur(10px); } to { opacity: 1; transform: none; filter: none; } }
+      @keyframes livePulse { 0% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.55); } 70% { box-shadow: 0 0 0 0.5rem rgba(255, 82, 82, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); } }
+      @media (prefers-reduced-motion: reduce) {
+        .ilive__dot { animation: none; }
+        .ilive.is-live { animation: none; }
+      }
       .ibtn {
         display: inline-flex;
         align-items: center;
@@ -391,6 +425,28 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       .isec__note { text-align: center; margin-top: 1.6rem; font-size: 0.86rem; color: var(--muted); }
 
       /* ===== フッター（薄く） ===== */
+      /* ===== 一番下：浮遊アイコンの帯（プラスアルファの装飾・floatSlow） ===== */
+      .iconband {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: clamp(1.4rem, 6vw, 3.6rem);
+        padding: clamp(2.6rem, 7vw, 4.8rem) 1.2rem clamp(1.4rem, 4vw, 2.6rem);
+      }
+      .iconband__i { color: var(--gold); opacity: 0.5; }
+      .iconband__i:nth-child(odd) { color: var(--gold-strong); opacity: 0.62; }
+      .iconband__i:nth-child(3n) { margin-top: -0.8rem; }
+      .iconband__i:nth-child(3n + 2) { margin-top: 0.7rem; }
+      .iconband__i svg { width: clamp(26px, 4.4vw, 38px); height: clamp(26px, 4.4vw, 38px); display: block; }
+      @media (prefers-reduced-motion: no-preference) {
+        .iconband__i { animation: floatSlow 5.6s ease-in-out infinite; }
+        .iconband__i:nth-child(2) { animation-delay: -0.9s; }
+        .iconband__i:nth-child(3) { animation-delay: -1.9s; }
+        .iconband__i:nth-child(4) { animation-delay: -2.8s; }
+        .iconband__i:nth-child(5) { animation-delay: -3.7s; }
+        .iconband__i:nth-child(6) { animation-delay: -4.5s; }
+      }
       .ifoot {
         text-align: center;
         padding: 2.6rem 1rem 3.2rem;
@@ -403,12 +459,14 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       /* ===== 登場演出（ブラー＋立ち上がり） ===== */
       .reveal { opacity: 0; transform: translateY(30px); filter: blur(10px); transition: opacity 0.85s ease, transform 0.85s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.85s ease; }
       .reveal.is-visible { opacity: 1; transform: none; filter: none; }
-      .intro > * { opacity: 0; transform: translateY(22px); filter: blur(8px); animation: introRise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-      .intro > :nth-child(2) { animation-delay: 0.12s; }
-      .intro > :nth-child(3) { animation-delay: 0.22s; }
-      .intro > :nth-child(4) { animation-delay: 0.34s; }
-      .intro > :nth-child(5) { animation-delay: 0.46s; }
-      @keyframes introRise { to { opacity: 1; transform: none; filter: none; } }
+      /* 最も基本的な映画的入場：ラベル→見出し→説明文が0.2秒刻みで順に立ち上がる（軽量＝blurなし） */
+      /* ロード画面が明けてから再生（裏で再生し終わるのを防ぐ）＝html.intro-go で起動 */
+      .intro > * { opacity: 0; transform: translateY(24px); animation: introRise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-play-state: paused; }
+      html.intro-go .intro > * { animation-play-state: running; }
+      .intro > :nth-child(2), .intro > :nth-child(3) { animation-delay: 0.2s; } /* 見出し＋ローマ字 */
+      .intro > :nth-child(4) { animation-delay: 0.4s; } /* 説明文 */
+      .intro > :nth-child(5) { animation-delay: 0.6s; } /* CTA */
+      @keyframes introRise { to { opacity: 1; transform: none; } }
 
       /* ===== PROFILE ===== */
       .isec--alt { background: var(--bg-2); }
@@ -428,6 +486,18 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       .iprofile__row dt { position: relative; margin: 0; padding-left: 1.15rem; color: var(--muted); font-size: 0.82rem; letter-spacing: 0.08em; white-space: nowrap; }
       .iprofile__row dt::before { content: '◆'; position: absolute; left: 0; top: 0.2em; color: var(--gold); font-size: 0.52rem; }
       .iprofile__row dd { margin: 0; color: var(--ink); font-size: 1.04rem; line-height: 1.5; }
+      /* プロフィール項目：リスト段差出現（ブロックが画面に入ったら1項目ずつ立ち上がる） */
+      .iprofile__row { opacity: 0; transform: translateY(12px); transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1); }
+      .iprofile.is-visible .iprofile__row { opacity: 1; transform: none; }
+      .iprofile.is-visible .iprofile__row:nth-child(1) { transition-delay: 0.08s; }
+      .iprofile.is-visible .iprofile__row:nth-child(2) { transition-delay: 0.16s; }
+      .iprofile.is-visible .iprofile__row:nth-child(3) { transition-delay: 0.24s; }
+      .iprofile.is-visible .iprofile__row:nth-child(4) { transition-delay: 0.32s; }
+      .iprofile.is-visible .iprofile__row:nth-child(5) { transition-delay: 0.4s; }
+      .iprofile.is-visible .iprofile__row:nth-child(6) { transition-delay: 0.48s; }
+      .iprofile.is-visible .iprofile__row:nth-child(7) { transition-delay: 0.56s; }
+      .iprofile.is-visible .iprofile__row:nth-child(8) { transition-delay: 0.64s; }
+      .iprofile.is-visible .iprofile__row:nth-child(9) { transition-delay: 0.72s; }
       .iprofile__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; }
       .iprofile__chips li {
         padding: 0.4rem 1.2rem;
@@ -470,15 +540,94 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       .isec__lead { text-align: center; max-width: 40rem; margin: 0 auto 1.7rem; color: var(--ink-soft); line-height: 1.9; }
       .isec__inner--narrow { max-width: 640px; }
 
-      /* VIDEO（プレースホルダ） */
-      .ivideos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.1rem; max-width: 1000px; margin: 0 auto; }
-      .ivideo { text-decoration: none; color: var(--ink-soft); }
-      .ivideo__thumb { display: grid; place-items: center; aspect-ratio: 16 / 9; border-radius: 12px; background: linear-gradient(150deg, #2a2014, #15100a); border: 1px solid var(--card-line); color: var(--gold); font-size: 1.5rem; }
-      .ivideo__title { display: block; margin-top: 0.6rem; font-size: 0.92rem; }
+      /* VIDEO（おすすめ動画：3Dシリンダーカルーセル・バニラCSS 3D） */
+      .icyl { max-width: 1000px; margin: 0 auto; }
+      .icyl-stage { perspective: 1200px; perspective-origin: 50% 44%; height: clamp(260px, 38vw, 330px); display: grid; place-items: center; overflow: hidden; }
+      .icyl-ring {
+        /* ↓ カード枚数=6 と必ず一致（360/6=60deg）。半径で間隔を調整 */
+        --cyl-angle: 60deg;
+        --cyl-radius: 310px;
+        position: relative; width: clamp(228px, 30vw, 264px); height: clamp(128px, 17vw, 148px);
+        transform-style: preserve-3d; will-change: transform; cursor: grab; touch-action: pan-y;
+      }
+      .icyl-ring.is-drag { cursor: grabbing; }
+      .icyl-card {
+        position: absolute; inset: 0; border-radius: 14px; overflow: hidden; backface-visibility: hidden;
+        transform: rotateY(calc(var(--i) * var(--cyl-angle))) translateZ(var(--cyl-radius));
+        display: flex; flex-direction: column; text-decoration: none;
+        background: linear-gradient(155deg, #2a2014, #14100a); border: 1px solid var(--card-line);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.5);
+      }
+      .icyl-card__thumb { flex: 1; display: grid; place-items: center; color: var(--gold); font-size: 1.7rem; background: radial-gradient(120% 130% at 50% 28%, rgba(201, 168, 105, 0.14), transparent 62%); }
+      .icyl-card__title { padding: 0.5rem 0.7rem; font-size: 0.82rem; color: #f3ead7; background: rgba(8, 6, 4, 0.55); border-top: 1px solid var(--card-line); }
+      .icyl-note { text-align: center; font-size: 0.76rem; color: var(--ink-soft); opacity: 0.72; margin: 1rem 0 0; }
+      /* 動きが苦手／モバイルは平面の横スクロールにフォールバック（JSも早期return） */
+      @media (prefers-reduced-motion: reduce), (max-width: 640px) {
+        .icyl-stage { perspective: none; height: auto; overflow-x: auto; overflow-y: hidden; place-items: stretch; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        .icyl-ring { transform: none !important; transform-style: flat; position: static; width: auto; height: auto; display: flex; gap: 0.85rem; padding: 0.3rem 0.2rem 1rem; cursor: default; }
+        .icyl-card { position: relative; inset: auto; transform: none !important; flex: 0 0 76%; max-width: 280px; height: clamp(150px, 44vw, 184px); scroll-snap-align: center; }
+        .icyl-note { display: none; } /* 横スクロール（スクロールバーで自明）。回転の文言はモバイルでは不正確なため隠す */
+      }
+
+      /* ===== PICK UP（おすすめ）：横並びカード（吹き出しラベル付き） ===== */
+      .ipick { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.7rem 1.3rem; max-width: 1000px; margin: 0 auto; }
+      .ipick__card { display: block; text-decoration: none; color: var(--ink-soft); }
+      .ipick__pick { position: relative; display: block; width: max-content; max-width: 100%; margin: 0 auto 0.85rem; padding: 0.34rem 1rem; border-radius: 999px; background: var(--gold-bright); color: #14100b; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.02em; text-align: center; }
+      .ipick__pick::after { content: ''; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: var(--gold-bright); transform: translateX(-50%) rotate(45deg); }
+      .ipick__thumb { display: grid; place-items: center; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: linear-gradient(150deg, #2a2014, #14100a); border: 1px solid var(--card-line); color: var(--gold); font-size: 1.6rem; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4); transition: transform 0.25s ease; }
+      .ipick__card:hover .ipick__thumb { transform: translateY(-4px); }
+      .ipick__title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 0.6rem; font-size: 0.92rem; line-height: 1.5; }
+
+      /* ===== VIDEO（最新動画）：オートスクロールのリール（フィルムロール風・端フェード） ===== */
+      .ireel { position: relative; overflow: hidden; max-width: 1180px; margin: 0 auto; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+      .ireel__track { display: flex; width: max-content; }
+      .ireel__card { flex: 0 0 clamp(232px, 26vw, 290px); margin-right: 1.2rem; text-decoration: none; color: var(--ink-soft); }
+      .ireel__thumb { display: grid; place-items: center; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: linear-gradient(150deg, #2a2014, #14100a); border: 1px solid var(--card-line); color: var(--gold); font-size: 1.6rem; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4); }
+      .ireel__title { display: block; margin-top: 0.55rem; font-size: 0.9rem; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      @media (prefers-reduced-motion: no-preference) {
+        .ireel__track { animation: reelRoll 34s linear infinite; }
+        .ireel:hover .ireel__track { animation-play-state: paused; }
+      }
+      @keyframes reelRoll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+      /* 動きが苦手な設定：自動スクロールを止めて手動の横スクロールに */
+      @media (prefers-reduced-motion: reduce) { .ireel { overflow-x: auto; } .ireel__track { animation: none; } }
+
+      /* ===== 各セクションの「すべて見る →」導線 ===== */
+      .isec__more { max-width: 1000px; margin: 1.2rem auto 0; text-align: right; }
+      .isec__more a { color: var(--gold-strong); text-decoration: none; font-size: 0.92rem; letter-spacing: 0.04em; }
+      .isec__more a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+      /* ===== ヒーロー直下：最新お知らせ1行バー ===== */
+      .inewsbar { display: flex; align-items: center; gap: 0.8rem; max-width: 1100px; margin: 0 auto; padding: 0.7rem clamp(1.2rem, 4vw, 2rem); border-top: 1px solid var(--card-line); border-bottom: 1px solid var(--card-line); background: rgba(20, 14, 9, 0.55); text-decoration: none; color: var(--ink-soft); font-size: 0.9rem; }
+      .inewsbar__tag { flex-shrink: 0; color: var(--gold-strong); font-weight: 700; letter-spacing: 0.08em; font-size: 0.78rem; }
+      .inewsbar__date { flex-shrink: 0; color: var(--muted); font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+      .inewsbar__title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .inewsbar__more { flex-shrink: 0; color: var(--gold-strong); font-size: 0.8rem; white-space: nowrap; }
+      .inewsbar:hover .inewsbar__more { text-decoration: underline; text-underline-offset: 2px; }
+      @media (max-width: 640px) { .inewsbar { font-size: 0.84rem; gap: 0.55rem; } .inewsbar__date { display: none; } }
+
+      /* ===== GALLERY（準備中）：金のひし形＋細罫で上品に ===== */
+      .igallery-soon { display: grid; place-items: center; gap: 0.55rem; max-width: 1000px; margin: 1.3rem auto 0; min-height: clamp(150px, 24vw, 230px); border: 1px solid var(--card-line); border-radius: 16px; background: radial-gradient(64% 82% at 50% 28%, rgba(201, 168, 105, 0.08), transparent 70%), var(--card-bg); color: var(--gold-strong); font-family: var(--serif); letter-spacing: 0.22em; font-size: clamp(0.95rem, 2.6vw, 1.25rem); text-transform: uppercase; }
+      .igallery-soon::before { content: ''; width: 7px; height: 7px; transform: rotate(45deg); background: var(--gold); }
 
       /* INFORMATION */
       .inews { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; max-width: 1000px; margin: 0 auto; }
-      .inews__card { display: block; text-decoration: none; color: var(--ink); background: var(--card-bg); border: 1px solid var(--card-line); border-radius: 14px; overflow: hidden; }
+      /* お知らせ：ネオモーフィズム（暗地に二方向シャドウで浮き出す立体感） */
+      .inews__card {
+        display: block;
+        text-decoration: none;
+        color: var(--ink);
+        background: linear-gradient(145deg, #1f1810, #130f09);
+        border: 1px solid rgba(201, 168, 105, 0.1);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 7px 7px 16px rgba(0, 0, 0, 0.6), -6px -6px 14px rgba(120, 100, 64, 0.1);
+        transition: box-shadow 0.28s ease, transform 0.28s ease;
+      }
+      .inews__card:hover {
+        transform: translateY(-3px);
+        box-shadow: 10px 10px 24px rgba(0, 0, 0, 0.64), -7px -7px 16px rgba(120, 100, 64, 0.14);
+      }
       .inews__thumb { display: block; position: relative; aspect-ratio: 16 / 9; background: linear-gradient(150deg, #2a2014, #15100a); }
       .inews__thumb img { width: 100%; height: 100%; object-fit: cover; }
       .inews__ph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--gold); text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.9rem; }
@@ -486,8 +635,24 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       .inews__cat { color: var(--gold-strong); text-transform: uppercase; letter-spacing: 0.08em; }
       .inews__title { display: block; padding: 0.3rem 0.9rem 0.9rem; font-size: 0.96rem; line-height: 1.5; }
 
-      /* STORE */
-      .istore { position: relative; display: block; max-width: 760px; margin: 0 auto; border-radius: 16px; overflow: hidden; min-height: clamp(150px, 24vw, 230px); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4); text-decoration: none; }
+      /* STORE（SpotlightBorder：カーソル追従の光る枠） */
+      .ispot {
+        --spot-x: -9999px;
+        --spot-y: -9999px;
+        --spot-size: 300px;
+        position: relative; max-width: 760px; margin: 0 auto; border-radius: 18px; padding: 1.5px;
+        background: linear-gradient(135deg, rgba(201, 168, 105, 0.22), rgba(201, 168, 105, 0.05));
+      }
+      .ispot::before {
+        content: ''; position: absolute; inset: 0; border-radius: 18px; padding: 1.5px;
+        background: radial-gradient(circle var(--spot-size) at var(--spot-x) var(--spot-y), var(--gold-bright), transparent 60%);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+      .istore { position: relative; display: block; width: 100%; border-radius: 16.5px; overflow: hidden; min-height: clamp(150px, 24vw, 230px); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4); text-decoration: none; }
       .istore__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 28%; }
       .istore::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 8, 5, 0.86), rgba(10, 8, 5, 0.42) 60%, transparent); }
       .istore__text { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 0.3rem; padding: clamp(1.4rem, 4vw, 2.2rem); }
@@ -562,10 +727,12 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       }
       .iprofile__art :global(img), .iabout__art :global(img) { position: relative; z-index: 1; }
       .iprofile__art :global(img) { filter: drop-shadow(0 26px 44px rgba(0, 0, 0, 0.55)); }
+      /* 立ち絵のふわふわ（artFloat）は重いので【保留＝停止中】。復活させるなら下のコメントを外す
       @media (prefers-reduced-motion: no-preference) {
         .iprofile__art :global(img), .iabout__art :global(img) { animation: artFloat 7.5s ease-in-out infinite alternate; }
       }
       @keyframes artFloat { from { transform: translateY(2px); } to { transform: translateY(-10px); } }
+      */
       /* 黒トーン：帯と画面の縁を落として中央に視線を集める（奥行き） */
       html[data-form='dark'] .isec { box-shadow: inset 0 0 160px 30px rgba(0, 0, 0, 0.45); }
       html[data-form='dark'] .ihero::after {
@@ -588,6 +755,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       @media (prefers-reduced-motion: reduce) {
         .reveal { opacity: 1; transform: none; filter: none; transition: none; }
         .intro > * { opacity: 1; transform: none; filter: none; animation: none; }
+        .iprofile__row { opacity: 1; transform: none; transition: none; }
         .ihero__kv, .ihero__glow { animation: none; }
         .cursorglow { display: none; }
         html { scroll-behavior: auto; }
@@ -608,15 +776,16 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       }
 
       /* ===== フロストガラス丸CTA（ヒーローYouTube） ===== */
-      .ibtn-icon { display: inline-grid; place-items: center; width: 56px; height: 56px; flex-shrink: 0; border-radius: 50%; color: var(--gold-strong); background: rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--gold); transition: background 0.2s ease, border-color 0.2s ease; }
-      .ibtn-icon:hover { background: rgba(255, 255, 255, 0.18); border-color: var(--gold-strong); }
+      /* §59 フロストガラスCTAアイコン円：bg-white/80 + blur → ホバーでソリッド */
+      .ibtn-icon { display: inline-grid; place-items: center; width: 56px; height: 56px; flex-shrink: 0; border-radius: 50%; color: #1c140b; background: rgba(255, 255, 255, 0.8); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.55); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28); transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
+      .ibtn-icon:hover { background: #fff; border-color: #fff; color: #0a0a0a; }
       .ibtn-icon svg { width: 26px; height: 26px; fill: currentColor; }
 
       /* ===== 浮遊アイコン（floatSlow） ===== */
       @media (prefers-reduced-motion: no-preference) {
         .floaty { animation: floatSlow 5.5s ease-in-out infinite; }
-        .ivideo:nth-child(2) .floaty { animation-delay: -1.6s; }
-        .ivideo:nth-child(3) .floaty { animation-delay: -3.2s; }
+        .icyl-card:nth-child(2n) .floaty { animation-delay: -1.6s; }
+        .icyl-card:nth-child(3n) .floaty { animation-delay: -3.2s; }
       }
       @keyframes floatSlow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
@@ -693,9 +862,9 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       @media (min-width: 860px) {
         [data-edit='hero'] { --ex: -157px; --ey: -46px; --es: 1.04; }
         [data-edit='art-prof'] { --ex: -156px; --ey: -75px; --es: 1.24; }
-        [data-edit='txt-prof'] { --ex: 6px; --ey: 107px; --es: 1.48; }
-        [data-edit='txt-about'] { --ex: -89px; --ey: -50px; --es: 1.36; }
-        [data-edit='art-about'] { --es: 1.04; }
+        [data-edit='txt-prof'] { --ex: -4px; --ey: 125px; --es: 1.36; }
+        [data-edit='txt-about'] { --ex: -95px; --ey: -45px; --es: 1.12; }
+        [data-edit='art-about'] { --ex: 175px; --ey: 29px; --es: 1.36; }
       }
       html.is-editing [data-edit] { outline: 1px dashed rgba(201, 168, 105, 0.6); outline-offset: 5px; cursor: grab; }
       html.is-editing [data-edit]:hover { outline-color: #e8cf95; }
@@ -709,6 +878,12 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       <p class="iload__name"><span>和</span><span>香</span><span>松</span><span>庵</span></p>
       <p class="iload__en">Official Site</p>
     </div>
+    <noscript>
+      <style>
+        .iload { display: none !important; } /* JS無効：ロード画面で全面が隠れないように */
+        .intro > * { animation: none !important; opacity: 1 !important; transform: none !important; }
+      </style>
+    </noscript>
     <span class="cursorglow" aria-hidden="true"></span>
 
     <header class="inav">
@@ -728,12 +903,18 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         src={keyVisual}
         widths={[768, 1280, 1920]}
         sizes="100vw"
+        quality={88}
         alt={`${site.name}のキービジュアル`}
         loading="eager"
         fetchpriority="high"
       />
       <div class="ihero__scrim" aria-hidden="true"></div>
       <div class="ihero__glow" aria-hidden="true"></div>
+      <a class="ilive" href={site.links.youtube} rel="noopener" target="_blank" hidden>
+        <span class="ilive__dot" aria-hidden="true"></span>
+        <span class="ilive__now">配信中</span>
+        <span class="ilive__title"></span>
+      </a>
       <div class="ihero__content">
         <div class="ihero__inner intro" data-edit="hero">
           <p class="ihero__kicker">Cafe &amp; Bar の店長 ・ 個人勢VTuber</p>
@@ -751,6 +932,17 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       <span class="ihero__scrollcue" aria-hidden="true">scroll</span>
     </section>
 
+    {
+      information.length > 0 && (
+        <a class="inewsbar" href="#information">
+          <span class="inewsbar__tag">✦ NEW</span>
+          <time class="inewsbar__date">{information[0]?.date}</time>
+          <span class="inewsbar__title">{information[0]?.title}</span>
+          <span class="inewsbar__more">お知らせへ <span aria-hidden="true">→</span></span>
+        </a>
+      )
+    }
+
     <section class="isec isec--alt" id="profile">
       <div class="isec__inner">
         <div class="ihead reveal">
@@ -761,8 +953,9 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
           <div class="iprofile__art" data-edit="art-prof">
             <Image
               src={standArt}
-              widths={[360, 540, 760]}
-              sizes="(min-width: 860px) 420px, 70vw"
+              widths={[440, 660, 920, 1280]}
+              sizes="(min-width: 860px) 600px, 80vw"
+              quality={90}
               alt={`${site.name}の立ち絵`}
               loading="lazy"
             />
@@ -798,8 +991,9 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
           <div class="iabout__art" data-edit="art-about">
             <Image
               src={barArt}
-              widths={[360, 540, 760]}
-              sizes="(min-width: 860px) 440px, 76vw"
+              widths={[440, 680, 960, 1320]}
+              sizes="(min-width: 860px) 660px, 80vw"
+              quality={90}
               alt={`${site.name}の立ち絵（カクテルをお届け）`}
               loading="lazy"
             />
@@ -838,22 +1032,62 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
             </div>
           )
         }
+        <p class="isec__more reveal"><a href="/schedule">スケジュールをすべて見る →</a></p>
       </div>
     </section>
 
-    <section class="isec isec--alt" id="videos">
+    <section class="isec isec--alt" id="pickup">
       <div class="isec__inner">
-        <div class="ihead reveal"><p class="ihead__kicker">VIDEO</p><span class="ihead__rule" aria-hidden="true"></span></div>
-        <p class="isec__lead reveal">配信のアーカイブや切り抜きは YouTube で公開中。最新動画は公開後ここに自動で並びます。</p>
-        <div class="ivideos reveal">
-          <a class="ivideo" href={site.links.youtube} target="_blank" rel="me noopener"><span class="ivideo__thumb" aria-hidden="true"><span class="floaty">▶</span></span><span class="ivideo__title">最新配信アーカイブ</span></a>
-          <a class="ivideo" href={site.links.youtube} target="_blank" rel="me noopener"><span class="ivideo__thumb" aria-hidden="true"><span class="floaty">▶</span></span><span class="ivideo__title">歌ってみた・歌枠</span></a>
-          <a class="ivideo" href={site.links.youtube} target="_blank" rel="me noopener"><span class="ivideo__thumb" aria-hidden="true"><span class="floaty">▶</span></span><span class="ivideo__title">ゲーム実況</span></a>
+        <div class="ihead reveal"><p class="ihead__kicker">PICK UP</p><p class="ihead__title">おすすめ</p><span class="ihead__rule" aria-hidden="true"></span></div>
+        <p class="isec__lead reveal">いま観てほしい配信をピックアップ。</p>
+        <div class="ipick reveal">
+          {
+            [
+              { t: '夜のカフェタイム雑談', p: 'イチオシ' },
+              { t: '歌ってみた・歌枠', p: '人気' },
+              { t: 'ゲーム実況 #3', p: '必見' },
+            ].map((v) => (
+              <a class="ipick__card" href={site.links.youtube} target="_blank" rel="me noopener">
+                <span class="ipick__pick">{v.p}</span>
+                <span class="ipick__thumb" aria-hidden="true">▶</span>
+                <span class="ipick__title">{v.t}</span>
+              </a>
+            ))
+          }
         </div>
       </div>
     </section>
 
-    <section class="isec" id="information">
+    <section class="isec" id="videos">
+      <div class="isec__inner">
+        <div class="ihead reveal"><p class="ihead__kicker">VIDEO</p><p class="ihead__title">最新動画</p><span class="ihead__rule" aria-hidden="true"></span></div>
+        <p class="isec__lead reveal">最新の配信アーカイブはこちら。公開後はここに自動で並びます。</p>
+        <div class="ireel reveal">
+          <div class="ireel__track">
+            {
+              [0, 1].flatMap((dup) =>
+                ['【雑談】夜のカフェタイム', '【ゲーム】〇〇 初見プレイ #3', '【歌枠】まったり弾き語り', '【コラボ】〇〇さんと', '【作業】もくもく作業配信', '【記念】登録者ありがとう枠'].map((title) => (
+                  <a
+                    class="ireel__card"
+                    href={site.links.youtube}
+                    target="_blank"
+                    rel="me noopener"
+                    aria-hidden={dup === 1 ? 'true' : undefined}
+                    tabindex={dup === 1 ? -1 : undefined}
+                  >
+                    <span class="ireel__thumb" aria-hidden="true">▶</span>
+                    <span class="ireel__title">{title}</span>
+                  </a>
+                ))
+              )
+            }
+          </div>
+        </div>
+        <p class="isec__more reveal"><a href="/videos">動画をすべて見る →</a></p>
+      </div>
+    </section>
+
+    <section class="isec isec--alt" id="information">
       <div class="isec__inner">
         <div class="ihead reveal"><p class="ihead__kicker">INFORMATION</p><span class="ihead__rule" aria-hidden="true"></span></div>
         <div class="inews reveal">
@@ -873,6 +1107,15 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
             })
           }
         </div>
+        <p class="isec__more reveal"><a href="/news">過去のお知らせ一覧 →</a></p>
+      </div>
+    </section>
+
+    <section class="isec" id="gallery">
+      <div class="isec__inner">
+        <div class="ihead reveal"><p class="ihead__kicker">GALLERY</p><p class="ihead__title">ギャラリー</p><span class="ihead__rule" aria-hidden="true"></span></div>
+        <p class="isec__lead reveal">わたしの色んな姿や、みんなが描いてくれたファンアートをご紹介！</p>
+        <div class="igallery-soon reveal">Coming soon …</div>
       </div>
     </section>
 
@@ -880,11 +1123,13 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       <div class="isec__inner">
         <div class="ihead reveal"><p class="ihead__kicker">STORE</p><span class="ihead__rule" aria-hidden="true"></span></div>
         <p class="isec__lead reveal">配信に使える自作の OBS ウィジェットなどを BOOTH で販売中。オリジナルグッズも順次追加していきます。</p>
-        <a class="istore reveal" href={site.links.booth} target="_blank" rel="me noopener" aria-label="BOOTHストアを見る">
-          <Image class="istore__bg" src={keyVisual} widths={[480, 768, 1024]} sizes="(min-width: 760px) 760px, 100vw" alt="" loading="lazy" />
-          <span class="istore__text"><span class="istore__en">OFFICIAL STORE</span><span class="istore__jp">和香松庵 STORE</span></span>
-          <span class="istore__btn">BOOTH ▸</span>
-        </a>
+        <div class="ispot reveal" data-spot>
+          <a class="istore" href={site.links.booth} target="_blank" rel="me noopener" aria-label="BOOTHストアを見る">
+            <Image class="istore__bg" src={keyVisual} widths={[480, 768, 1024, 1520]} sizes="(min-width: 760px) 760px, 100vw" alt="" loading="lazy" />
+            <span class="istore__text"><span class="istore__en">OFFICIAL STORE</span><span class="istore__jp">和香松庵 STORE</span></span>
+            <span class="istore__btn">BOOTH ▸</span>
+          </a>
+        </div>
       </div>
     </section>
 
@@ -954,20 +1199,20 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
           <input type="range" min="0.7" max="1.5" step="0.02" value="1" data-var="--art-scale" />
         </label>
         <label class="ed__field">
-          <span class="ed__lab">光のプール（立ち絵） <b data-out="--spotlight">0.30</b></span>
-          <input type="range" min="0" max="1.6" step="0.05" value="0.3" data-var="--spotlight" />
+          <span class="ed__lab">光のプール（立ち絵） <b data-out="--spotlight">0.40</b></span>
+          <input type="range" min="0" max="1.6" step="0.05" value="0.4" data-var="--spotlight" />
         </label>
         <label class="ed__field">
-          <span class="ed__lab">カーソルの光 <b data-out="--cursor-size">170</b><span class="ed__u">px</span></span>
-          <input type="range" min="120" max="520" step="10" value="170" data-var="--cursor-size" data-unit="px" />
+          <span class="ed__lab">カーソルの光 <b data-out="--cursor-size">120</b><span class="ed__u">px</span></span>
+          <input type="range" min="120" max="520" step="10" value="120" data-var="--cursor-size" data-unit="px" />
         </label>
         <label class="ed__field">
-          <span class="ed__lab">縁の暗さ（黒トーン） <b data-out="--vignette">0.25</b></span>
-          <input type="range" min="0" max="0.85" step="0.05" value="0.25" data-var="--vignette" />
+          <span class="ed__lab">縁の暗さ（黒トーン） <b data-out="--vignette">0.20</b></span>
+          <input type="range" min="0" max="0.85" step="0.05" value="0.2" data-var="--vignette" />
         </label>
         <label class="ed__field">
-          <span class="ed__lab">全体グロー <b data-out="--glow-strength">0.85</b></span>
-          <input type="range" min="0" max="1.8" step="0.05" value="0.85" data-var="--glow-strength" />
+          <span class="ed__lab">全体グロー <b data-out="--glow-strength">0.00</b></span>
+          <input type="range" min="0" max="1.8" step="0.05" value="0" data-var="--glow-strength" />
         </label>
         <div class="ed__btns">
           <button class="ed__btn ed__btn--p" type="button" data-ed-copy>設定をコピー</button>
@@ -977,6 +1222,15 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       </div>
     </aside>
 
+    <div class="iconband" aria-hidden="true">
+      <span class="iconband__i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2" /><path d="M14 2v2" /><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1" /><path d="M6 2v2" /></svg></span>
+      <span class="iconband__i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12 4.207 4.207A.707.707 0 0 1 4.707 3h14.586a.707.707 0 0 1 .5 1.207z" /><path d="M12 12v10" /><path d="M7 22h10" /></svg></span>
+      <span class="iconband__i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg></span>
+      <span class="iconband__i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /></svg></span>
+      <span class="iconband__i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /><path d="M20 2v4" /><path d="M22 4h-4" /><circle cx="4" cy="20" r="2" /></svg></span>
+      <span class="iconband__i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" /></svg></span>
+    </div>
+
     <footer class="ifoot">
       <p class="ifoot__brand">{site.name}</p>
       <p class="ifoot__en">Official Web Site — preview</p>
@@ -984,16 +1238,24 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
 
     <script is:inline>
       // ===== ロード画面（同一セッションでは1回だけ・RISE） =====
+      // ロードが明けた瞬間にヒーロー入場（intro-go）を起動＝演出を裏で再生し終えない
       (function () {
+        const html = document.documentElement;
+        const goIntro = () => html.classList.add('intro-go');
         const load = document.getElementById('iload');
-        if (load) {
-          let seen = false;
-          try { seen = !!sessionStorage.getItem('iori-loaded'); sessionStorage.setItem('iori-loaded', '1'); } catch (e) {}
-          if (seen) {
-            load.classList.add('is-done');
+        if (!load) { goIntro(); return; }
+        let seen = false;
+        try { seen = !!sessionStorage.getItem('iori-loaded'); sessionStorage.setItem('iori-loaded', '1'); } catch (e) {}
+        if (seen) {
+          load.classList.add('is-done');
+          goIntro();
+        } else {
+          const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (reduce) {
+            setTimeout(() => { load.classList.add('is-done'); goIntro(); }, 200);
           } else {
-            const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-            setTimeout(() => load.classList.add('is-done'), reduce ? 200 : 1900);
+            // ロード画面が薄れてから入場開始＝動きが画面で見えるようにする
+            setTimeout(() => { load.classList.add('is-done'); setTimeout(goIntro, 450); }, 1900);
           }
         }
       })();
@@ -1159,6 +1421,94 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
           addEventListener('pointerleave', () => (glow.style.opacity = '0'));
         }
       }
+
+      // SpotlightBorder：カーソル追従の光る枠（ストアバナー等 [data-spot]）
+      document.querySelectorAll('[data-spot]').forEach((wrap) => {
+        wrap.addEventListener('pointermove', (e) => {
+          const r = wrap.getBoundingClientRect();
+          wrap.style.setProperty('--spot-x', e.clientX - r.left + 'px');
+          wrap.style.setProperty('--spot-y', e.clientY - r.top + 'px');
+        });
+        wrap.addEventListener('pointerleave', () => {
+          wrap.style.setProperty('--spot-x', '-9999px');
+          wrap.style.setProperty('--spot-y', '-9999px');
+        });
+      });
+
+      // YouTubeライブ中の検知 → ライブ中バッジを heroReveal で点灯（本番 /api/live と同契約）
+      (function () {
+        const badge = document.querySelector('.ilive');
+        if (!badge) return;
+        const titleEl = badge.querySelector('.ilive__title');
+        const show = (url, title) => {
+          if (url) badge.href = url;
+          if (titleEl) titleEl.textContent = title || ''; // 外部由来タイトルは textContent で挿入＝XSS回避
+          badge.hidden = false;
+          badge.classList.add('is-live');
+        };
+        // プレビュー確認用：?live=1 で強制点灯（本番では /api/live の判定で表示）
+        if (new URLSearchParams(location.search).get('live') === '1') {
+          show(badge.href, '【プレビュー】ただいま配信中！まったり雑談しています');
+          return;
+        }
+        fetch('/api/live', { headers: { accept: 'application/json' } })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((d) => {
+            const live = d && d.isLive === true && d.liveVideo && typeof d.liveVideo.url === 'string' ? d.liveVideo : null;
+            if (live) show(live.url, live.title);
+          })
+          .catch(() => {});
+      })();
+
+      // おすすめ動画：3Dシリンダーカルーセル（ドラッグ＋慣性／ホバーで一時停止）
+      // reduced-motion・モバイルは CSS が平面の横スクロールを担当するので JS は早期return
+      (function () {
+        const ring = document.getElementById('cylRing');
+        if (!ring) return;
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches || matchMedia('(max-width: 640px)').matches) return;
+        const MIN = 0.1; // 自動回転の最低速（見やすいよう低速。元見本は0.25）
+        let ry = 0,
+          vel = MIN,
+          dragging = false,
+          hover = false,
+          moved = false,
+          lastX = 0;
+        ring.addEventListener('pointerdown', (e) => {
+          dragging = true;
+          moved = false;
+          lastX = e.clientX;
+          ring.classList.add('is-drag');
+          try {
+            ring.setPointerCapture && ring.setPointerCapture(e.pointerId);
+          } catch (err) {}
+        });
+        addEventListener('pointermove', (e) => {
+          if (!dragging) return;
+          const dx = e.clientX - lastX;
+          if (Math.abs(dx) > 3) moved = true;
+          ry += dx * 0.4;
+          vel = dx * 0.05;
+          lastX = e.clientX;
+        });
+        addEventListener('pointerup', () => {
+          dragging = false;
+          ring.classList.remove('is-drag');
+        });
+        ring.addEventListener('pointerenter', () => (hover = true));
+        ring.addEventListener('pointerleave', () => (hover = false));
+        // ドラッグ直後の誤クリック（カードのリンク遷移）を抑止
+        ring.addEventListener('click', (e) => { if (moved) e.preventDefault(); }, true);
+        function loop() {
+          if (!dragging && !hover) {
+            ry += vel;
+            vel *= 0.95;
+            if (Math.abs(vel) < MIN) vel = vel < 0 ? -MIN : MIN;
+          }
+          ring.style.transform = `rotateX(-5deg) rotateY(${ry}deg)`;
+          requestAnimationFrame(loop);
+        }
+        loop();
+      })();
     </script>
   </body>
 </html>
