@@ -290,8 +290,8 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         position: fixed;
         top: 0;
         left: 0;
-        width: 520px;
-        height: 520px;
+        width: 260px;
+        height: 260px;
         border-radius: 50%;
         pointer-events: none;
         z-index: 4;
@@ -358,6 +358,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         padding: 1.3rem 1.4rem;
         background: var(--card-bg);
         border: 1px solid var(--card-line);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
         -webkit-backdrop-filter: blur(8px);
         backdrop-filter: blur(8px);
         overflow: hidden;
@@ -425,7 +426,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       }
       @media (min-width: 860px) {
         .iprofile { flex-direction: row; align-items: flex-start; gap: 3rem; max-width: 1080px; margin: 0 auto; }
-        .iprofile__art { flex-shrink: 0; width: min(44%, 420px); }
+        .iprofile__art { flex-shrink: 0; width: min(48%, 462px); }
         .iprofile__body { flex: 1 1 0; min-width: 0; max-width: none; margin-top: 1rem; }
       }
 
@@ -447,9 +448,41 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       @media (min-width: 860px) {
         .iabout { flex-direction: row; align-items: center; gap: 3rem; text-align: left; max-width: 1040px; margin: 0 auto; }
         .iabout__body { flex: 1 1 0; min-width: 0; }
-        .iabout__art { flex-shrink: 0; width: min(46%, 440px); }
+        .iabout__art { flex-shrink: 0; width: min(50%, 470px); }
         .iabout__rule { margin-left: 0; margin-right: auto; }
         .iabout__story { max-width: none; }
+      }
+
+      /* ===== 奥行き演出（黒地に光のプール／立ち絵の浮かび上がり） ===== */
+      .iprofile__art, .iabout__art { position: relative; }
+      .iprofile__art::before, .iabout__art::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 48%;
+        width: 122%;
+        height: 96%;
+        transform: translate(-50%, -50%);
+        z-index: 0;
+        pointer-events: none;
+        background: radial-gradient(50% 50% at 50% 50%, var(--glow-2), transparent 68%);
+        opacity: 0.8;
+      }
+      .iprofile__art :global(img), .iabout__art :global(img) { position: relative; z-index: 1; }
+      .iprofile__art :global(img) { filter: drop-shadow(0 26px 44px rgba(0, 0, 0, 0.55)); }
+      @media (prefers-reduced-motion: no-preference) {
+        .iprofile__art :global(img), .iabout__art :global(img) { animation: artFloat 7.5s ease-in-out infinite alternate; }
+      }
+      @keyframes artFloat { from { transform: translateY(2px); } to { transform: translateY(-10px); } }
+      /* 黒トーン：帯と画面の縁を落として中央に視線を集める（奥行き） */
+      html[data-form='dark'] .isec { box-shadow: inset 0 0 160px 30px rgba(0, 0, 0, 0.45); }
+      html[data-form='dark'] .ihero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        box-shadow: inset 0 0 220px 60px rgba(0, 0, 0, 0.5);
       }
 
       /* ===== モバイル軽量化 ===== */
