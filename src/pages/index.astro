@@ -259,7 +259,7 @@ try {
       <section class="lp-section" id="information">
         <div class="lp-inner lp-inner--info reveal">
           <SectionHead kicker="INFORMATION" title="お知らせ" />
-          <ul class="info-grid">
+          <ul class="info-grid stagger-list">
             {information.slice(0, 3).map((item) => {
               const Tag = item.url ? 'a' : 'div';
               const linkProps = item.url ? { href: item.url, ...externalAttrs(item.url) } : {};

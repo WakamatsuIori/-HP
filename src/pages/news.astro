@@ -11,7 +11,7 @@ import { externalAttrs } from '../lib/links';
     information.length === 0 ? (
       <p class="placeholder-note">お知らせはまだありません。</p>
     ) : (
-      <ul class="news-list">
+      <ul class="news-list stagger-list">
         {information.map((item) => {
           const Tag = item.url ? 'a' : 'div';
           const linkProps = item.url ? { href: item.url, ...externalAttrs(item.url) } : {};

@@ -1,38 +1,48 @@
 ---
 /**
  * セクション見出し（大きな英字のウォーターマーク＋日本語サブ＋アールデコ調の金の区切り）。
- * index.astro の各セクションで使う共通見出し。出力・見た目は従来の <div class="section-head"> と同一。
+ * index.astro の各セクションで使う共通見出し。
  */
 interface Props {
   kicker: string; // 大英字（例: SCHEDULE）
-  title: string; // 日本語サブ（例: 今週の予定）
+  title: string;  // 日本語サブ（例: 今週の予定）
 }
 const { kicker, title } = Astro.props;
 ---
 
-<div class="section-head"><p class="section-kicker">{kicker}</p><h2>{title}</h2></div>
+<div class="section-head">
+  <p class="section-kicker">{kicker}</p>
+  <h2>{title}</h2>
+  <span class="section-divider-wrap" aria-hidden="true">
+    <svg class="section-divider" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 40">
+      <!-- 左線：x1=165→x2=0 で中央から外へ描画 -->
+      <line class="dl" x1="165" y1="20" x2="0" y2="20"
+            stroke="#c2a86b" stroke-width="1.4" pathLength="1"/>
+      <!-- 右線：x1=235→x2=400 で中央から外へ描画 -->
+      <line class="dl" x1="235" y1="20" x2="400" y2="20"
+            stroke="#c2a86b" stroke-width="1.4" pathLength="1"/>
+      <!-- 中央装飾：少し遅れてフェードイン -->
+      <g class="dl-center">
+        <circle cx="178" cy="20" r="2.2" fill="#c2a86b"/>
+        <circle cx="222" cy="20" r="2.2" fill="#c2a86b"/>
+        <g transform="translate(200,20)">
+          <path d="M0 -11 L9 0 L0 11 L-9 0 Z" fill="#c2a86b" stroke="#c2a86b" stroke-width="1.2"/>
+          <circle cx="0" cy="0" r="2.5" fill="#1b110a" stroke="none"/>
+        </g>
+      </g>
+    </svg>
+  </span>
+</div>
 
 <style>
-  /* セクション見出し：大きな英字のウォーターマーク＋日本語サブ（参考サイトの手法を金で翻訳） */
   .section-head {
     position: relative;
     text-align: center;
     margin: 0 auto 1.15rem;
-    padding-bottom: 0.95rem;
     line-height: 1;
   }
-  /* 和の区切りあしらい：花の区切り罫（SVG・中央配置・金 #c2a86b）。
-     従来の「細線＋ひし形」を、同じ意匠を含むより繊細な花罫に格上げ。 */
-  .section-head::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: 0.1rem;
-    transform: translateX(-50%);
-    width: 172px;
-    height: 17px;
-    background: url('/ornaments/divider-hana.svg') center / contain no-repeat;
-  }
+
+  /* ── clip-path reveal 初期状態 ── */
   .section-kicker {
     margin: 0;
     font-family: var(--font-logo);
@@ -40,7 +50,9 @@ const { kicker, title } = Astro.props;
     font-weight: 500;
     letter-spacing: 0.1em;
     line-height: 1;
-    color: rgba(156, 143, 107, 0.55); /* 単色の金ウォーターマーク（可読性優先・箔グラデは廃止） */
+    color: rgba(156, 143, 107, 0.55);
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.65s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .section-head h2 {
     display: block;
@@ -50,6 +62,69 @@ const { kicker, title } = Astro.props;
     font-size: 1.1rem;
     letter-spacing: 0.1em;
     color: var(--text);
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.12s;
   }
-  .section-head h2::after { content: none; } /* 大英字がアクセントなのでグローバルの金タブは消す */
+  .section-head h2::after { content: none; }
+
+  /* ── .is-visible で全演出を起動 ── */
+  .section-head.is-visible .section-kicker {
+    clip-path: inset(0 0% 0 0);
+  }
+  .section-head.is-visible h2 {
+    clip-path: inset(0 0% 0 0);
+  }
+
+  /* 区切り線ラッパー */
+  .section-divider-wrap {
+    display: block;
+    text-align: center;
+    margin-top: 0.4rem;
+    line-height: 0;
+  }
+  .section-divider {
+    width: 172px;
+    height: 17px;
+    overflow: visible;
+  }
+
+  /* SVG ドロー演出（.section-head.is-visible から発火） */
+  .dl {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.75s ease-out 0.2s;
+  }
+  .dl-center {
+    opacity: 0;
+    transition: opacity 0.3s ease 0.75s;
+  }
+  .section-head.is-visible .dl {
+    stroke-dashoffset: 0;
+  }
+  .section-head.is-visible .dl-center {
+    opacity: 1;
+  }
+
+  /* 動きを減らす設定のユーザーには即表示 */
+  @media (prefers-reduced-motion: reduce) {
+    .section-kicker,
+    .section-head h2 { clip-path: none; transition: none; }
+    .dl { transition: none; stroke-dashoffset: 0; }
+    .dl-center { transition: none; opacity: 1; }
+  }
 </style>
+
+<script>
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          observer.unobserve(e.target);
+        }
+      });
+    },
+    { threshold: 0.4 }
+  );
+  document.querySelectorAll('.section-head').forEach((el) => observer.observe(el));
+</script>

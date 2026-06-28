@@ -529,4 +529,40 @@ const nav = [
     padding: 1rem;
     color: var(--muted);
   }
+
+  /* ── スタッガーフェードアップ ── */
+  .stagger-list > * {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    transition-delay: calc(var(--i, 0) * 0.07s);
+  }
+  .stagger-list.is-visible > * {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stagger-list > * { transition: none; opacity: 1; transform: none; }
+  }
 </style>
+
+<script>
+  // スタッガー：各子に --i を付与してから IntersectionObserver で監視
+  document.querySelectorAll<HTMLElement>('.stagger-list').forEach((list) => {
+    [...list.children].forEach((child, i) => {
+      (child as HTMLElement).style.setProperty('--i', String(i));
+    });
+  });
+  const staggerObs = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          staggerObs.unobserve(e.target);
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll('.stagger-list').forEach((el) => staggerObs.observe(el));
+</script>
