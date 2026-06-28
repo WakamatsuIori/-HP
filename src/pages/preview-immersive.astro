@@ -10,6 +10,9 @@ import { site } from '../config/site';
 import { loadSchedule } from '../lib/loadSchedule';
 import { groupByJstDay, jstTime } from '../lib/schedule';
 import keyVisual from '../assets/IMG_5833.png';
+import standArt from '../assets/Wakamatsu_full_size.png';
+import barArt from '../assets/wakamatsusan_.png';
+import { intro, profile } from '../config/profile';
 
 const events = await loadSchedule();
 const days = groupByJstDay(events).slice(0, 4);
@@ -394,6 +397,61 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       .intro > :nth-child(5) { animation-delay: 0.46s; }
       @keyframes introRise { to { opacity: 1; transform: none; filter: none; } }
 
+      /* ===== PROFILE ===== */
+      .isec--alt { background: var(--bg-2); }
+      .iprofile { display: flex; flex-direction: column; align-items: center; gap: 1.6rem; }
+      .iprofile__art { width: min(70%, 360px); }
+      .iprofile__art :global(img) { width: 100%; height: auto; }
+      .iprofile__body { width: 100%; max-width: 36rem; }
+      .iprofile__list { margin: 0 0 1.2rem; }
+      .iprofile__row {
+        display: grid;
+        grid-template-columns: 7.5rem 1fr;
+        gap: 0.3rem 1.2rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--card-line);
+      }
+      .iprofile__row dt { position: relative; margin: 0; padding-left: 1.2rem; color: var(--muted); font-size: 0.96rem; white-space: nowrap; }
+      .iprofile__row dt::before { content: '◆'; position: absolute; left: 0; top: 0.12em; color: var(--gold); font-size: 0.58rem; }
+      .iprofile__row dd { margin: 0; color: var(--ink); font-size: 1rem; }
+      .iprofile__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; }
+      .iprofile__chips li {
+        padding: 0.4rem 1.2rem;
+        border: 1px solid var(--gold);
+        border-radius: 999px;
+        color: var(--gold-strong);
+        font-size: 0.92rem;
+        background: var(--card-bg);
+      }
+      @media (min-width: 860px) {
+        .iprofile { flex-direction: row; align-items: flex-start; gap: 3rem; max-width: 1080px; margin: 0 auto; }
+        .iprofile__art { flex-shrink: 0; width: min(44%, 420px); }
+        .iprofile__body { flex: 1 1 0; min-width: 0; max-width: none; margin-top: 1rem; }
+      }
+
+      /* ===== ABOUT（ごあいさつ） ===== */
+      .iabout { display: flex; flex-direction: column; align-items: center; gap: 1.6rem; text-align: center; }
+      .iabout__art { width: min(76%, 360px); }
+      .iabout__art :global(img) {
+        width: 100%;
+        height: auto;
+        -webkit-mask-image: linear-gradient(to bottom, #000 84%, transparent 100%);
+        mask-image: linear-gradient(to bottom, #000 84%, transparent 100%);
+      }
+      .iabout__catch { font-family: var(--serif); font-weight: 700; font-size: clamp(1.7rem, 4.6vw, 2.6rem); line-height: 1.42; color: var(--gold-strong); margin: 0 0 0.4rem; }
+      .iabout__en { font-style: italic; font-size: clamp(0.82rem, 2.2vw, 1rem); color: var(--muted); margin: 0 0 1rem; }
+      .iabout__rule { display: block; width: 3.2rem; height: 1px; margin: 0 auto 1.2rem; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+      .iabout__story { text-align: left; max-width: 34rem; margin: 0 auto; }
+      .iabout__story p { margin: 0 0 0.9rem; font-size: 1rem; line-height: 2; color: var(--ink-soft); }
+      .iabout__story p:last-child { margin-bottom: 0; }
+      @media (min-width: 860px) {
+        .iabout { flex-direction: row; align-items: center; gap: 3rem; text-align: left; max-width: 1040px; margin: 0 auto; }
+        .iabout__body { flex: 1 1 0; min-width: 0; }
+        .iabout__art { flex-shrink: 0; width: min(46%, 440px); }
+        .iabout__rule { margin-left: 0; margin-right: auto; }
+        .iabout__story { max-width: none; }
+      }
+
       /* ===== モバイル軽量化 ===== */
       @media (max-width: 640px) {
         .ihero__glow { display: none; }
@@ -450,6 +508,64 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         </div>
       </div>
       <span class="ihero__scrollcue" aria-hidden="true">scroll</span>
+    </section>
+
+    <section class="isec isec--alt" id="profile">
+      <div class="isec__inner">
+        <div class="ihead reveal">
+          <p class="ihead__kicker">PROFILE</p>
+          <p class="ihead__title">和香松庵 とは</p>
+          <span class="ihead__rule" aria-hidden="true"></span>
+        </div>
+        <div class="iprofile reveal">
+          <div class="iprofile__art">
+            <Image
+              src={standArt}
+              widths={[360, 540, 760]}
+              sizes="(min-width: 860px) 420px, 70vw"
+              alt={`${site.name}の立ち絵`}
+              loading="lazy"
+            />
+          </div>
+          <div class="iprofile__body">
+            <dl class="iprofile__list">
+              {profile.rows.map((row) => (
+                <div class="iprofile__row">
+                  <dt>{row.label}</dt>
+                  <dd>{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <ul class="iprofile__chips">
+              {profile.chips.map((chip) => <li>{chip}</li>)}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="isec" id="about">
+      <div class="isec__inner">
+        <div class="iabout reveal">
+          <div class="iabout__body">
+            <h2 class="iabout__catch">{intro.catchLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</h2>
+            <p class="iabout__en">{intro.catchEn}</p>
+            <span class="iabout__rule" aria-hidden="true"></span>
+            <div class="iabout__story">
+              {intro.story.map((para) => <p>{para}</p>)}
+            </div>
+          </div>
+          <div class="iabout__art">
+            <Image
+              src={barArt}
+              widths={[360, 540, 760]}
+              sizes="(min-width: 860px) 440px, 76vw"
+              alt={`${site.name}の立ち絵（カクテルをお届け）`}
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="isec" id="schedule">
