@@ -49,6 +49,7 @@
 
 ## いま公開前（未コミット/未push）
 - main は origin より先行（未pushコミットあり）＝反映待ちが出ることがある。デザイン調整中（Cinzelフォント・favicon・Prettier設定・フォント再サブセット）。
+- **トップ ブラッシュアップ（作業中・ブランチ `design/top-fullwidth-brushup`・未push・2026-06-28）**：本文720px→幅トークン化で全画面寄せ（`--content`1180/`--content-wide`1320/`--content-prose`720。`Base.astro`・`index.astro`）。演出は **静(refined)／動(dramatic)** の2版を実装し `?fx=dramatic` で切替（`Base.astro` の is:inline＋全 dramatic CSS を `html[data-fx='dramatic']` でガード）。動＝ヒーロー金の靄/金粉/一閃・見出し一字ずつ立つ・区切り金スイープ・帯背景の金漂い・予定盤の金スイープ。reduced-motion／モバイルは自動で軽量化。**本人が静/動を未決定（保留中）**。決定後＝敗者CSS・`?fx` 配線を削除→`/code-review`→push で反映。テスト94件パス。ローカル全ビルドは従来どおり `/videos` の YouTube キー未設定で停止（CI は通る）。計画書＝`C:\Users\wakam\.claude\plans\temporal-swinging-clock.md`。
 - `docs/research/`：フォント/エフェクト/和あしらいの研究カタログ（選定資料）。
 
 ## 次にやるべき優先（ロードマップ順）
