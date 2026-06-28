@@ -1166,6 +1166,26 @@ try {
     .lp-section--tint::before { animation: bokehDrift 22s ease-in-out infinite alternate; animation-play-state: paused; }
     .lp-section--tint.in-view::before { animation-play-state: running; }
   }
+  /* 華やか版(?fx=dramatic)：帯にもう一段、ごく淡い金のブロブをゆっくり漂わせる（in-viewのみ） */
+  html[data-fx='dramatic'] .lp-section--tint::after {
+    content: '';
+    position: absolute;
+    inset: -15%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(30% 40% at 18% 30%, rgba(201, 168, 105, 0.1), transparent 60%),
+      radial-gradient(34% 44% at 82% 68%, rgba(232, 207, 149, 0.09), transparent 62%);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html[data-fx='dramatic'] .lp-section--tint.in-view::after {
+      animation: tintBlob 26s ease-in-out infinite alternate;
+    }
+  }
+  @keyframes tintBlob {
+    from { transform: translate3d(0, 0, 0) scale(1); }
+    to { transform: translate3d(-3%, 2%, 0) scale(1.1); }
+  }
   /* 和あしらい（控えめ）：署名セクション SCHEDULE だけ、対角の隅に極薄のコーナー飾り。
      セクション背景画像として配置＝文字の背面・base色(#f3f0e7)は維持。全帯には付けない（過剰回避）。 */
   #schedule.lp-section--tint {
