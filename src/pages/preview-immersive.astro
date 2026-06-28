@@ -34,11 +34,15 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       rel="stylesheet"
     />
     <script is:inline>
-      // ?form=dark で黒×金トーン（既定=cream）。前回の ?fx と同じ使い捨て配線。
+      // ?form=dark で黒×金トーン（既定=cream）。エディタの保存値(localStorage)も先読みして
+      // 描画前に反映（チラつき防止）。使い捨ての調整用配線。
       (function () {
         try {
-          var f = new URLSearchParams(location.search).get('form');
+          var q = new URLSearchParams(location.search).get('form');
+          var f = q || localStorage.getItem('immersive-form') || 'cream';
           document.documentElement.dataset.form = f === 'dark' ? 'dark' : 'cream';
+          var saved = JSON.parse(localStorage.getItem('immersive-editor') || '{}');
+          for (var k in saved) document.documentElement.style.setProperty(k, saved[k]);
         } catch (e) {
           document.documentElement.dataset.form = 'cream';
         }
@@ -50,6 +54,12 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         --serif: 'Shippori Mincho', 'Zen Old Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
         --logo: 'Cinzel', 'Marcellus', serif;
         --gothic: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', system-ui, sans-serif;
+        /* ▼ 調整パネルのスライダーで動かす値（既定）。localStorage に保存される。 */
+        --art-scale: 1;
+        --spotlight: 0.8;
+        --cursor-size: 260px;
+        --vignette: 0.45;
+        --glow-strength: 1;
       }
 
       /* ===== トーン①：明クリーム×金（世界観キープ） ===== */
@@ -206,6 +216,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         z-index: 1;
         pointer-events: none;
         mix-blend-mode: var(--blend);
+        opacity: var(--glow-strength);
         background:
           radial-gradient(38% 46% at 50% 38%, var(--glow-2), transparent 66%),
           radial-gradient(40% 50% at 80% 24%, var(--glow), transparent 64%);
@@ -290,8 +301,8 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         position: fixed;
         top: 0;
         left: 0;
-        width: 260px;
-        height: 260px;
+        width: var(--cursor-size);
+        height: var(--cursor-size);
         border-radius: 50%;
         pointer-events: none;
         z-index: 4;
@@ -319,7 +330,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         background:
           radial-gradient(36% 44% at 16% 24%, var(--glow), transparent 62%),
           radial-gradient(40% 50% at 86% 78%, var(--glow), transparent 64%);
-        opacity: 0.5;
+        opacity: calc(0.5 * var(--glow-strength));
       }
       .isec__inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
       .ihead { text-align: center; margin-bottom: clamp(1.8rem, 4vw, 3rem); }
@@ -401,7 +412,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       /* ===== PROFILE ===== */
       .isec--alt { background: var(--bg-2); }
       .iprofile { display: flex; flex-direction: column; align-items: center; gap: 1.6rem; }
-      .iprofile__art { width: min(70%, 360px); }
+      .iprofile__art { width: calc(min(70%, 360px) * var(--art-scale)); }
       .iprofile__art :global(img) { width: 100%; height: auto; }
       .iprofile__body { width: 100%; max-width: 36rem; }
       .iprofile__list { margin: 0 0 1.2rem; }
@@ -426,13 +437,13 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       }
       @media (min-width: 860px) {
         .iprofile { flex-direction: row; align-items: flex-start; gap: 3rem; max-width: 1080px; margin: 0 auto; }
-        .iprofile__art { flex-shrink: 0; width: min(48%, 462px); }
+        .iprofile__art { flex-shrink: 0; width: calc(min(48%, 462px) * var(--art-scale)); }
         .iprofile__body { flex: 1 1 0; min-width: 0; max-width: none; margin-top: 1rem; }
       }
 
       /* ===== ABOUT（ごあいさつ） ===== */
       .iabout { display: flex; flex-direction: column; align-items: center; gap: 1.6rem; text-align: center; }
-      .iabout__art { width: min(76%, 360px); }
+      .iabout__art { width: calc(min(76%, 360px) * var(--art-scale)); }
       .iabout__art :global(img) {
         width: 100%;
         height: auto;
@@ -448,7 +459,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       @media (min-width: 860px) {
         .iabout { flex-direction: row; align-items: center; gap: 3rem; text-align: left; max-width: 1040px; margin: 0 auto; }
         .iabout__body { flex: 1 1 0; min-width: 0; }
-        .iabout__art { flex-shrink: 0; width: min(50%, 470px); }
+        .iabout__art { flex-shrink: 0; width: calc(min(50%, 470px) * var(--art-scale)); }
         .iabout__rule { margin-left: 0; margin-right: auto; }
         .iabout__story { max-width: none; }
       }
@@ -466,7 +477,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         z-index: 0;
         pointer-events: none;
         background: radial-gradient(50% 50% at 50% 50%, var(--glow-2), transparent 68%);
-        opacity: 0.8;
+        opacity: var(--spotlight);
       }
       .iprofile__art :global(img), .iabout__art :global(img) { position: relative; z-index: 1; }
       .iprofile__art :global(img) { filter: drop-shadow(0 26px 44px rgba(0, 0, 0, 0.55)); }
@@ -500,6 +511,72 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         .cursorglow { display: none; }
         html { scroll-behavior: auto; }
       }
+      /* ===== 調整パネル（プレビュー専用・LPエディタ風・使い捨て） ===== */
+      .ed {
+        position: fixed;
+        right: 14px;
+        bottom: 14px;
+        z-index: 90;
+        width: 272px;
+        max-width: calc(100vw - 28px);
+        font-family: var(--gothic);
+        color: #f3ecdd;
+        background: rgba(18, 14, 9, 0.93);
+        border: 1px solid rgba(201, 168, 105, 0.42);
+        border-radius: 12px;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 16px 44px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+      }
+      .ed__handle {
+        width: 100%;
+        text-align: left;
+        font: inherit;
+        font-size: 0.84rem;
+        letter-spacing: 0.04em;
+        color: #e8cf95;
+        background: rgba(201, 168, 105, 0.14);
+        border: none;
+        border-bottom: 1px solid rgba(201, 168, 105, 0.28);
+        padding: 0.6rem 0.85rem;
+        cursor: pointer;
+      }
+      .ed__body { padding: 0.7rem 0.85rem 0.85rem; display: grid; gap: 0.62rem; }
+      .ed.is-closed .ed__body { display: none; }
+      .ed__tones { display: flex; gap: 0.4rem; }
+      .ed__tone {
+        flex: 1;
+        font: inherit;
+        font-size: 0.78rem;
+        color: #d8c7a0;
+        background: transparent;
+        border: 1px solid rgba(201, 168, 105, 0.4);
+        border-radius: 7px;
+        padding: 0.34rem;
+        cursor: pointer;
+      }
+      .ed__tone.is-on { background: rgba(201, 168, 105, 0.3); color: #fff8ec; }
+      .ed__field { display: grid; gap: 0.22rem; }
+      .ed__lab { font-size: 0.75rem; color: #d8c7a0; display: flex; justify-content: space-between; align-items: baseline; }
+      .ed__lab b { color: #e8cf95; font-weight: 600; }
+      .ed__u { color: #9c8f6b; }
+      .ed__field input[type='range'] { width: 100%; accent-color: #c9a86a; cursor: pointer; }
+      .ed__btns { display: flex; gap: 0.4rem; margin-top: 0.15rem; }
+      .ed__btn {
+        flex: 1;
+        font: inherit;
+        font-size: 0.78rem;
+        color: #d8c7a0;
+        background: transparent;
+        border: 1px solid rgba(201, 168, 105, 0.4);
+        border-radius: 7px;
+        padding: 0.42rem;
+        cursor: pointer;
+      }
+      .ed__btn--p { color: #14100b; background: #cda14e; border-color: #cda14e; font-weight: 600; }
+      .ed__msg { font-size: 0.72rem; color: #9bc77f; min-height: 1em; margin: 0; word-break: break-word; }
+      @media (max-width: 640px) { .ed { width: 210px; right: 8px; bottom: 8px; } }
     </style>
   </head>
   <body>
@@ -635,20 +712,109 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       </div>
     </section>
 
+    <aside class="ed" id="ed" aria-label="プレビュー調整パネル">
+      <button class="ed__handle" type="button" data-ed-toggle aria-expanded="true">⚙ 調整パネル（あなたが調整できます）</button>
+      <div class="ed__body">
+        <div class="ed__tones">
+          <button class="ed__tone" type="button" data-tone="cream">明クリーム</button>
+          <button class="ed__tone" type="button" data-tone="dark">黒×金</button>
+        </div>
+        <label class="ed__field">
+          <span class="ed__lab">立ち絵の大きさ <b data-out="--art-scale">1.00</b></span>
+          <input type="range" min="0.7" max="1.5" step="0.02" value="1" data-var="--art-scale" />
+        </label>
+        <label class="ed__field">
+          <span class="ed__lab">光のプール（立ち絵） <b data-out="--spotlight">0.80</b></span>
+          <input type="range" min="0" max="1.6" step="0.05" value="0.8" data-var="--spotlight" />
+        </label>
+        <label class="ed__field">
+          <span class="ed__lab">カーソルの光 <b data-out="--cursor-size">260</b><span class="ed__u">px</span></span>
+          <input type="range" min="120" max="520" step="10" value="260" data-var="--cursor-size" data-unit="px" />
+        </label>
+        <label class="ed__field">
+          <span class="ed__lab">縁の暗さ（黒トーン） <b data-out="--vignette">0.45</b></span>
+          <input type="range" min="0" max="0.85" step="0.05" value="0.45" data-var="--vignette" />
+        </label>
+        <label class="ed__field">
+          <span class="ed__lab">全体グロー <b data-out="--glow-strength">1.00</b></span>
+          <input type="range" min="0" max="1.8" step="0.05" value="1" data-var="--glow-strength" />
+        </label>
+        <div class="ed__btns">
+          <button class="ed__btn ed__btn--p" type="button" data-ed-copy>設定をコピー</button>
+          <button class="ed__btn" type="button" data-ed-reset>リセット</button>
+        </div>
+        <p class="ed__msg" data-ed-msg aria-live="polite"></p>
+      </div>
+    </aside>
+
     <footer class="ifoot">
       <p class="ifoot__brand">{site.name}</p>
       <p class="ifoot__en">Official Web Site — preview</p>
     </footer>
 
     <script is:inline>
-      // トーン切替ボタン（?form を書き換えて即反映）
+      // ===== 調整パネル（LPエディタ風・あなたが値を動かせる） =====
+      const EDITOR_KEYS = ['--art-scale', '--spotlight', '--cursor-size', '--vignette', '--glow-strength'];
+      const edRead = () => {
+        try { return JSON.parse(localStorage.getItem('immersive-editor') || '{}'); } catch (e) { return {}; }
+      };
+      const edFmt = (v, unit) => (unit ? String(Math.round(parseFloat(v))) : parseFloat(v).toFixed(2));
+
+      function setTone(tone) {
+        const t = tone === 'dark' ? 'dark' : 'cream';
+        document.documentElement.dataset.form = t;
+        try { localStorage.setItem('immersive-form', t); } catch (e) {}
+        document.querySelectorAll('[data-tone]').forEach((b) => b.classList.toggle('is-on', b.dataset.tone === t));
+      }
+      setTone(document.documentElement.dataset.form);
+      document.querySelectorAll('[data-tone]').forEach((b) => b.addEventListener('click', () => setTone(b.dataset.tone)));
+      // ナビ右上の切替ボタンはトーンを反転
       document.querySelector('[data-toggle]')?.addEventListener('click', () => {
-        const cur = document.documentElement.dataset.form === 'dark' ? 'dark' : 'cream';
-        const next = cur === 'dark' ? 'cream' : 'dark';
-        document.documentElement.dataset.form = next;
-        const url = new URL(location.href);
-        url.searchParams.set('form', next);
-        history.replaceState(null, '', url);
+        setTone(document.documentElement.dataset.form === 'dark' ? 'cream' : 'dark');
+      });
+
+      // スライダー → CSS変数（即反映＋localStorage保存）
+      const edSaved = edRead();
+      document.querySelectorAll('.ed__field input[type=range]').forEach((input) => {
+        const key = input.dataset.var;
+        const unit = input.dataset.unit || '';
+        if (edSaved[key] != null) input.value = parseFloat(edSaved[key]);
+        const out = document.querySelector(`[data-out="${key}"]`);
+        const apply = () => {
+          const val = input.value + unit;
+          document.documentElement.style.setProperty(key, val);
+          if (out) out.textContent = edFmt(input.value, unit);
+          const cur = edRead();
+          cur[key] = val;
+          try { localStorage.setItem('immersive-editor', JSON.stringify(cur)); } catch (e) {}
+        };
+        if (out) out.textContent = edFmt(input.value, unit);
+        input.addEventListener('input', apply);
+      });
+
+      // 開閉・コピー・リセット
+      document.querySelector('[data-ed-toggle]')?.addEventListener('click', (e) => {
+        const ed = document.getElementById('ed');
+        const closed = ed.classList.toggle('is-closed');
+        e.currentTarget.setAttribute('aria-expanded', String(!closed));
+      });
+      document.querySelector('[data-ed-copy]')?.addEventListener('click', () => {
+        const cs = getComputedStyle(document.documentElement);
+        const lines = EDITOR_KEYS.map((k) => `${k}: ${cs.getPropertyValue(k).trim()};`);
+        lines.push('form: ' + document.documentElement.dataset.form);
+        const text = lines.join('\n');
+        const msg = document.querySelector('[data-ed-msg]');
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text).then(
+            () => { if (msg) msg.textContent = 'コピーしました。私に貼ってください'; },
+            () => { if (msg) msg.textContent = text; }
+          );
+        } else if (msg) { msg.textContent = text; }
+      });
+      document.querySelector('[data-ed-reset]')?.addEventListener('click', () => {
+        try { localStorage.removeItem('immersive-editor'); } catch (e) {}
+        EDITOR_KEYS.forEach((k) => document.documentElement.style.removeProperty(k));
+        location.reload();
       });
 
       // スクロール登場（ブラー＋立ち上がり）
