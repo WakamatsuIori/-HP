@@ -97,7 +97,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         /* ▼ 調整パネルのスライダーで動かす値（既定）。localStorage に保存される。 */
         --art-scale: 1;
         --spotlight: 0.4;
-        --vignette: 0.2;
+        --vignette: 0.45;
         --glow-strength: 0;
         /* 弧状ラジアルグラデーション装飾（見本帳#58）＝ページ全体の上方アーク光の強さ */
         --arc-strength: 0.9;
@@ -194,8 +194,12 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         -webkit-backdrop-filter: blur(16px) saturate(1.25);
         backdrop-filter: blur(16px) saturate(1.25);
         border-bottom: 1px solid var(--nav-line);
-        transition: background 0.3s ease, border-color 0.3s ease;
+        transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
       }
+      /* スクロールでガラス濃度を上げる（is-scrolled は末尾JSが付与） */
+      html[data-form='dark'] .inav.is-scrolled { background: rgba(14, 10, 6, 0.82); border-bottom-color: rgba(201, 168, 105, 0.4); }
+      html[data-form='cream'] .inav.is-scrolled { background: rgba(250, 249, 246, 0.9); border-bottom-color: rgba(156, 143, 107, 0.46); }
+      .inav.is-scrolled { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28); }
       .inav__brand {
         display: flex;
         flex-direction: column;
@@ -270,7 +274,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         .inav__links a { padding: 0.72rem 0.1rem; font-size: 1rem; border-top: 1px solid var(--nav-line); }
         .inav__links a:first-child { border-top: 0; }
         /* プレビュー専用トーン切替はスマホで小さく（昇格時に撤去される要素） */
-        .inav__toggle { font-size: 0.66rem; padding: 0.3rem 0.6rem; }
+        .inav__toggle { display: none; } /* スマホはトーン切替を隠す（ヘッダー混雑解消・切替はパネルで可） */
       }
 
       /* ===== 没入ヒーロー ===== */
@@ -658,7 +662,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
       @keyframes reelRoll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
       /* 動きが苦手な設定・スマホ：自動スクロールを止めて手スワイプの横スクロールに（複製カードは隠す／スナップ付き） */
       @media (prefers-reduced-motion: reduce), (max-width: 640px) {
-        .ireel { overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+        .ireel { overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; -webkit-mask-image: none; mask-image: none; }
         .ireel__track { animation: none; }
         .ireel__card { scroll-snap-align: start; }
         .ireel__card[aria-hidden='true'] { display: none; }
@@ -812,14 +816,14 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
       @keyframes artFloat { from { transform: translateY(2px); } to { transform: translateY(-10px); } }
       */
       /* 黒トーン：帯と画面の縁を落として中央に視線を集める（奥行き） */
-      html[data-form='dark'] .isec { box-shadow: inset 0 0 160px 30px rgba(0, 0, 0, 0.45); }
+      html[data-form='dark'] .isec { box-shadow: inset 0 0 160px 30px rgba(0, 0, 0, var(--vignette)); }
       html[data-form='dark'] .ihero::after {
         content: '';
         position: absolute;
         inset: 0;
         z-index: 1;
         pointer-events: none;
-        box-shadow: inset 0 0 220px 60px rgba(0, 0, 0, 0.5);
+        box-shadow: inset 0 0 220px 60px rgba(0, 0, 0, var(--vignette));
       }
 
       /* ===== モバイル軽量化 ===== */
@@ -1307,8 +1311,8 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
           <input type="range" min="0" max="1.4" step="0.05" value="0.9" data-var="--arc-strength" />
         </label>
         <label class="ed__field">
-          <span class="ed__lab">縁の暗さ（黒トーン） <b data-out="--vignette">0.20</b></span>
-          <input type="range" min="0" max="0.85" step="0.05" value="0.2" data-var="--vignette" />
+          <span class="ed__lab">縁の暗さ（黒トーン） <b data-out="--vignette">0.45</b></span>
+          <input type="range" min="0" max="0.85" step="0.05" value="0.45" data-var="--vignette" />
         </label>
         <label class="ed__field">
           <span class="ed__lab">全体グロー <b data-out="--glow-strength">0.00</b></span>
