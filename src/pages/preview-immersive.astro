@@ -442,17 +442,6 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         background: var(--bg);
         overflow: clip;
       }
-      .isec::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        background:
-          radial-gradient(36% 44% at 16% 24%, var(--glow), transparent 62%),
-          radial-gradient(40% 50% at 86% 78%, var(--glow), transparent 64%);
-        opacity: calc(0.5 * var(--glow-strength));
-      }
       .isec__inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
       .ihead { text-align: center; margin-bottom: clamp(1.8rem, 4vw, 3rem); }
       .ihead__kicker {
@@ -829,8 +818,9 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
       /* ===== モバイル軽量化 ===== */
       @media (max-width: 640px) {
         .ihero__glow { display: none; }
-        .isec::before { opacity: 0.32; }
         .icard { -webkit-backdrop-filter: none; backdrop-filter: none; }
+        /* スマホは画面が小さく光が相対的に強く出るので、上からの光を約半分に抑える */
+        body::before { opacity: calc(var(--arc-strength) * 0.55); }
       }
       /* ===== 動きが苦手な設定：静止 ===== */
       @media (prefers-reduced-motion: reduce) {
@@ -1369,7 +1359,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
       const edRead = () => {
         try { return JSON.parse(localStorage.getItem('immersive-editor') || '{}'); } catch (e) { return {}; }
       };
-      const edFmt = (v, unit) => (unit ? String(Math.round(parseFloat(v))) : parseFloat(v).toFixed(2));
+      const edFmt = (v) => parseFloat(v).toFixed(2);
 
       function setTone(tone) {
         const t = tone === 'dark' ? 'dark' : 'cream';
@@ -1388,18 +1378,17 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
       const edSaved = edRead();
       document.querySelectorAll('.ed__field input[type=range]').forEach((input) => {
         const key = input.dataset.var;
-        const unit = input.dataset.unit || '';
         if (edSaved[key] != null) input.value = parseFloat(edSaved[key]);
         const out = document.querySelector(`[data-out="${key}"]`);
         const apply = () => {
-          const val = input.value + unit;
+          const val = input.value;
           document.documentElement.style.setProperty(key, val);
-          if (out) out.textContent = edFmt(input.value, unit);
+          if (out) out.textContent = edFmt(input.value);
           const cur = edRead();
           cur[key] = val;
           try { localStorage.setItem('immersive-editor', JSON.stringify(cur)); } catch (e) {}
         };
-        if (out) out.textContent = edFmt(input.value, unit);
+        if (out) out.textContent = edFmt(input.value);
         input.addEventListener('input', apply);
       });
 
@@ -1409,6 +1398,11 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         const closed = ed.classList.toggle('is-closed');
         e.currentTarget.setAttribute('aria-expanded', String(!closed));
       });
+      // スマホでは調整パネルを最初は畳んでおく（見出しバーだけ表示・タップで開ける）
+      if (window.matchMedia('(max-width: 640px)').matches) {
+        document.getElementById('ed')?.classList.add('is-closed');
+        document.querySelector('[data-ed-toggle]')?.setAttribute('aria-expanded', 'false');
+      }
       document.querySelector('[data-ed-copy]')?.addEventListener('click', () => {
         const cs = getComputedStyle(document.documentElement);
         const lines = EDITOR_KEYS.map((k) => `${k}: ${cs.getPropertyValue(k).trim()};`);
@@ -1563,7 +1557,9 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         burger.addEventListener('click', (e) => { e.stopPropagation(); setOpen(!nav.classList.contains('nav-open')); });
         links.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
         document.addEventListener('click', (e) => { if (nav.classList.contains('nav-open') && !nav.contains(e.target)) setOpen(false); });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && nav.classList.contains('nav-open')) { setOpen(false); burger.focus(); }
+        });
       })();
 
     </script>
