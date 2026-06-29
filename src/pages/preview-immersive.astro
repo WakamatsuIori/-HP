@@ -14,11 +14,50 @@ import standArt from '../assets/Wakamatsu_full_size.png';
 import barArt from '../assets/wakamatsusan_.png';
 import { intro, profile } from '../config/profile';
 import { information } from '../config/information';
+import { loadVideos } from '../lib/loadVideos';
+import { featuredLabels } from '../config/featured';
+import type { Video } from '../lib/youtube';
 
 const events = await loadSchedule();
 const days = groupByJstDay(events).slice(0, 4);
 
-const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 'お仕事依頼'];
+// ヘッダーナビ＝本番(Base.astro)と同じ並び・同じセクションへのページ内アンカー。
+const nav = [
+  { href: '#profile', label: 'プロフィール' },
+  { href: '#schedule', label: 'スケジュール' },
+  { href: '#videos', label: '動画' },
+  { href: '#goods', label: 'ストア' },
+  { href: '#work', label: 'お仕事依頼' },
+];
+
+// 動画（YouTube）。本番=実データのみ。取得失敗でもトップ全体は落とさない（index.astro と同じ作法）。
+let latestTop: Video[] = [];
+let featured: Video[] = [];
+try {
+  const v = await loadVideos();
+  latestTop = v.latest.slice(0, 6); // リールは多めに6本
+  featured = v.featured; // おすすめ＝固定指定(featuredVideoIds) or 最新上位3本
+} catch (err) {
+  console.warn('[preview-immersive] 動画取得に失敗。動画枠は準備中表示で継続:', err instanceof Error ? err.message : err);
+}
+// dev かつ実データが空のときだけ、レイアウト確認用のサンプルを出す（本番では出ない）。
+const mkSample = (id: string, title: string): Video => ({ id, title, url: site.links.youtube, thumbnailUrl: '', publishedAt: null });
+const sampleFeatured: Video[] = [
+  mkSample('s-f1', '夜のカフェタイム雑談（サンプル）'),
+  mkSample('s-f2', '歌ってみた・歌枠アーカイブ（サンプル）'),
+  mkSample('s-f3', 'ゲーム実況 #3（サンプル）'),
+];
+const sampleLatest: Video[] = [
+  mkSample('s-l1', '【雑談】夜のカフェタイム（サンプル）'),
+  mkSample('s-l2', '【ゲーム】〇〇 初見プレイ #3（サンプル）'),
+  mkSample('s-l3', '【歌枠】まったり弾き語り（サンプル）'),
+  mkSample('s-l4', '【コラボ】〇〇さんと（サンプル）'),
+  mkSample('s-l5', '【作業】もくもく作業配信（サンプル）'),
+  mkSample('s-l6', '【記念】登録者ありがとう枠（サンプル）'),
+];
+const useSample = import.meta.env.DEV;
+const pickList: Video[] = featured.length ? featured : useSample ? sampleFeatured : [];
+const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLatest : [];
 ---
 
 <!doctype html>
@@ -58,9 +97,10 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         /* ▼ 調整パネルのスライダーで動かす値（既定）。localStorage に保存される。 */
         --art-scale: 1;
         --spotlight: 0.4;
-        --cursor-size: 120px;
         --vignette: 0.2;
         --glow-strength: 0;
+        /* 弧状ラジアルグラデーション装飾（見本帳#58）＝ページ全体の上方アーク光の強さ */
+        --arc-strength: 0.9;
       }
 
       /* ===== トーン①：明クリーム×金（世界観キープ） ===== */
@@ -75,6 +115,8 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         --gold-bright: #c9a86a;
         --glow: rgba(201, 168, 105, 0.42);
         --glow-2: rgba(232, 207, 149, 0.5);
+        --arc-1: rgba(214, 184, 120, 0.42);
+        --arc-2: rgba(201, 168, 105, 0.16);
         --nav-bg: rgba(250, 249, 246, 0.62);
         --nav-line: rgba(156, 143, 107, 0.34);
         --card-bg: rgba(255, 255, 255, 0.55);
@@ -101,6 +143,8 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         --gold-bright: #f0d99a;
         --glow: rgba(232, 207, 149, 0.4);
         --glow-2: rgba(201, 168, 105, 0.5);
+        --arc-1: rgba(240, 214, 156, 0.58);
+        --arc-2: rgba(201, 168, 105, 0.22);
         --nav-bg: rgba(18, 13, 8, 0.5);
         --nav-line: rgba(201, 168, 105, 0.3);
         --card-bg: rgba(40, 30, 19, 0.5);
@@ -118,6 +162,23 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
 
       html { overflow-x: clip; scroll-behavior: smooth; color-scheme: light; }
       body { background: var(--bg); color: var(--ink); font-family: var(--gothic); line-height: 1.8; }
+      /* ===== 全体のライト：弧状ラジアルグラデーション装飾（見本帳#58） =====
+         画面上端の外（50% -60%）を光源に、上方から金の光がページ全体へ降りる。
+         position:fixed なのでスクロールしても常に上から照らす“ステージ照明”になる。 */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+        mix-blend-mode: var(--blend);
+        opacity: var(--arc-strength);
+        background:
+          radial-gradient(circle at 50% -60%, var(--arc-1) 0%, var(--arc-2) 35%, transparent 62%);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        body::before { opacity: calc(var(--arc-strength) * 0.7); }
+      }
 
       /* ===== ガラス質ナビ ===== */
       .inav {
@@ -146,6 +207,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         letter-spacing: 0.42em;
         color: var(--gold-strong);
         text-transform: uppercase;
+        margin-bottom: 0.22rem; /* 肩書きと名前にひと呼吸の余白 */
       }
       .inav__brand .jp {
         font-family: var(--serif);
@@ -182,8 +244,33 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         transition: border-color 0.2s ease, color 0.2s ease;
       }
       .inav__toggle:hover { border-color: var(--gold); color: var(--gold-strong); }
+      /* ハンバーガー（スマホのみ）。PCでは隠す */
+      .inav__burger { display: none; }
       @media (max-width: 720px) {
-        .inav__links a { display: none; }
+        .inav__burger {
+          display: inline-grid; gap: 4px; place-content: center;
+          width: 42px; height: 38px; margin-left: auto; padding: 0 9px;
+          background: transparent; border: 1px solid var(--nav-line); border-radius: 10px; cursor: pointer;
+        }
+        .inav__burger span { display: block; width: 22px; height: 2px; background: var(--gold-strong); border-radius: 2px; transition: transform 0.25s ease, opacity 0.2s ease; }
+        .inav.nav-open .inav__burger span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .inav.nav-open .inav__burger span:nth-child(2) { opacity: 0; }
+        .inav.nav-open .inav__burger span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+        /* リンク群はドロップダウン化（閉じ時は隠す） */
+        .inav__links {
+          position: absolute; top: 100%; left: 0; right: 0;
+          flex-direction: column; align-items: stretch; gap: 0;
+          padding: 0.2rem clamp(1rem, 4vw, 2.6rem) 0.7rem;
+          background: var(--nav-bg);
+          -webkit-backdrop-filter: blur(16px) saturate(1.25); backdrop-filter: blur(16px) saturate(1.25);
+          border-bottom: 1px solid var(--nav-line);
+          display: none;
+        }
+        .inav.nav-open .inav__links { display: flex; }
+        .inav__links a { padding: 0.72rem 0.1rem; font-size: 1rem; border-top: 1px solid var(--nav-line); }
+        .inav__links a:first-child { border-top: 0; }
+        /* プレビュー専用トーン切替はスマホで小さく（昇格時に撤去される要素） */
+        .inav__toggle { font-size: 0.66rem; padding: 0.3rem 0.6rem; }
       }
 
       /* ===== 没入ヒーロー ===== */
@@ -318,6 +405,19 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       .ibtn--solid:hover { transform: translateY(-2px); }
       .ibtn--ghost { background: transparent; color: var(--gold-strong); border: 1px solid var(--gold); }
       .ibtn--ghost:hover { transform: translateY(-2px); border-color: var(--gold-strong); }
+      /* §37 テキストロール＋矢印回転（ヒーローCTA）：ホバーで文字が巻き上がり、矢印が -45°→0° に立つ */
+      .ibtn--roll { overflow: hidden; }
+      .ibtn__roll { display: block; overflow: hidden; height: 1.2em; }
+      .ibtn__rollinner { display: flex; flex-direction: column; transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1); }
+      .ibtn__rollinner > span { height: 1.2em; line-height: 1.2em; white-space: nowrap; }
+      .ibtn--roll:hover .ibtn__rollinner, .ibtn--roll:focus-visible .ibtn__rollinner { transform: translateY(-50%); }
+      .ibtn__arrow { display: inline-block; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); transform: rotate(-45deg); }
+      .ibtn--roll:hover .ibtn__arrow, .ibtn--roll:focus-visible .ibtn__arrow { transform: rotate(0deg); }
+      .ibtn__yt { width: 1.15em; height: 1.15em; flex-shrink: 0; fill: #ff4d4d; }
+      .ibtn--yt:hover { border-color: #ff6a6a; }
+      @media (prefers-reduced-motion: reduce) {
+        .ibtn__rollinner, .ibtn__arrow { transition: none; }
+      }
       .ihero__scrollcue {
         position: absolute;
         left: 50%;
@@ -329,24 +429,6 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         letter-spacing: 0.36em;
         color: var(--muted);
         text-transform: uppercase;
-      }
-
-      /* ===== カーソル光（PCのみ・JSで座標更新） ===== */
-      .cursorglow {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: var(--cursor-size);
-        height: var(--cursor-size);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 4;
-        opacity: 0;
-        transform: translate(-50%, -50%);
-        background: radial-gradient(circle, var(--glow-2), transparent 62%);
-        mix-blend-mode: var(--blend);
-        transition: opacity 0.4s ease;
-        will-change: transform;
       }
 
       /* ===== 没入セクション（スケジュール） ===== */
@@ -523,6 +605,16 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         mask-image: linear-gradient(to bottom, #000 84%, transparent 100%);
       }
       .iabout__catch { font-family: var(--serif); font-weight: 700; font-size: clamp(1.7rem, 4.6vw, 2.6rem); line-height: 1.42; color: var(--gold-strong); margin: 0 0 0.4rem; }
+      /* §67 revealLine：catchを1行ずつ clip-path で左から拭って出す。既存 .reveal→.is-visible のトリガに同乗（JS不要）。本文は読みやすさ優先でワイプしない */
+      .iabout__catchline { display: block; clip-path: inset(0 100% 0 0); }
+      .iabout.is-visible .iabout__catchline { animation: revealLine 1s cubic-bezier(0.77, 0, 0.18, 1) forwards; }
+      .iabout.is-visible .iabout__catchline:nth-child(1) { animation-delay: 0.05s; }
+      .iabout.is-visible .iabout__catchline:nth-child(2) { animation-delay: 0.28s; }
+      @keyframes revealLine { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0% 0 0); } }
+      @media (prefers-reduced-motion: reduce) {
+        .iabout__catchline { clip-path: inset(0 0 0 0); }
+        .iabout.is-visible .iabout__catchline { animation: none; }
+      }
       .iabout__en { font-style: italic; font-size: clamp(0.82rem, 2.2vw, 1rem); color: var(--muted); margin: 0 0 1rem; }
       .iabout__rule { display: block; width: 3.2rem; height: 1px; margin: 0 auto 1.2rem; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
       .iabout__story { text-align: left; max-width: 34rem; margin: 0 auto; }
@@ -537,37 +629,10 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       }
 
       /* ===== 残りセクション共通 ===== */
-      .isec__lead { text-align: center; max-width: 40rem; margin: 0 auto 1.7rem; color: var(--ink-soft); line-height: 1.9; }
+      .isec__lead { text-align: center; max-width: 40rem; margin: 0 auto 1.7rem; color: var(--ink-soft); line-height: 1.9; text-wrap: balance; word-break: auto-phrase; }
+      /* 文の区切り（。）で折り返す保険：日本語の不自然な改行（「す。」だけ落ちる/「順次」が割れる）を防ぐ */
+      .isec__lead .nb { display: inline-block; }
       .isec__inner--narrow { max-width: 640px; }
-
-      /* VIDEO（おすすめ動画：3Dシリンダーカルーセル・バニラCSS 3D） */
-      .icyl { max-width: 1000px; margin: 0 auto; }
-      .icyl-stage { perspective: 1200px; perspective-origin: 50% 44%; height: clamp(260px, 38vw, 330px); display: grid; place-items: center; overflow: hidden; }
-      .icyl-ring {
-        /* ↓ カード枚数=6 と必ず一致（360/6=60deg）。半径で間隔を調整 */
-        --cyl-angle: 60deg;
-        --cyl-radius: 310px;
-        position: relative; width: clamp(228px, 30vw, 264px); height: clamp(128px, 17vw, 148px);
-        transform-style: preserve-3d; will-change: transform; cursor: grab; touch-action: pan-y;
-      }
-      .icyl-ring.is-drag { cursor: grabbing; }
-      .icyl-card {
-        position: absolute; inset: 0; border-radius: 14px; overflow: hidden; backface-visibility: hidden;
-        transform: rotateY(calc(var(--i) * var(--cyl-angle))) translateZ(var(--cyl-radius));
-        display: flex; flex-direction: column; text-decoration: none;
-        background: linear-gradient(155deg, #2a2014, #14100a); border: 1px solid var(--card-line);
-        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.5);
-      }
-      .icyl-card__thumb { flex: 1; display: grid; place-items: center; color: var(--gold); font-size: 1.7rem; background: radial-gradient(120% 130% at 50% 28%, rgba(201, 168, 105, 0.14), transparent 62%); }
-      .icyl-card__title { padding: 0.5rem 0.7rem; font-size: 0.82rem; color: #f3ead7; background: rgba(8, 6, 4, 0.55); border-top: 1px solid var(--card-line); }
-      .icyl-note { text-align: center; font-size: 0.76rem; color: var(--ink-soft); opacity: 0.72; margin: 1rem 0 0; }
-      /* 動きが苦手／モバイルは平面の横スクロールにフォールバック（JSも早期return） */
-      @media (prefers-reduced-motion: reduce), (max-width: 640px) {
-        .icyl-stage { perspective: none; height: auto; overflow-x: auto; overflow-y: hidden; place-items: stretch; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
-        .icyl-ring { transform: none !important; transform-style: flat; position: static; width: auto; height: auto; display: flex; gap: 0.85rem; padding: 0.3rem 0.2rem 1rem; cursor: default; }
-        .icyl-card { position: relative; inset: auto; transform: none !important; flex: 0 0 76%; max-width: 280px; height: clamp(150px, 44vw, 184px); scroll-snap-align: center; }
-        .icyl-note { display: none; } /* 横スクロール（スクロールバーで自明）。回転の文言はモバイルでは不正確なため隠す */
-      }
 
       /* ===== PICK UP（おすすめ）：横並びカード（吹き出しラベル付き） ===== */
       .ipick { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.7rem 1.3rem; max-width: 1000px; margin: 0 auto; }
@@ -584,13 +649,20 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       .ireel__card { flex: 0 0 clamp(232px, 26vw, 290px); margin-right: 1.2rem; text-decoration: none; color: var(--ink-soft); }
       .ireel__thumb { display: grid; place-items: center; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: linear-gradient(150deg, #2a2014, #14100a); border: 1px solid var(--card-line); color: var(--gold); font-size: 1.6rem; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4); }
       .ireel__title { display: block; margin-top: 0.55rem; font-size: 0.9rem; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      @media (prefers-reduced-motion: no-preference) {
+      /* 実データのサムネ画像（あればグリフ▶の代わりに敷く） */
+      .ipick__thumb img, .ireel__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      @media (prefers-reduced-motion: no-preference) and (min-width: 641px) {
         .ireel__track { animation: reelRoll 34s linear infinite; }
         .ireel:hover .ireel__track { animation-play-state: paused; }
       }
       @keyframes reelRoll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-      /* 動きが苦手な設定：自動スクロールを止めて手動の横スクロールに */
-      @media (prefers-reduced-motion: reduce) { .ireel { overflow-x: auto; } .ireel__track { animation: none; } }
+      /* 動きが苦手な設定・スマホ：自動スクロールを止めて手スワイプの横スクロールに（複製カードは隠す／スナップ付き） */
+      @media (prefers-reduced-motion: reduce), (max-width: 640px) {
+        .ireel { overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+        .ireel__track { animation: none; }
+        .ireel__card { scroll-snap-align: start; }
+        .ireel__card[aria-hidden='true'] { display: none; }
+      }
 
       /* ===== 各セクションの「すべて見る →」導線 ===== */
       .isec__more { max-width: 1000px; margin: 1.2rem auto 0; text-align: right; }
@@ -662,25 +734,31 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
 
       /* FOLLOW */
       .ifollow { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 820px; margin: 0 auto; }
+      /* §15 グロービューカード（blur45px＋グラデ枠）に寄せる：太いグラデ枠＋背後の上方オーラ＋上にSNSアイコン */
       .ifollow__card {
         position: relative; isolation: isolate;
-        display: flex; flex-direction: column; gap: 0.25rem;
-        padding: 1.2rem 1.3rem; border-radius: 12px; text-decoration: none;
-        border: 1px solid transparent;
+        display: flex; flex-direction: column; gap: 0.3rem;
+        padding: 1.55rem 1.45rem; border-radius: 16px; text-decoration: none;
+        border: 1.5px solid transparent;
         background:
           linear-gradient(#1a130b, #1a130b) padding-box,
-          linear-gradient(135deg, var(--gc1, var(--gold)), var(--gc2, var(--gold-strong))) border-box;
-        transition: transform 0.18s ease;
+          linear-gradient(140deg, var(--gc1, var(--gold)), var(--gc2, var(--gold-strong))) border-box;
+        box-shadow: inset 0 1px 0 rgba(232, 207, 149, 0.06);
+        transition: transform 0.2s ease, box-shadow 0.25s ease;
       }
       .ifollow__card::before {
-        content: ''; position: absolute; inset: 8px; z-index: -1; border-radius: 12px;
-        background: var(--gc1, var(--gold)); filter: blur(45px); opacity: 0.32; transition: opacity 0.25s ease;
+        content: ''; position: absolute; inset: -10px 10px auto 10px; height: 56%; z-index: -1; border-radius: 30px;
+        background: linear-gradient(140deg, var(--gc1, var(--gold)), var(--gc2, var(--gold-strong)));
+        filter: blur(44px); opacity: 0.22; transition: opacity 0.25s ease; pointer-events: none;
       }
       .ifollow__card:hover { transform: translateY(-3px); }
-      .ifollow__card:hover::before { opacity: 0.5; }
-      .ifollow--yt { --gc1: #ff4d4d; --gc2: #b3352f; }
-      .ifollow--x { --gc1: #aab6c2; --gc2: #2c2c2c; }
-      .ifollow--ma { --gc1: #f6a8c8; --gc2: #ec6a9c; }
+      .ifollow__card:hover::before { opacity: 0.36; }
+      /* くすませた上品トーン（原色をやめ、深く落ち着いた色味に） */
+      .ifollow--yt { --gc1: #c2645a; --gc2: #6b332e; }
+      .ifollow--x { --gc1: #93a6bf; --gc2: #3a4658; }
+      .ifollow--ma { --gc1: #cf94ac; --gc2: #8f5870; }
+      .ifollow__icon { display: inline-flex; width: 1.9rem; height: 1.9rem; margin-bottom: 0.4rem; }
+      .ifollow__icon svg { width: 100%; height: 100%; fill: var(--gc1, var(--gold)); }
       .ifollow__label { font-family: var(--serif); font-size: 1.18rem; font-weight: 700; color: var(--gold-strong); }
       .ifollow__sub { font-size: 0.82rem; color: var(--muted); }
 
@@ -747,7 +825,6 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       /* ===== モバイル軽量化 ===== */
       @media (max-width: 640px) {
         .ihero__glow { display: none; }
-        .cursorglow { display: none; }
         .isec::before { opacity: 0.32; }
         .icard { -webkit-backdrop-filter: none; backdrop-filter: none; }
       }
@@ -757,7 +834,6 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         .intro > * { opacity: 1; transform: none; filter: none; animation: none; }
         .iprofile__row { opacity: 1; transform: none; transition: none; }
         .ihero__kv, .ihero__glow { animation: none; }
-        .cursorglow { display: none; }
         html { scroll-behavior: auto; }
       }
       /* ===== ロード画面（Type Motion: RISE） ===== */
@@ -784,8 +860,6 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       /* ===== 浮遊アイコン（floatSlow） ===== */
       @media (prefers-reduced-motion: no-preference) {
         .floaty { animation: floatSlow 5.5s ease-in-out infinite; }
-        .icyl-card:nth-child(2n) .floaty { animation-delay: -1.6s; }
-        .icyl-card:nth-child(3n) .floaty { animation-delay: -3.2s; }
       }
       @keyframes floatSlow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
@@ -860,12 +934,17 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       [data-edit] { transform: translate(var(--ex, 0px), var(--ey, 0px)) scale(var(--es, 1)); }
       /* ▼ 本人が調整した配置を既定に焼き込み（デスクトップのみ。モバイルは縦並びのため無補正） */
       @media (min-width: 860px) {
-        [data-edit='hero'] { --ex: -157px; --ey: -46px; --es: 1.04; }
+        /* 屋号の左シフトは幅で段階調整（下の min-width:1100/1300/1440 で上書き）。狭い画面は弱めて見切れ防止 */
+        [data-edit='hero'] { --ex: -12px; --ey: -46px; --es: 1.04; }
         [data-edit='art-prof'] { --ex: -156px; --ey: -75px; --es: 1.24; }
         [data-edit='txt-prof'] { --ex: -4px; --ey: 125px; --es: 1.36; }
         [data-edit='txt-about'] { --ex: -95px; --ey: -45px; --es: 1.12; }
         [data-edit='art-about'] { --ex: 175px; --ey: 29px; --es: 1.36; }
       }
+      /* 屋号の左シフトを幅で段階強化（実測した余裕の内側＝見切れ防止／広い画面≥1440は調整値−157pxを維持） */
+      @media (min-width: 1100px) { [data-edit='hero'] { --ex: -28px; } }
+      @media (min-width: 1280px) { [data-edit='hero'] { --ex: -75px; } }
+      @media (min-width: 1440px) { [data-edit='hero'] { --ex: -157px; } }
       html.is-editing [data-edit] { outline: 1px dashed rgba(201, 168, 105, 0.6); outline-offset: 5px; cursor: grab; }
       html.is-editing [data-edit]:hover { outline-color: #e8cf95; }
       html.is-editing [data-edit].is-grab { cursor: grabbing; }
@@ -884,16 +963,18 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
         .intro > * { animation: none !important; opacity: 1 !important; transform: none !important; }
       </style>
     </noscript>
-    <span class="cursorglow" aria-hidden="true"></span>
 
     <header class="inav">
       <a href="#top" class="inav__brand" style="text-decoration:none">
-        <span class="en">Cafe &amp; Bar</span>
+        <span class="en">Indie VTuber</span>
         <span class="jp">{site.name}</span>
       </a>
-      <nav class="inav__links">
-        {nav.map((n) => <a href="#">{n}</a>)}
+      <nav class="inav__links" id="inav-links">
+        {nav.map((n) => <a href={n.href}>{n.label}</a>)}
       </nav>
+      <button class="inav__burger" type="button" aria-label="メニューを開閉" aria-expanded="false" aria-controls="inav-links">
+        <span></span><span></span><span></span>
+      </button>
       <button class="inav__toggle" type="button" data-toggle>トーン切替（明⇄黒金）</button>
     </header>
 
@@ -922,9 +1003,14 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
           <p class="ihero__romaji">WAKAMATSU IORI</p>
           <p class="ihero__tag">雑談とゲームを肴に、ゆるりと楽しい夜を。<br />ようこそ、隠れ家カフェ＆バーへ。</p>
           <div class="ihero__cta">
-            <a class="ibtn ibtn--solid" href="#schedule">今夜の品書きを見る</a>
-            <a class="ibtn-icon floaty" href={site.links.youtube} rel="me noopener" target="_blank" aria-label="YouTubeチャンネルへ">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            <a class="ibtn ibtn--solid ibtn--roll" href="#schedule">
+              <span class="ibtn__roll"><span class="ibtn__rollinner"><span>今夜の品書きを見る</span><span aria-hidden="true">今夜の品書きを見る</span></span></span>
+              <span class="ibtn__arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="ibtn ibtn--ghost ibtn--roll ibtn--yt" href={site.links.youtube} rel="me noopener" target="_blank" aria-label="YouTubeチャンネルへ">
+              <svg class="ibtn__yt" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              <span class="ibtn__roll"><span class="ibtn__rollinner"><span>YouTube</span><span aria-hidden="true">YouTube</span></span></span>
+              <span class="ibtn__arrow" aria-hidden="true">→</span>
             </a>
           </div>
         </div>
@@ -981,7 +1067,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       <div class="isec__inner">
         <div class="iabout reveal">
           <div class="iabout__body" data-edit="txt-about">
-            <h2 class="iabout__catch">{intro.catchLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</h2>
+            <h2 class="iabout__catch">{intro.catchLines.map((line) => (<span class="iabout__catchline">{line}</span>))}</h2>
             <p class="iabout__en">{intro.catchEn}</p>
             <span class="iabout__rule" aria-hidden="true"></span>
             <div class="iabout__story">
@@ -1036,53 +1122,67 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       </div>
     </section>
 
-    <section class="isec isec--alt" id="pickup">
-      <div class="isec__inner">
-        <div class="ihead reveal"><p class="ihead__kicker">PICK UP</p><p class="ihead__title">おすすめ</p><span class="ihead__rule" aria-hidden="true"></span></div>
-        <p class="isec__lead reveal">いま観てほしい配信をピックアップ。</p>
-        <div class="ipick reveal">
-          {
-            [
-              { t: '夜のカフェタイム雑談', p: 'イチオシ' },
-              { t: '歌ってみた・歌枠', p: '人気' },
-              { t: 'ゲーム実況 #3', p: '必見' },
-            ].map((v) => (
-              <a class="ipick__card" href={site.links.youtube} target="_blank" rel="me noopener">
-                <span class="ipick__pick">{v.p}</span>
-                <span class="ipick__thumb" aria-hidden="true">▶</span>
-                <span class="ipick__title">{v.t}</span>
-              </a>
-            ))
-          }
-        </div>
-      </div>
-    </section>
+    {
+      pickList.length > 0 && (
+        <section class="isec isec--alt" id="pickup">
+          <div class="isec__inner">
+            <div class="ihead reveal"><p class="ihead__kicker">PICK UP</p><p class="ihead__title">おすすめ</p><span class="ihead__rule" aria-hidden="true"></span></div>
+            <p class="isec__lead reveal">いま観てほしい配信をピックアップ。</p>
+            <div class="ipick reveal">
+              {pickList.map((v, i) => (
+                <a class="ipick__card" href={v.url} target="_blank" rel="noopener">
+                  <span class="ipick__pick">{featuredLabels[i] ?? 'おすすめ！'}</span>
+                  <span class="ipick__thumb">
+                    {v.thumbnailUrl ? (
+                      <img src={v.thumbnailUrl} alt="" loading="lazy" decoding="async" />
+                    ) : (
+                      <span class="ipick__ph" aria-hidden="true">▶</span>
+                    )}
+                  </span>
+                  <span class="ipick__title">{v.title}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
 
     <section class="isec" id="videos">
       <div class="isec__inner">
         <div class="ihead reveal"><p class="ihead__kicker">VIDEO</p><p class="ihead__title">最新動画</p><span class="ihead__rule" aria-hidden="true"></span></div>
         <p class="isec__lead reveal">最新の配信アーカイブはこちら。公開後はここに自動で並びます。</p>
-        <div class="ireel reveal">
-          <div class="ireel__track">
-            {
-              [0, 1].flatMap((dup) =>
-                ['【雑談】夜のカフェタイム', '【ゲーム】〇〇 初見プレイ #3', '【歌枠】まったり弾き語り', '【コラボ】〇〇さんと', '【作業】もくもく作業配信', '【記念】登録者ありがとう枠'].map((title) => (
-                  <a
-                    class="ireel__card"
-                    href={site.links.youtube}
-                    target="_blank"
-                    rel="me noopener"
-                    aria-hidden={dup === 1 ? 'true' : undefined}
-                    tabindex={dup === 1 ? -1 : undefined}
-                  >
-                    <span class="ireel__thumb" aria-hidden="true">▶</span>
-                    <span class="ireel__title">{title}</span>
-                  </a>
-                ))
-              )
-            }
-          </div>
-        </div>
+        {
+          reelList.length > 0 ? (
+            <div class="ireel reveal">
+              <div class="ireel__track">
+                {[0, 1].flatMap((dup) =>
+                  reelList.map((v) => (
+                    <a
+                      class="ireel__card"
+                      href={v.url}
+                      target="_blank"
+                      rel="noopener"
+                      aria-hidden={dup === 1 ? 'true' : undefined}
+                      tabindex={dup === 1 ? -1 : undefined}
+                    >
+                      <span class="ireel__thumb">
+                        {v.thumbnailUrl ? (
+                          <img src={v.thumbnailUrl} alt="" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="ireel__ph" aria-hidden="true">▶</span>
+                        )}
+                      </span>
+                      <span class="ireel__title">{v.title}</span>
+                    </a>
+                  ))
+                )}
+              </div>
+            </div>
+          ) : (
+            <p class="isec__note reveal">最新動画はまもなく表示されます。</p>
+          )
+        }
         <p class="isec__more reveal"><a href="/videos">動画をすべて見る →</a></p>
       </div>
     </section>
@@ -1122,7 +1222,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
     <section class="isec isec--alt" id="goods">
       <div class="isec__inner">
         <div class="ihead reveal"><p class="ihead__kicker">STORE</p><span class="ihead__rule" aria-hidden="true"></span></div>
-        <p class="isec__lead reveal">配信に使える自作の OBS ウィジェットなどを BOOTH で販売中。オリジナルグッズも順次追加していきます。</p>
+        <p class="isec__lead reveal"><span class="nb">配信に使える自作の OBS ウィジェットなどを BOOTH で販売中。</span><wbr /><span class="nb">オリジナルグッズも順次追加していきます。</span></p>
         <div class="ispot reveal" data-spot>
           <a class="istore" href={site.links.booth} target="_blank" rel="me noopener" aria-label="BOOTHストアを見る">
             <Image class="istore__bg" src={keyVisual} widths={[480, 768, 1024, 1520]} sizes="(min-width: 760px) 760px, 100vw" alt="" loading="lazy" />
@@ -1136,11 +1236,11 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
     <section class="isec" id="follow">
       <div class="isec__inner">
         <div class="ihead reveal"><p class="ihead__kicker">FOLLOW</p><span class="ihead__rule" aria-hidden="true"></span></div>
-        <p class="isec__lead reveal">配信のお知らせや日常は各SNSで。フォロー・チャンネル登録で応援よろしくお願いします。</p>
+        <p class="isec__lead reveal"><span class="nb">配信のお知らせや日常は各SNSで。</span><wbr /><span class="nb">フォロー・チャンネル登録で応援よろしくお願いします。</span></p>
         <div class="ifollow reveal">
-          <a class="ifollow__card ifollow--yt" href={site.links.youtube} target="_blank" rel="me noopener"><span class="ifollow__label">YouTube</span><span class="ifollow__sub">配信・アーカイブ</span></a>
-          <a class="ifollow__card ifollow--x" href={site.links.x} target="_blank" rel="me noopener"><span class="ifollow__label">X (Twitter)</span><span class="ifollow__sub">お知らせ・日常</span></a>
-          <a class="ifollow__card ifollow--ma" href={site.links.marshmallow} target="_blank" rel="me noopener"><span class="ifollow__label">マシュマロ</span><span class="ifollow__sub">匿名でメッセージ</span></a>
+          <a class="ifollow__card ifollow--yt" href={site.links.youtube} target="_blank" rel="me noopener"><span class="ifollow__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></span><span class="ifollow__label">YouTube</span><span class="ifollow__sub">配信・アーカイブ</span></a>
+          <a class="ifollow__card ifollow--x" href={site.links.x} target="_blank" rel="me noopener"><span class="ifollow__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span><span class="ifollow__label">X (Twitter)</span><span class="ifollow__sub">お知らせ・日常</span></a>
+          <a class="ifollow__card ifollow--ma" href={site.links.marshmallow} target="_blank" rel="me noopener"><span class="ifollow__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></span><span class="ifollow__label">マシュマロ</span><span class="ifollow__sub">匿名でメッセージ</span></a>
         </div>
       </div>
     </section>
@@ -1203,8 +1303,8 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
           <input type="range" min="0" max="1.6" step="0.05" value="0.4" data-var="--spotlight" />
         </label>
         <label class="ed__field">
-          <span class="ed__lab">カーソルの光 <b data-out="--cursor-size">120</b><span class="ed__u">px</span></span>
-          <input type="range" min="120" max="520" step="10" value="120" data-var="--cursor-size" data-unit="px" />
+          <span class="ed__lab">全体のライト（上から） <b data-out="--arc-strength">0.90</b></span>
+          <input type="range" min="0" max="1.4" step="0.05" value="0.9" data-var="--arc-strength" />
         </label>
         <label class="ed__field">
           <span class="ed__lab">縁の暗さ（黒トーン） <b data-out="--vignette">0.20</b></span>
@@ -1261,7 +1361,7 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       })();
 
       // ===== 調整パネル（LPエディタ風・あなたが値を動かせる） =====
-      const EDITOR_KEYS = ['--art-scale', '--spotlight', '--cursor-size', '--vignette', '--glow-strength'];
+      const EDITOR_KEYS = ['--art-scale', '--spotlight', '--arc-strength', '--vignette', '--glow-strength'];
       const edRead = () => {
         try { return JSON.parse(localStorage.getItem('immersive-editor') || '{}'); } catch (e) { return {}; }
       };
@@ -1408,20 +1508,6 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
       onScroll();
       addEventListener('scroll', onScroll, { passive: true });
 
-      // カーソル光（精密ポインタ＋動きOKのときだけ）
-      const fine = matchMedia('(any-hover: hover) and (any-pointer: fine)').matches;
-      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (fine && !reduce) {
-        const glow = document.querySelector('.cursorglow');
-        if (glow) {
-          addEventListener('pointermove', (e) => {
-            glow.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
-            glow.style.opacity = '1';
-          });
-          addEventListener('pointerleave', () => (glow.style.opacity = '0'));
-        }
-      }
-
       // SpotlightBorder：カーソル追従の光る枠（ストアバナー等 [data-spot]）
       document.querySelectorAll('[data-spot]').forEach((wrap) => {
         wrap.addEventListener('pointermove', (e) => {
@@ -1460,55 +1546,22 @@ const nav = ['プロフィール', 'スケジュール', '動画', 'ストア', 
           .catch(() => {});
       })();
 
-      // おすすめ動画：3Dシリンダーカルーセル（ドラッグ＋慣性／ホバーで一時停止）
-      // reduced-motion・モバイルは CSS が平面の横スクロールを担当するので JS は早期return
+      // ハンバーガーメニュー（スマホ）：開閉・リンクで閉じる・外側/Escで閉じる
       (function () {
-        const ring = document.getElementById('cylRing');
-        if (!ring) return;
-        if (matchMedia('(prefers-reduced-motion: reduce)').matches || matchMedia('(max-width: 640px)').matches) return;
-        const MIN = 0.1; // 自動回転の最低速（見やすいよう低速。元見本は0.25）
-        let ry = 0,
-          vel = MIN,
-          dragging = false,
-          hover = false,
-          moved = false,
-          lastX = 0;
-        ring.addEventListener('pointerdown', (e) => {
-          dragging = true;
-          moved = false;
-          lastX = e.clientX;
-          ring.classList.add('is-drag');
-          try {
-            ring.setPointerCapture && ring.setPointerCapture(e.pointerId);
-          } catch (err) {}
-        });
-        addEventListener('pointermove', (e) => {
-          if (!dragging) return;
-          const dx = e.clientX - lastX;
-          if (Math.abs(dx) > 3) moved = true;
-          ry += dx * 0.4;
-          vel = dx * 0.05;
-          lastX = e.clientX;
-        });
-        addEventListener('pointerup', () => {
-          dragging = false;
-          ring.classList.remove('is-drag');
-        });
-        ring.addEventListener('pointerenter', () => (hover = true));
-        ring.addEventListener('pointerleave', () => (hover = false));
-        // ドラッグ直後の誤クリック（カードのリンク遷移）を抑止
-        ring.addEventListener('click', (e) => { if (moved) e.preventDefault(); }, true);
-        function loop() {
-          if (!dragging && !hover) {
-            ry += vel;
-            vel *= 0.95;
-            if (Math.abs(vel) < MIN) vel = vel < 0 ? -MIN : MIN;
-          }
-          ring.style.transform = `rotateX(-5deg) rotateY(${ry}deg)`;
-          requestAnimationFrame(loop);
-        }
-        loop();
+        const nav = document.querySelector('.inav');
+        const burger = nav && nav.querySelector('.inav__burger');
+        const links = nav && nav.querySelector('.inav__links');
+        if (!nav || !burger || !links) return;
+        const setOpen = (open) => {
+          nav.classList.toggle('nav-open', open);
+          burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        };
+        burger.addEventListener('click', (e) => { e.stopPropagation(); setOpen(!nav.classList.contains('nav-open')); });
+        links.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
+        document.addEventListener('click', (e) => { if (nav.classList.contains('nav-open') && !nav.contains(e.target)) setOpen(false); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
       })();
+
     </script>
   </body>
 </html>
