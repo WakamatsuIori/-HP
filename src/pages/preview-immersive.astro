@@ -81,7 +81,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
           var q = new URLSearchParams(location.search).get('form');
           var f = q || localStorage.getItem('immersive-form') || 'dark';
           document.documentElement.dataset.form = f === 'dark' ? 'dark' : 'cream';
-          var saved = JSON.parse(localStorage.getItem('immersive-editor') || '{}');
+          var saved = JSON.parse(localStorage.getItem('immersive-editor-v2') || '{}');
           for (var k in saved) document.documentElement.style.setProperty(k, saved[k]);
         } catch (e) {
           document.documentElement.dataset.form = 'cream';
@@ -96,11 +96,11 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         --gothic: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', system-ui, sans-serif;
         /* ▼ 調整パネルのスライダーで動かす値（既定）。localStorage に保存される。 */
         --art-scale: 1;
-        --spotlight: 0.4;
-        --vignette: 0.45;
+        --spotlight: 0.3;
+        --vignette: 0.3;
         --glow-strength: 0;
         /* 弧状ラジアルグラデーション装飾（見本帳#58）＝ページ全体の上方アーク光の強さ */
-        --arc-strength: 0.9;
+        --arc-strength: 0.45;
       }
 
       /* ===== トーン①：明クリーム×金（世界観キープ） ===== */
@@ -297,10 +297,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         z-index: 0;
         transform-origin: 54% 16%;
       }
-      @media (prefers-reduced-motion: no-preference) {
-        .ihero__kv { animation: kvZoom 24s ease-in-out infinite alternate; }
-      }
-      @keyframes kvZoom { from { transform: scale(1); } to { transform: scale(1.07); } }
+      /* 立ち絵は動かさない（KVズーム停止）。本人の希望で静止のまま。 */
       .ihero__scrim { position: absolute; inset: 0; z-index: 1; background: var(--scrim); }
       .ihero__glow {
         position: absolute;
@@ -313,12 +310,13 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
           radial-gradient(38% 46% at 50% 38%, var(--glow-2), transparent 66%),
           radial-gradient(40% 50% at 80% 24%, var(--glow), transparent 64%);
       }
+      /* 立ち絵の周りで温かい金の光がゆっくり“呼吸”する（横移動はやめ、静かに明滅＋微かに拡縮）。 */
       @media (prefers-reduced-motion: no-preference) {
-        .ihero__glow { animation: glowDrift 18s ease-in-out infinite alternate; }
+        .ihero__glow { animation: glowBreathe 9s ease-in-out infinite; }
       }
-      @keyframes glowDrift {
-        from { transform: translate3d(0, 0, 0) scale(1); }
-        to { transform: translate3d(2%, -1.6%, 0) scale(1.08); }
+      @keyframes glowBreathe {
+        0%, 100% { opacity: calc(var(--glow-strength) * 0.6); transform: scale(1); }
+        50% { opacity: var(--glow-strength); transform: scale(1.045); }
       }
       .ihero__content {
         position: relative;
@@ -931,9 +929,9 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         /* 屋号の左シフトは幅で段階調整（下の min-width:1100/1300/1440 で上書き）。狭い画面は弱めて見切れ防止 */
         [data-edit='hero'] { --ex: -12px; --ey: -46px; --es: 1.04; }
         [data-edit='art-prof'] { --ex: -156px; --ey: -75px; --es: 1.24; }
-        [data-edit='txt-prof'] { --ex: -4px; --ey: 125px; --es: 1.36; }
-        [data-edit='txt-about'] { --ex: -95px; --ey: -45px; --es: 1.12; }
-        [data-edit='art-about'] { --ex: 175px; --ey: 29px; --es: 1.36; }
+        [data-edit='txt-prof'] { --ex: 6px; --ey: 107px; --es: 1.6; }
+        [data-edit='txt-about'] { --ex: -89px; --ey: -50px; --es: 1.36; }
+        [data-edit='art-about'] { --ex: 0px; --ey: 0px; --es: 1.08; }
       }
       /* 屋号の左シフトを幅で段階強化（実測した余裕の内側＝見切れ防止／広い画面≥1440は調整値−157pxを維持） */
       @media (min-width: 1100px) { [data-edit='hero'] { --ex: -28px; } }
@@ -1357,7 +1355,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
       // ===== 調整パネル（LPエディタ風・あなたが値を動かせる） =====
       const EDITOR_KEYS = ['--art-scale', '--spotlight', '--arc-strength', '--vignette', '--glow-strength'];
       const edRead = () => {
-        try { return JSON.parse(localStorage.getItem('immersive-editor') || '{}'); } catch (e) { return {}; }
+        try { return JSON.parse(localStorage.getItem('immersive-editor-v2') || '{}'); } catch (e) { return {}; }
       };
       const edFmt = (v) => parseFloat(v).toFixed(2);
 
@@ -1386,7 +1384,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
           if (out) out.textContent = edFmt(input.value);
           const cur = edRead();
           cur[key] = val;
-          try { localStorage.setItem('immersive-editor', JSON.stringify(cur)); } catch (e) {}
+          try { localStorage.setItem('immersive-editor-v2', JSON.stringify(cur)); } catch (e) {}
         };
         if (out) out.textContent = edFmt(input.value);
         input.addEventListener('input', apply);
@@ -1419,7 +1417,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         } else if (msg) { msg.textContent = text; }
       });
       document.querySelector('[data-ed-reset]')?.addEventListener('click', () => {
-        try { localStorage.removeItem('immersive-editor'); localStorage.removeItem('immersive-layout'); } catch (e) {}
+        try { localStorage.removeItem('immersive-editor-v2'); localStorage.removeItem('immersive-layout'); } catch (e) {}
         location.reload();
       });
 
