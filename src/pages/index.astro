@@ -490,8 +490,8 @@ try {
       font-family: var(--font-serif);
       font-size: 1.05rem;
       letter-spacing: 0.5em;
-      color: rgba(232, 207, 149, 0.26);
-      text-shadow: 0 1px 14px rgba(0, 0, 0, 0.6);
+      color: rgba(232, 207, 149, 0.34);
+      text-shadow: 0 1px 14px rgba(0, 0, 0, 0.7);
     }
   }
   .kicker {
@@ -535,11 +535,11 @@ try {
     padding: 0.55rem 1.1rem;
     border: 1px solid rgba(201, 168, 105, 0.4);
     border-radius: 10px;
-    background: rgba(20, 14, 9, 0.55);
+    background: rgba(18, 12, 8, 0.82);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
   }
-  .cd-label { margin: 0; font-size: 0.78rem; letter-spacing: 0.1em; color: rgba(243, 231, 207, 0.72); }
+  .cd-label { margin: 0; font-size: 0.78rem; letter-spacing: 0.1em; color: rgba(243, 231, 207, 0.78); }
   .cd-label--solo { margin: 0 0 1.6rem; font-size: 0.9rem; }
   .cd-time { font-size: 1.32rem; font-weight: 600; color: var(--h-gold); font-variant-numeric: tabular-nums; }
   .cd-next-title { width: 100%; font-size: 0.88rem; color: rgba(243, 231, 207, 0.82); }
@@ -582,7 +582,7 @@ try {
   .btn-ghost { border: 1px solid var(--gold, #c9a86a); color: var(--gold-strong, #e8cf95); background: rgba(20, 14, 9, 0.4); }
   .btn-ghost:hover { background: rgba(201, 168, 105, 0.14); border-color: var(--gold-strong, #e8cf95); transform: translateY(-1px); }
   .btn-ghost-dark { border: 1px solid var(--accent); color: var(--accent-strong); }
-  .btn-ghost-dark:hover { background: rgba(156, 143, 107, 0.1); transform: translateY(-1px); }
+  .btn-ghost-dark:hover { background: rgba(201, 168, 105, 0.12); transform: translateY(-1px); }
 
   .kicker--dark { color: var(--accent-strong); text-shadow: none; }
   .welcome__lead { margin: 0.7rem 0 1.8rem; line-height: 2.05; font-size: var(--pf-lead); }
@@ -629,7 +629,7 @@ try {
     border-radius: 999px;
     font-size: 1.1rem;
     color: var(--accent-strong);
-    background: rgba(156, 143, 107, 0.06);
+    background: rgba(201, 168, 105, 0.06);
   }
 
   /* スマホはプロフィール周りの文字を一段小さく・余白を詰めてサイト全体と馴染ませる。
@@ -893,7 +893,7 @@ try {
     border: 1px solid var(--line);
     border-radius: 14px;
     background:
-      radial-gradient(64% 82% at 50% 28%, rgba(156, 143, 107, 0.07), transparent 70%),
+      radial-gradient(64% 82% at 50% 28%, rgba(201, 168, 105, 0.07), transparent 70%),
       var(--card);
     color: var(--accent-strong);
     font-family: var(--font-serif);
@@ -1119,20 +1119,32 @@ try {
     min-height: clamp(110px, 18vw, 150px);
     padding: clamp(1.1rem, 3vw, 1.7rem);
     border-radius: 12px;
+    border: 1px solid var(--card-line);
     text-decoration: none;
-    color: #fffdf8;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    background: linear-gradient(150deg, #221a10, #16100a);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
   }
-  .sns-banner--yt { background: linear-gradient(120deg, #7a1f1f, #b3352f); }
-  .sns-banner--x { background: linear-gradient(120deg, #181818, #3a3a3a); }
-  .sns-banner--marshmallow { background: linear-gradient(120deg, #ec6a9c, #f4a0c2); }
+  /* くすませたブランド差し色を左肩にほのかに（黒×金の基調を保つ・FOLLOW を上品トーンで統一） */
+  .sns-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(78% 120% at 0% 0%, var(--sns-tint, transparent), transparent 62%);
+  }
+  .sns-banner--yt { --sns-tint: rgba(194, 100, 90, 0.3); }
+  .sns-banner--x { --sns-tint: rgba(147, 166, 191, 0.24); }
+  .sns-banner--marshmallow { --sns-tint: rgba(207, 148, 172, 0.28); }
   .sns-banner__label {
+    position: relative;
     font-family: var(--font-serif);
     font-size: clamp(1.3rem, 3.5vw, 1.8rem);
     font-weight: 700;
     letter-spacing: 0.04em;
+    color: var(--gold-strong);
   }
-  .sns-banner__sub { font-size: 0.85rem; opacity: 0.9; }
+  .sns-banner__sub { position: relative; font-size: 0.85rem; color: var(--muted); }
 
   /* ===== LP（1ページ縦スクロール）のセクション土台 ===== */
   /* 各セクションはフルブリード。中身は .lp-inner で読みやすい幅に収める。

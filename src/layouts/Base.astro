@@ -424,6 +424,8 @@ const nav = [
   }
   /* スマホはタップ領域を最低44px相当まで広げる（誤タップ防止・WCAG 2.5.5） */
   @media (max-width: 640px) {
+    /* モバイルは blur を軽め（GPU負荷を抑える） */
+    .site-header { -webkit-backdrop-filter: blur(8px) saturate(1.2); backdrop-filter: blur(8px) saturate(1.2); }
     .site-header nav a { padding-block: 0.62rem; }
     .site-header nav a::after { bottom: 0.42rem; }
   }
