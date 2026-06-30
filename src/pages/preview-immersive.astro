@@ -401,10 +401,11 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         letter-spacing: 0.04em;
         text-decoration: none;
         cursor: pointer;
-        transition: transform 0.18s ease, background 0.2s ease, border-color 0.2s ease;
+        transition: transform 0.18s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
       }
-      .ibtn--solid { background: var(--gold-strong); color: var(--bg); border: 1px solid var(--gold-strong); }
-      .ibtn--solid:hover { transform: translateY(-2px); }
+      .ibtn--solid { background: var(--gold-strong); color: var(--bg); border: 1px solid var(--gold-strong); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32); }
+      /* ホバーで金の光がふわっと灯る（押したくなる質感） */
+      .ibtn--solid:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(232, 207, 149, 0.45); }
       .ibtn--ghost { background: transparent; color: var(--gold-strong); border: 1px solid var(--gold); }
       .ibtn--ghost:hover { transform: translateY(-2px); border-color: var(--gold-strong); }
       /* §37 テキストロール＋矢印回転（ヒーローCTA）：ホバーで文字が巻き上がり、矢印が -45°→0° に立つ */
@@ -447,8 +448,13 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         font-size: clamp(2.2rem, 7vw, 3.8rem);
         font-weight: 500;
         letter-spacing: 0.1em;
-        color: var(--gold);
-        opacity: 0.85;
+        color: var(--gold); /* フォールバック（background-clip 非対応時） */
+        /* 金箔の艶：上が明るく中央が落ち着く縦グラデを文字に流し込む */
+        background: linear-gradient(180deg, var(--gold-strong) 0%, var(--gold) 52%, var(--gold-strong) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        opacity: 0.88;
         line-height: 1;
       }
       .ihead__title {
@@ -459,11 +465,23 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         margin-top: 0.4rem;
       }
       .ihead__rule {
+        position: relative;
         display: block;
-        width: 3.4rem;
+        width: 4.6rem;
         height: 1px;
-        margin: 1rem auto 0;
+        margin: 1.05rem auto 0;
         background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      }
+      /* 区切り線の中央に金の菱形（プロフィール/ガイドラインの◆モチーフと統一） */
+      .ihead__rule::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 5px;
+        height: 5px;
+        transform: translate(-50%, -50%) rotate(45deg);
+        background: var(--gold-strong);
       }
       .icards {
         display: grid;
@@ -481,7 +499,10 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         -webkit-backdrop-filter: blur(8px);
         backdrop-filter: blur(8px);
         overflow: hidden;
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
       }
+      /* ホバーで金枠がふっと明るくなる（お知らせカードと統一の所作） */
+      .icard:hover { border-color: var(--gold); box-shadow: 0 22px 46px rgba(0, 0, 0, 0.42); }
       .icard__day {
         font-family: var(--serif);
         font-size: 1.05rem;
@@ -607,7 +628,8 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         .iabout.is-visible .iabout__catchline { animation: none; }
       }
       .iabout__en { font-style: italic; font-size: clamp(0.82rem, 2.2vw, 1rem); color: var(--muted); margin: 0 0 1rem; }
-      .iabout__rule { display: block; width: 3.2rem; height: 1px; margin: 0 auto 1.2rem; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+      .iabout__rule { position: relative; display: block; width: 4.4rem; height: 1px; margin: 0 auto 1.2rem; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+      .iabout__rule::before { content: ''; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; transform: translate(-50%, -50%) rotate(45deg); background: var(--gold-strong); }
       .iabout__story { text-align: left; max-width: 34rem; margin: 0 auto; }
       .iabout__story p { margin: 0 0 0.9rem; font-size: 1rem; line-height: 2; color: var(--ink-soft); }
       .iabout__story p:last-child { margin-bottom: 0; }
@@ -660,14 +682,38 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
       .isec__more a { color: var(--gold-strong); text-decoration: none; font-size: 0.92rem; letter-spacing: 0.04em; }
       .isec__more a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-      /* ===== ヒーロー直下：最新お知らせ1行バー ===== */
-      .inewsbar { display: flex; align-items: center; gap: 0.8rem; max-width: 1100px; margin: 0 auto; padding: 0.7rem clamp(1.2rem, 4vw, 2rem); border-top: 1px solid var(--card-line); border-bottom: 1px solid var(--card-line); background: rgba(20, 14, 9, 0.55); text-decoration: none; color: var(--ink-soft); font-size: 0.9rem; }
-      .inewsbar__tag { flex-shrink: 0; color: var(--gold-strong); font-weight: 700; letter-spacing: 0.08em; font-size: 0.78rem; }
+      /* ===== ヒーロー直下：最新お知らせ（中央フロートの金縁丸帯カード） =====
+         全幅の細線帯はヒーロー直後だと安っぽいので、中央に浮く上品なピル型に。
+         金グラデ枠＋柔らかい影＋上下余白で“一拍おく”。NEWは金チップ（PICK UPバッジと同じ言語）。 */
+      .inewsbar {
+        display: flex; align-items: center; gap: 0.85rem;
+        max-width: 660px;
+        margin: clamp(1.4rem, 4vw, 2.6rem) auto;
+        padding: 0.5rem 1.3rem 0.5rem 0.6rem;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background:
+          linear-gradient(#1c150d, #160f08) padding-box,
+          linear-gradient(100deg, var(--gold), var(--gold-strong)) border-box;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
+        text-decoration: none; color: var(--ink-soft); font-size: 0.9rem;
+        transition: transform 0.2s ease, box-shadow 0.25s ease;
+      }
+      .inewsbar:hover { transform: translateY(-2px); box-shadow: 0 18px 42px rgba(0, 0, 0, 0.5); }
+      .inewsbar__tag {
+        flex-shrink: 0;
+        padding: 0.28rem 0.85rem; border-radius: 999px;
+        background: var(--gold-bright); color: #14100b;
+        font-weight: 700; letter-spacing: 0.06em; font-size: 0.68rem;
+      }
       .inewsbar__date { flex-shrink: 0; color: var(--muted); font-size: 0.78rem; font-variant-numeric: tabular-nums; }
-      .inewsbar__title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-      .inewsbar__more { flex-shrink: 0; color: var(--gold-strong); font-size: 0.8rem; white-space: nowrap; }
+      .inewsbar__title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ink); }
+      .inewsbar__more { flex-shrink: 0; color: var(--gold-strong); font-size: 0.82rem; white-space: nowrap; }
       .inewsbar:hover .inewsbar__more { text-decoration: underline; text-underline-offset: 2px; }
-      @media (max-width: 640px) { .inewsbar { font-size: 0.84rem; gap: 0.55rem; } .inewsbar__date { display: none; } }
+      @media (max-width: 640px) {
+        .inewsbar { max-width: none; margin: clamp(1rem, 4vw, 1.6rem) clamp(1rem, 4vw, 1.2rem); padding: 0.45rem 1rem 0.45rem 0.5rem; font-size: 0.84rem; gap: 0.55rem; }
+        .inewsbar__date { display: none; }
+      }
 
       /* ===== GALLERY（準備中）：金のひし形＋細罫で上品に ===== */
       .igallery-soon { display: grid; place-items: center; gap: 0.55rem; max-width: 1000px; margin: 1.3rem auto 0; min-height: clamp(150px, 24vw, 230px); border: 1px solid var(--card-line); border-radius: 16px; background: radial-gradient(64% 82% at 50% 28%, rgba(201, 168, 105, 0.08), transparent 70%), var(--card-bg); color: var(--gold-strong); font-family: var(--serif); letter-spacing: 0.22em; font-size: clamp(0.95rem, 2.6vw, 1.25rem); text-transform: uppercase; }
@@ -685,10 +731,11 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
         border-radius: 16px;
         overflow: hidden;
         box-shadow: 7px 7px 16px rgba(0, 0, 0, 0.6), -6px -6px 14px rgba(120, 100, 64, 0.1);
-        transition: box-shadow 0.28s ease, transform 0.28s ease;
+        transition: box-shadow 0.28s ease, transform 0.28s ease, border-color 0.28s ease;
       }
       .inews__card:hover {
         transform: translateY(-3px);
+        border-color: rgba(201, 168, 105, 0.4);
         box-shadow: 10px 10px 24px rgba(0, 0, 0, 0.64), -7px -7px 16px rgba(120, 100, 64, 0.14);
       }
       .inews__thumb { display: block; position: relative; aspect-ratio: 16 / 9; background: linear-gradient(150deg, #2a2014, #15100a); }
@@ -928,10 +975,13 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
       @media (min-width: 860px) {
         /* 屋号の左シフトは幅で段階調整（下の min-width:1100/1300/1440 で上書き）。狭い画面は弱めて見切れ防止 */
         [data-edit='hero'] { --ex: -12px; --ey: -46px; --es: 1.04; }
-        [data-edit='art-prof'] { --ex: -156px; --ey: -75px; --es: 1.24; }
-        [data-edit='txt-prof'] { --ex: 6px; --ey: 107px; --es: 1.6; }
-        [data-edit='txt-about'] { --ex: -89px; --ey: -50px; --es: 1.36; }
-        [data-edit='art-about'] { --ex: 0px; --ey: 0px; --es: 1.08; }
+        /* プロフィール／ごあいさつの配置：以前ドラッグ＆ホイールで付けた絶対pxの拡大・横シフトは、
+           調整時より狭い画面だと立ち絵が左へ・本文が右(or左)へ見切れていた。きれいに収まる既定レイアウトに戻す
+           （立ち絵の大きさは各セクションの width 指定が担保。横シフト・極端な拡大は付けない）。 */
+        [data-edit='art-prof'] { --ex: 0px; --ey: 0px; --es: 1; }
+        [data-edit='txt-prof'] { --ex: 0px; --ey: 0px; --es: 1; }
+        [data-edit='txt-about'] { --ex: 0px; --ey: 0px; --es: 1; }
+        [data-edit='art-about'] { --ex: 0px; --ey: 0px; --es: 1; }
       }
       /* 屋号の左シフトを幅で段階強化（実測した余裕の内側＝見切れ防止／広い画面≥1440は調整値−157pxを維持） */
       @media (min-width: 1100px) { [data-edit='hero'] { --ex: -28px; } }
@@ -1278,41 +1328,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
       </div>
     </section>
 
-    <aside class="ed" id="ed" aria-label="プレビュー調整パネル">
-      <button class="ed__handle" type="button" data-ed-toggle aria-expanded="true">⚙ 調整パネル（あなたが調整できます）</button>
-      <div class="ed__body">
-        <button class="ed__btn ed__edit" type="button" data-ed-edit aria-pressed="false">🖐 配置を動かす（ドラッグ＝移動 / ホイール＝拡縮）</button>
-        <div class="ed__tones">
-          <button class="ed__tone" type="button" data-tone="cream">明クリーム</button>
-          <button class="ed__tone" type="button" data-tone="dark">黒×金</button>
-        </div>
-        <label class="ed__field">
-          <span class="ed__lab">立ち絵の大きさ <b data-out="--art-scale">1.00</b></span>
-          <input type="range" min="0.7" max="1.5" step="0.02" value="1" data-var="--art-scale" />
-        </label>
-        <label class="ed__field">
-          <span class="ed__lab">光のプール（立ち絵） <b data-out="--spotlight">0.40</b></span>
-          <input type="range" min="0" max="1.6" step="0.05" value="0.4" data-var="--spotlight" />
-        </label>
-        <label class="ed__field">
-          <span class="ed__lab">全体のライト（上から） <b data-out="--arc-strength">0.90</b></span>
-          <input type="range" min="0" max="1.4" step="0.05" value="0.9" data-var="--arc-strength" />
-        </label>
-        <label class="ed__field">
-          <span class="ed__lab">縁の暗さ（黒トーン） <b data-out="--vignette">0.45</b></span>
-          <input type="range" min="0" max="0.85" step="0.05" value="0.45" data-var="--vignette" />
-        </label>
-        <label class="ed__field">
-          <span class="ed__lab">全体グロー <b data-out="--glow-strength">0.00</b></span>
-          <input type="range" min="0" max="1.8" step="0.05" value="0" data-var="--glow-strength" />
-        </label>
-        <div class="ed__btns">
-          <button class="ed__btn ed__btn--p" type="button" data-ed-copy>設定をコピー</button>
-          <button class="ed__btn" type="button" data-ed-reset>リセット</button>
-        </div>
-        <p class="ed__msg" data-ed-msg aria-live="polite"></p>
-      </div>
-    </aside>
+    <!-- 調整パネルは役目を終えたため撤去（調整値はCSS既定に焼き込み済み）。トーン切替はヘッダー右上ボタン／?form= で可能。 -->
 
     <div class="iconband" aria-hidden="true">
       <span class="iconband__i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2" /><path d="M14 2v2" /><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1" /><path d="M6 2v2" /></svg></span>
