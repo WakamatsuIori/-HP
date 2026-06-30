@@ -240,13 +240,26 @@ const nav = [
     font-display: swap;
   }
   :root {
-    --bg: #faf9f6;
-    --text: #423f38;
-    --muted: #6e6855; /* 二次テキスト：白/帯/地色いずれでもWCAG AA(4.5:1)以上を満たす濃さ */
-    --accent: #9c8f6b;        /* くすみ金：見出し装飾・大きいアクセント用 */
-    --accent-strong: #6f6444; /* 濃い金：本文リンク等の小さい文字用（白背景でAAコントラスト確保） */
-    --line: #e7e3d9;
-    --card: #ffffff;
+    /* ===== 黒×金（dark）本番トーン：没入トップ(index)と全サブページ共通の大元 ===== */
+    --bg: #14100b;            /* 地（焦茶黒） */
+    --bg-2: #1b140d;          /* 一段持ち上げた暗色サーフェス（フッター等） */
+    --text: #f3e7cf;          /* 本文（明るい生成り金） */
+    --ink-soft: rgba(243, 231, 207, 0.86);
+    --muted: #b8a888;         /* 二次テキスト：dark地でWCAG AA以上を満たす濃さ */
+    --accent: #c9a86a;        /* くすみ金：見出し装飾・大きいアクセント用 */
+    --accent-strong: #e8cf95; /* 明るい金：本文リンク等の小さい文字用（dark地でAAコントラスト確保） */
+    /* 没入トップが参照する金スケール別名（Base一元管理） */
+    --gold: #c9a86a;
+    --gold-strong: #e8cf95;
+    --gold-bright: #f0d99a;
+    --line: rgba(201, 168, 105, 0.22); /* 罫線＝金の細線 */
+    --card: #1b140d;          /* カード/ダイヤ型/アイコンの暗色サーフェス */
+    --card-bg: rgba(40, 30, 19, 0.5);
+    --card-line: rgba(201, 168, 105, 0.26);
+    --nav-bg: rgba(18, 13, 8, 0.62);   /* ガラス質ナビの半透明地 */
+    --nav-line: rgba(201, 168, 105, 0.3);
+    --glow: rgba(232, 207, 149, 0.4);
+    --glow-2: rgba(201, 168, 105, 0.5);
     /* レイアウト幅トークン（全画面寄せ：広いコンテナ＋長文だけ可読幅で据え置き） */
     --content: 1180px;       /* 標準コンテナ最大幅 */
     --content-wide: 1320px;  /* スケジュール等の特に広い帯 */
@@ -256,7 +269,7 @@ const nav = [
     --font-logo: 'Cinzel', var(--font-serif); /* 欧文ロゴ・英字ディスプレイ用（未読込時は明朝へ） */
   }
   * { box-sizing: border-box; }
-  html { color-scheme: light; overflow-x: clip; } /* 100vwのフルブリードで横スクロールを出さない（縦は保持） */
+  html { color-scheme: dark; overflow-x: clip; scroll-padding-top: 4rem; } /* dark=黒金トーン／横スクロール出さない／固定ナビ分のアンカー補正 */
 
   /* ===== 初回のみ スプラッシュ（屋号だけのタイトルカード） ===== */
   #splash {
@@ -317,7 +330,7 @@ const nav = [
   a { color: var(--accent-strong); }
 
   /* テキスト選択：既定の青ではなく、ブランドのくすみ金トーンで上品に */
-  ::selection { background: rgba(156, 143, 107, 0.28); color: var(--text); }
+  ::selection { background: rgba(201, 168, 105, 0.32); color: #fff8ec; }
 
   /* キーボード操作時のフォーカス表示（マウス操作には出ない）。
      金の細いリングで、世界観を崩さずアクセシビリティを担保。 */
@@ -363,13 +376,18 @@ const nav = [
   }
 
   .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 60;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.25rem 1rem;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--line);
-    background: var(--card);
+    padding: 0.7rem clamp(1rem, 4vw, 2.2rem);
+    border-bottom: 1px solid var(--nav-line);
+    background: var(--nav-bg);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    backdrop-filter: blur(16px) saturate(1.2);
   }
   .site-header .brand {
     font-family: var(--font-serif);
@@ -424,6 +442,7 @@ const nav = [
 
   .site-footer {
     border-top: 1px solid var(--line);
+    background: var(--bg-2);
     padding: 1.5rem 1rem 2.5rem;
     text-align: center;
     font-size: 0.85rem;
