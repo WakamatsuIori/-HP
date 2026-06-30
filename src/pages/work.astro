@@ -188,15 +188,20 @@ const subscribersText = subscriberCount != null ? `${subscriberCount.toLocaleStr
     color: var(--muted);
   }
 
-  /* フォーム */
+  /* フォーム：白い外部フォーム(Googleフォーム)を黒地で浮かせない＝ダークのマット＋金枠＋角丸で額装する */
   .form-wrap {
     margin-top: 1.25rem;
+    padding: 10px;
+    background: var(--bg-2);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
   }
   .form-wrap iframe {
     display: block;
     width: 100%;
-    border-radius: 8px;
-    border: 1px solid var(--line);
+    border-radius: 10px;
+    border: none;
   }
   .form-placeholder {
     margin-top: 1.25rem;

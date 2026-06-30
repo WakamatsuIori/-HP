@@ -1225,7 +1225,13 @@ try {
     font-weight: 500;
     letter-spacing: 0.1em;
     line-height: 1;
-    color: rgba(156, 143, 107, 0.55); /* 単色の金ウォーターマーク（可読性優先・箔グラデは廃止） */
+    color: var(--accent, #c9a86a); /* フォールバック */
+    /* 金箔の艶（黒地で映える縦グラデ）。SectionHead と統一 */
+    background: linear-gradient(180deg, var(--gold-strong, #e8cf95) 0%, var(--gold, #c9a86a) 52%, var(--gold-strong, #e8cf95) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0.85;
   }
 
   .sec-lead { text-align: center; margin: 0 auto 0.9rem; max-width: 34rem; line-height: 1.7; }

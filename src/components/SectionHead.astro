@@ -64,7 +64,13 @@ const gradId = `dl-gold-${kicker.replace(/[^a-zA-Z0-9]/g, '') || 'x'}`;
     font-weight: 500;
     letter-spacing: 0.1em;
     line-height: 1;
-    color: rgba(156, 143, 107, 0.55);
+    color: var(--accent, #c9a86a); /* background-clip 非対応時のフォールバック */
+    /* 金箔の艶：上が明るく中央が落ち着く縦グラデを文字に流し込む（黒地で映える） */
+    background: linear-gradient(180deg, var(--gold-strong, #e8cf95) 0%, var(--gold, #c9a86a) 52%, var(--gold-strong, #e8cf95) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0.85;
     clip-path: inset(0 100% 0 0);
     transition: clip-path 0.65s cubic-bezier(0.4, 0, 0.2, 1);
   }
