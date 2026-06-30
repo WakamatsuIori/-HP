@@ -125,44 +125,8 @@ const gradId = `dl-gold-${kicker.replace(/[^a-zA-Z0-9]/g, '') || 'x'}`;
     opacity: 1;
   }
 
-  /* ── 見出しの一字ずつ立ち上がり用：両モードで inline-block（refined は clip-path 演出のまま） ── */
+  /* 見出しの文字は一字ずつ span 化（clip-path リビールの土台）。inline-block で字形を保つ */
   .section-head h2 .ch { display: inline-block; }
-
-  /* ── 華やか版(?fx=dramatic)：見出しは一字ずつ立ち上がり、区切りに金スイープ ── */
-  html[data-fx='dramatic'] .section-head h2 {
-    clip-path: none;
-    transition: none;
-  }
-  html[data-fx='dramatic'] .section-head h2 .ch {
-    opacity: 0;
-    transform: translateY(0.6em);
-    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
-    transition-delay: calc(var(--ci, 0) * 0.045s);
-  }
-  html[data-fx='dramatic'] .section-head.is-visible h2 .ch {
-    opacity: 1;
-    transform: none;
-  }
-  html[data-fx='dramatic'] .section-divider-wrap {
-    display: inline-block;
-    position: relative;
-    overflow: hidden;
-  }
-  html[data-fx='dramatic'] .section-divider-wrap::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(90deg, transparent 35%, rgba(246, 232, 190, 0.9) 50%, transparent 65%);
-    transform: translateX(-130%);
-  }
-  html[data-fx='dramatic'] .section-head.is-visible .section-divider-wrap::after {
-    animation: dividerSweep 1.15s ease-out 0.6s 1 both;
-  }
-  @keyframes dividerSweep {
-    from { transform: translateX(-130%); }
-    to { transform: translateX(130%); }
-  }
 
   /* 動きを減らす設定のユーザーには即表示 */
   @media (prefers-reduced-motion: reduce) {
@@ -170,8 +134,6 @@ const gradId = `dl-gold-${kicker.replace(/[^a-zA-Z0-9]/g, '') || 'x'}`;
     .section-head h2 { clip-path: none; transition: none; }
     .dl { transition: none; stroke-dashoffset: 0; }
     .dl-center { transition: none; opacity: 1; }
-    html[data-fx='dramatic'] .section-head h2 .ch { opacity: 1; transform: none; transition: none; }
-    html[data-fx='dramatic'] .section-divider-wrap::after { display: none; }
   }
 </style>
 

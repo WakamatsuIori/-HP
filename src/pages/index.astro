@@ -91,14 +91,6 @@ try {
       <span class="spark"></span>
       <span class="spark"></span>
     </div>
-    {/* 華やか版(?fx=dramatic)だけの追加演出：金の靄・降る金粉・一閃の金スイープ。
-        refined では CSS で display:none（DOMは出すが描画コストを持たせない）。装飾なので aria-hidden。 */}
-    <div class="hero2__aura" aria-hidden="true"></div>
-    <div class="hero2__dust" aria-hidden="true">
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-    </div>
-    <span class="hero2__sweep" aria-hidden="true"></span>
     {/* 掛軸風の縦書きアクセント（装飾・デスクトップのみ。読み上げは主見出しがあるので除外） */}
     <p class="hero2__vertical" aria-hidden="true">和香松庵</p>
     <div class="hero2__content">
@@ -1173,26 +1165,6 @@ try {
     .lp-section--tint::before { animation: bokehDrift 22s ease-in-out infinite alternate; animation-play-state: paused; }
     .lp-section--tint.in-view::before { animation-play-state: running; }
   }
-  /* 華やか版(?fx=dramatic)：帯にもう一段、ごく淡い金のブロブをゆっくり漂わせる（in-viewのみ） */
-  html[data-fx='dramatic'] .lp-section--tint::after {
-    content: '';
-    position: absolute;
-    inset: -15%;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(30% 40% at 18% 30%, rgba(201, 168, 105, 0.1), transparent 60%),
-      radial-gradient(34% 44% at 82% 68%, rgba(232, 207, 149, 0.09), transparent 62%);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    html[data-fx='dramatic'] .lp-section--tint.in-view::after {
-      animation: tintBlob 26s ease-in-out infinite alternate;
-    }
-  }
-  @keyframes tintBlob {
-    from { transform: translate3d(0, 0, 0) scale(1); }
-    to { transform: translate3d(-3%, 2%, 0) scale(1.1); }
-  }
   /* 和あしらい（控えめ）：署名セクション SCHEDULE だけ、対角の隅に極薄のコーナー飾り。
      セクション背景画像として配置＝文字の背面・base色(#f3f0e7)は維持。全帯には付けない（過剰回避）。 */
   #schedule.lp-section--tint {
@@ -1319,111 +1291,6 @@ try {
     50% { opacity: 0.5; transform: scale(1); } /* 上品さ優先でピークを抑える */
   }
 
-  /* ===== 華やか版(?fx=dramatic) ヒーロー追加演出 ===== */
-  /* 既定(refined)では完全に非表示＝DOMは出すが描画コストを持たせない */
-  .hero2__aura,
-  .hero2__dust,
-  .hero2__sweep { display: none; }
-
-  /* 金の靄：ごく淡い金の光が screen で乗り、ゆっくり呼吸する */
-  html[data-fx='dramatic'] .hero2__aura {
-    display: block;
-    position: absolute;
-    inset: -12%;
-    z-index: 1;
-    pointer-events: none;
-    mix-blend-mode: screen;
-    background:
-      radial-gradient(38% 46% at 22% 30%, rgba(232, 207, 149, 0.55), transparent 60%),
-      radial-gradient(40% 50% at 80% 20%, rgba(201, 168, 105, 0.42), transparent 62%),
-      radial-gradient(48% 60% at 60% 92%, rgba(205, 161, 78, 0.30), transparent 66%);
-  }
-  /* 金粉：上から舞い落ちる小さな金の粒（CSSのみ・canvas不使用） */
-  html[data-fx='dramatic'] .hero2__dust {
-    display: block;
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    overflow: hidden;
-    pointer-events: none;
-  }
-  html[data-fx='dramatic'] .hero2__dust span {
-    position: absolute;
-    top: -6%;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(218, 182, 110, 1), rgba(190, 150, 80, 0) 64%);
-    box-shadow: 0 0 7px rgba(205, 161, 78, 0.6);
-    opacity: 0;
-  }
-  html[data-fx='dramatic'] .hero2__dust span:nth-child(1) { left: 8%; width: 5px; height: 5px; }
-  html[data-fx='dramatic'] .hero2__dust span:nth-child(2) { left: 19%; }
-  html[data-fx='dramatic'] .hero2__dust span:nth-child(3) { left: 31%; width: 4px; height: 4px; }
-  html[data-fx='dramatic'] .hero2__dust span:nth-child(4) { left: 43%; }
-  html[data-fx='dramatic'] .hero2__dust span:nth-child(5) { left: 55%; width: 7px; height: 7px; }
-  html[data-fx='dramatic'] .hero2__dust span:nth-child(6) { left: 64%; }
-  html[data-fx='dramatic'] .hero2__dust span:nth-child(7) { left: 73%; width: 4px; height: 4px; }
-  html[data-fx='dramatic'] .hero2__dust span:nth-child(8) { left: 82%; }
-  html[data-fx='dramatic'] .hero2__dust span:nth-child(9) { left: 90%; width: 5px; height: 5px; }
-  html[data-fx='dramatic'] .hero2__dust span:nth-child(10) { left: 97%; }
-  /* 一閃：読み込み時に金の光が一度だけ斜めに走る（無限ループにしない＝INP配慮） */
-  html[data-fx='dramatic'] .hero2__sweep {
-    display: block;
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    background: linear-gradient(105deg, transparent 40%, rgba(244, 230, 190, 0.5) 50%, transparent 60%);
-    transform: translateX(-130%);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    html[data-fx='dramatic'] .hero2.in-view .hero2__aura {
-      animation: heroAura 17s ease-in-out infinite alternate;
-    }
-    html[data-fx='dramatic'] .hero2.in-view .hero2__dust span {
-      animation: heroDust linear infinite;
-    }
-    html[data-fx='dramatic'] .hero2__dust span:nth-child(1) { animation-duration: 7.5s; animation-delay: 0s; }
-    html[data-fx='dramatic'] .hero2__dust span:nth-child(2) { animation-duration: 9s; animation-delay: 1.2s; }
-    html[data-fx='dramatic'] .hero2__dust span:nth-child(3) { animation-duration: 6.5s; animation-delay: 2.4s; }
-    html[data-fx='dramatic'] .hero2__dust span:nth-child(4) { animation-duration: 10s; animation-delay: 0.6s; }
-    html[data-fx='dramatic'] .hero2__dust span:nth-child(5) { animation-duration: 8s; animation-delay: 3.1s; }
-    html[data-fx='dramatic'] .hero2__dust span:nth-child(6) { animation-duration: 11s; animation-delay: 1.8s; }
-    html[data-fx='dramatic'] .hero2__dust span:nth-child(7) { animation-duration: 7s; animation-delay: 4s; }
-    html[data-fx='dramatic'] .hero2__dust span:nth-child(8) { animation-duration: 9.5s; animation-delay: 2.7s; }
-    html[data-fx='dramatic'] .hero2__dust span:nth-child(9) { animation-duration: 6.8s; animation-delay: 5s; }
-    html[data-fx='dramatic'] .hero2__dust span:nth-child(10) { animation-duration: 10.5s; animation-delay: 3.6s; }
-    html[data-fx='dramatic'] .hero2__sweep { animation: heroSweep 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.5s 1 both; }
-  }
-  @keyframes heroAura {
-    from { transform: translate3d(0, 0, 0) scale(1); }
-    to { transform: translate3d(2.2%, -1.6%, 0) scale(1.06); }
-  }
-  @keyframes heroDust {
-    0% { transform: translateY(-10%) translateX(0) scale(0.7); opacity: 0; }
-    12% { opacity: 1; }
-    88% { opacity: 0.85; }
-    100% { transform: translateY(680px) translateX(16px) scale(1); opacity: 0; }
-  }
-  @keyframes heroSweep {
-    from { transform: translateX(-130%); }
-    to { transform: translateX(130%); }
-  }
-
-  /* モバイルは静止画寄せ（憲法§6）：重い演出は出さない */
-  @media (max-width: 640px) {
-    html[data-fx='dramatic'] .hero2__aura,
-    html[data-fx='dramatic'] .hero2__dust,
-    html[data-fx='dramatic'] .hero2__sweep { display: none; }
-  }
-  /* 動きが苦手な設定：金粉と一閃は出さず、靄は静止させる */
-  @media (prefers-reduced-motion: reduce) {
-    html[data-fx='dramatic'] .hero2__dust,
-    html[data-fx='dramatic'] .hero2__sweep { display: none; }
-    html[data-fx='dramatic'] .hero2__aura { animation: none; }
-  }
 </style>
 
 <script>

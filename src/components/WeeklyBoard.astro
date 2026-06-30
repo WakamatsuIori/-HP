@@ -198,24 +198,4 @@ const {
   @media (max-width: 480px) {
     .wb__name { max-width: 48%; }
   }
-
-  /* 華やか版(?fx=dramatic)：ボード出現時に金の光が一度だけ横切る（親 .sched-grid.is-visible から発火） */
-  html[data-fx='dramatic'] .wb::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-    background: linear-gradient(105deg, transparent 42%, rgba(246, 232, 190, 0.35) 50%, transparent 58%);
-    transform: translateX(-130%);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    html[data-fx='dramatic'] :global(.sched-grid.is-visible) .wb::after {
-      animation: wbSweep 1.4s ease-out 0.5s 1 both;
-    }
-  }
-  @keyframes wbSweep {
-    from { transform: translateX(-130%); }
-    to { transform: translateX(130%); }
-  }
 </style>
