@@ -3,6 +3,7 @@ import {
   validateContact,
   looksLikeEmail,
   sanitizeForDiscord,
+  sheetSafe,
   buildDiscordMessage,
   buildSheetRow,
   CONTACT_SUBJECTS,
@@ -110,5 +111,25 @@ describe('buildSheetRow / buildDiscordMessage', () => {
     expect(msg).toContain('i@e.com');
     expect(msg).toContain('テスト');
     expect(msg).toContain(iso);
+  });
+});
+
+describe('sheetSafe（数式インジェクション対策）', () => {
+  it('先頭が = + - @ の値は ' + "'" + ' を前置する', () => {
+    expect(sheetSafe('=1+1')).toBe("'=1+1");
+    expect(sheetSafe('+123')).toBe("'+123");
+    expect(sheetSafe('-500')).toBe("'-500");
+    expect(sheetSafe('@user')).toBe("'@user");
+    expect(sheetSafe('=IMPORTXML("http://x","//a")')).toMatch(/^'/);
+  });
+  it('通常の文字列はそのまま', () => {
+    expect(sheetSafe('和香松 庵')).toBe('和香松 庵');
+    expect(sheetSafe('コラボのご相談')).toBe('コラボのご相談');
+  });
+  it('buildSheetRow は危険な先頭文字を無害化して1行にする', () => {
+    const bad: ValidatedContact = { name: '=cmd', email: 'i@e.com', subject: 'その他', message: '+9' };
+    const row = buildSheetRow(bad, '2026-07-01T00:00:00.000Z');
+    expect(row[2]).toBe("'=cmd");
+    expect(row[4]).toBe("'+9");
   });
 });

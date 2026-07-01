@@ -81,7 +81,16 @@ export function buildDiscordMessage(c: ValidatedContact, isoTime: string): strin
   ].join('\n');
 }
 
+/**
+ * スプレッドシートの数式インジェクション対策：先頭が = + - @ タブ/改行 で始まる値は
+ * ' を前置して「文字列」に固定する（本人がセルを再編集しても数式化しない）。
+ * 追記は RAW モード（google.ts）で入れる前提だが、二重の安全策として無害化しておく。
+ */
+export function sheetSafe(v: string): string {
+  return /^[=+\-@\t\r]/.test(v) ? "'" + v : v;
+}
+
 /** スプレッドシート追記用の1行（列順：日時 / 用件 / 名前 / メール / 内容）。 */
 export function buildSheetRow(c: ValidatedContact, isoTime: string): string[] {
-  return [isoTime, c.subject, c.name, c.email, c.message];
+  return [isoTime, sheetSafe(c.subject), sheetSafe(c.name), sheetSafe(c.email), sheetSafe(c.message)];
 }

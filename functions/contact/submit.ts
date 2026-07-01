@@ -98,6 +98,8 @@ export async function onRequestPost(ctx: Ctx): Promise<Response> {
 
   const isoTime = new Date().toISOString();
 
+  // スパム対策の砦は Turnstile＋ハニーポット＋Origin。将来、連投がひどければ
+  // KV による IP/日次のレート上限（interactions.ts の SCHED_KV 方式）を足す余地あり（現状は未実装）。
   // 届け先（両方あれば両方へ。少なくとも1つ成功すれば受理＝取りこぼしを避ける）
   const tasks: Promise<boolean>[] = [];
 
@@ -111,8 +113,14 @@ export async function onRequestPost(ctx: Ctx): Promise<Response> {
           allowed_mentions: { parse: [] }, // @everyone/@here 等を無効化
         }),
       })
-        .then((r) => r.ok)
-        .catch(() => false),
+        .then((r) => {
+          if (!r.ok) console.warn('[contact] Discord webhook 応答異常:', r.status);
+          return r.ok;
+        })
+        .catch((e) => {
+          console.error('[contact] Discord送信に失敗:', e instanceof Error ? e.message : e);
+          return false;
+        }),
     );
   }
 
@@ -121,13 +129,15 @@ export async function onRequestPost(ctx: Ctx): Promise<Response> {
       (async () => {
         try {
           const at = await getAccessToken(
-            { clientEmail: env.GOOGLE_SA_EMAIL!, privateKey: env.GOOGLE_SA_PRIVATE_KEY! },
+            // 秘密鍵は1行env(\nエスケープ)で保存されるため実改行へ戻す（既存Calendar連携と同じ作法）
+            { clientEmail: env.GOOGLE_SA_EMAIL!, privateKey: env.GOOGLE_SA_PRIVATE_KEY!.replace(/\\n/g, '\n') },
             Math.floor(Date.now() / 1000),
             'https://www.googleapis.com/auth/spreadsheets',
           );
           await appendSheetRow(at, env.CONTACT_SHEET_ID!, 'A1', buildSheetRow(v.value, isoTime));
           return true;
-        } catch {
+        } catch (e) {
+          console.error('[contact] スプレッドシート追記に失敗:', e instanceof Error ? e.message : e);
           return false;
         }
       })(),
