@@ -40,15 +40,10 @@ const ready = SITE_KEY.length > 0;
     <label>ウェブサイト<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
   </div>
 
-  {
-    ready ? (
-      <div class="cf-turnstile" data-sitekey={SITE_KEY} data-theme="dark" data-language="ja" />
-    ) : (
-      <p class="iform__note">※ フォームは設定準備中です。お急ぎの場合は各SNSへご連絡ください。</p>
-    )
-  }
+  {/* Turnstile はサイトキーがある時だけ表示（無ければ素の送信＝ハニーポット等で防御） */}
+  {ready && <div class="cf-turnstile" data-sitekey={SITE_KEY} data-theme="dark" data-language="ja" />}
 
-  <button class="iform__send" type="submit" disabled={!ready}>送信する</button>
+  <button class="iform__send" type="submit">送信する</button>
   <p class="iform__msg" data-msg role="status" aria-live="polite"></p>
 </form>
 

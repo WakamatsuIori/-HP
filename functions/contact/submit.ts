@@ -88,12 +88,14 @@ export async function onRequestPost(ctx: Ctx): Promise<Response> {
     return json({ ok: false, message: v.message }, 400);
   }
 
-  // Turnstile 検証（未設定＝準備中）
-  if (!env.TURNSTILE_SECRET_KEY) return json({ ok: false, message: 'フォームは設定準備中です。' }, 503);
-  const token = raw['cf-turnstile-response'] || '';
-  const ip = request.headers.get('cf-connecting-ip');
-  if (!token || !(await verifyTurnstile(env.TURNSTILE_SECRET_KEY, token, ip))) {
-    return json({ ok: false, message: '確認に失敗しました。ページを再読み込みしてお試しください。' }, 400);
+  // Turnstile 検証（設定されている時だけ実施）。未設定ならスキップ＝ハニーポット＋Origin＋入力検証で受理。
+  // 後日 TURNSTILE_SECRET_KEY を入れれば自動で有効化される（スパムが増えたら追加する想定）。
+  if (env.TURNSTILE_SECRET_KEY) {
+    const token = raw['cf-turnstile-response'] || '';
+    const ip = request.headers.get('cf-connecting-ip');
+    if (!token || !(await verifyTurnstile(env.TURNSTILE_SECRET_KEY, token, ip))) {
+      return json({ ok: false, message: '確認に失敗しました。ページを再読み込みしてお試しください。' }, 400);
+    }
   }
 
   const isoTime = new Date().toISOString();
