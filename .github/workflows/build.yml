@@ -49,6 +49,8 @@ jobs:
         env:
           ICS_URL: ${{ secrets.ICS_URL }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          # 問い合わせフォームのTurnstileサイトキー（公開値・HTMLに埋め込む）。未設定ならフォームは「準備中」表示。
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.PUBLIC_TURNSTILE_SITE_KEY }}
 
       - name: Cloudflare Pagesプロジェクトを用意（初回のみ作成・既存ならスキップ）
         run: npx wrangler@3 pages project create ${{ env.PAGES_PROJECT_NAME }} --production-branch=main || echo "プロジェクトは既に存在します（スキップ）"

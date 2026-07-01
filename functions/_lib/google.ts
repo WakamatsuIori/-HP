@@ -33,12 +33,16 @@ export interface ServiceAccount {
 }
 
 /** JWTを作成し、トークンエンドポイントでアクセストークンに交換する */
-export async function getAccessToken(sa: ServiceAccount, nowSec: number): Promise<string> {
+export async function getAccessToken(
+  sa: ServiceAccount,
+  nowSec: number,
+  scope = 'https://www.googleapis.com/auth/calendar.events',
+): Promise<string> {
   const header = b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
   const claims = b64url(
     JSON.stringify({
       iss: sa.clientEmail,
-      scope: 'https://www.googleapis.com/auth/calendar.events',
+      scope,
       aud: 'https://oauth2.googleapis.com/token',
       iat: nowSec,
       exp: nowSec + 3600,
@@ -137,4 +141,26 @@ export async function deleteEvent(token: string, calendarId: string, eventId: st
   if (!res.ok && res.status !== 410 && res.status !== 404) {
     throw new Error(`予定の削除に失敗: ${res.status} ${await res.text()}`);
   }
+}
+
+/**
+ * Google スプレッドシートの指定シートに1行追記する（values.append）。
+ * サービスアカウント(clientEmail)にそのシートの編集権限が必要（＝シートを共有しておく）。
+ * getAccessToken には scope に 'https://www.googleapis.com/auth/spreadsheets' を渡すこと。
+ */
+export async function appendSheetRow(
+  token: string,
+  spreadsheetId: string,
+  range: string,
+  row: (string | number)[],
+): Promise<void> {
+  const url =
+    `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}` +
+    `/values/${encodeURIComponent(range)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ values: [row] }),
+  });
+  if (!res.ok) throw new Error(`シート追記に失敗: ${res.status} ${await res.text()}`);
 }

@@ -1,0 +1,203 @@
+---
+/**
+ * 独自お問い合わせフォーム（黒×金）。トップ #work と /work で共用。
+ * 送信は Cloudflare Pages Function `/contact/submit` へ fetch POST（画面遷移なし）。
+ * スパム対策：隠しハニーポット（website）＋ Cloudflare Turnstile。
+ *
+ * Turnstile サイトキーはビルド時の公開環境変数 PUBLIC_TURNSTILE_SITE_KEY から埋め込む
+ * （PUBLIC_ 接頭辞＝Astroが import.meta.env に露出する公開値。サイトキーは公開情報）。
+ * 未設定ならフォームは「準備中」表示にして送信不可（＝キー投入前でもビルドは通る）。
+ */
+const SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '';
+const ready = SITE_KEY.length > 0;
+---
+
+<form class="iform" data-contact novalidate>
+  <label class="iform__field">
+    <span>お名前 / 会社名</span>
+    <input type="text" name="name" required maxlength="100" autocomplete="name" placeholder="例：〇〇株式会社 ご担当者様" />
+  </label>
+  <label class="iform__field">
+    <span>メールアドレス</span>
+    <input type="email" name="email" required maxlength="200" autocomplete="email" placeholder="you@example.com" />
+  </label>
+  <label class="iform__field">
+    <span>ご用件</span>
+    <select name="subject" required>
+      <option value="コラボのご相談">コラボのご相談</option>
+      <option value="企業案件・PR">企業案件・PR</option>
+      <option value="取材・出演">取材・出演</option>
+      <option value="その他">その他</option>
+    </select>
+  </label>
+  <label class="iform__field">
+    <span>内容</span>
+    <textarea name="message" required rows="5" maxlength="4000" placeholder="ご相談内容をご記入ください"></textarea>
+  </label>
+
+  {/* ハニーポット：画面外に隠す。人間は触れず、ボットが埋めるとサーバー側で弾く */}
+  <div class="iform__hp" aria-hidden="true">
+    <label>ウェブサイト<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+  </div>
+
+  {
+    ready ? (
+      <div class="cf-turnstile" data-sitekey={SITE_KEY} data-theme="dark" data-language="ja" />
+    ) : (
+      <p class="iform__note">※ フォームは設定準備中です。お急ぎの場合は各SNSへご連絡ください。</p>
+    )
+  }
+
+  <button class="iform__send" type="submit" disabled={!ready}>送信する</button>
+  <p class="iform__msg" data-msg role="status" aria-live="polite"></p>
+</form>
+
+{ready && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />}
+
+<script>
+  // 送信：/contact/submit へ FormData を POST。成功で「ありがとうございました」を表示。
+  document.querySelectorAll<HTMLFormElement>('form[data-contact]').forEach((form) => {
+    const msg = form.querySelector<HTMLElement>('[data-msg]');
+    const btn = form.querySelector<HTMLButtonElement>('.iform__send');
+    const setMsg = (text: string, cls: string) => {
+      if (msg) {
+        msg.textContent = text;
+        msg.className = 'iform__msg' + (cls ? ' ' + cls : '');
+      }
+    };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!btn || btn.disabled) return;
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      setMsg('', '');
+      btn.disabled = true;
+      const orig = btn.textContent;
+      btn.textContent = '送信中…';
+      try {
+        const res = await fetch('/contact/submit', { method: 'POST', body: new FormData(form) });
+        const data = (await res.json().catch(() => ({}))) as { ok?: boolean; message?: string };
+        if (res.ok && data.ok) {
+          form.reset();
+          setMsg('お問い合わせありがとうございました。確認のうえご返信いたします。', 'is-ok');
+        } else {
+          setMsg(data.message || '送信に失敗しました。時間をおいてお試しください。', 'is-err');
+        }
+      } catch {
+        setMsg('通信エラーです。時間をおいてお試しください。', 'is-err');
+      } finally {
+        // Turnstile はトークンを1回使うとリセットが要る
+        (window as unknown as { turnstile?: { reset?: () => void } }).turnstile?.reset?.();
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
+    });
+  });
+</script>
+
+<style>
+  /* 自作フォーム（黒×金）。トップと /work で共通。--ink は使わず Base の --text を使う */
+  .iform {
+    max-width: 560px;
+    margin: 0 auto;
+    display: grid;
+    gap: 1rem;
+  }
+  .iform__field {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .iform__field > span {
+    font-size: 0.82rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .iform__field input,
+  .iform__field select,
+  .iform__field textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 0.98rem;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    padding: 0.7rem 0.85rem;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+  .iform__field input::placeholder,
+  .iform__field textarea::placeholder {
+    color: rgba(184, 168, 136, 0.55);
+  }
+  .iform__field input:focus,
+  .iform__field select:focus,
+  .iform__field textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .iform__field textarea {
+    resize: vertical;
+  }
+  .iform__field select option {
+    color: #14100b;
+  }
+
+  /* ハニーポット：視覚・スクリーンリーダーから隠す（display:none は避ける＝一部ボットが無視するため） */
+  .iform__hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .cf-turnstile {
+    margin: 0.1rem 0;
+  }
+
+  .iform__send {
+    justify-self: start;
+    padding: 0.85rem 2.1rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+    background: var(--gold-strong);
+    color: var(--bg);
+    transition: transform 0.18s ease, opacity 0.18s ease;
+  }
+  .iform__send:hover {
+    transform: translateY(-2px);
+  }
+  .iform__send:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .iform__send {
+      transition: none;
+    }
+  }
+  .iform__note {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin: 0;
+  }
+  .iform__msg {
+    font-size: 0.86rem;
+    margin: 0;
+    min-height: 1.2em;
+    line-height: 1.5;
+  }
+  .iform__msg.is-ok {
+    color: #9bc77f;
+  }
+  .iform__msg.is-err {
+    color: #e79a8f;
+  }
+</style>

@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import ContactForm from '../components/ContactForm.astro';
 import { Image } from 'astro:assets';
 import { site } from '../config/site';
 import { loadSchedule } from '../lib/loadSchedule';
@@ -359,16 +360,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
     <div class="isec__inner isec__inner--narrow">
       <div class="ihead reveal"><p class="ihead__kicker">CONTACT</p><span class="ihead__rule" aria-hidden="true"></span></div>
       <p class="isec__lead reveal">コラボ・企業案件などのご相談を受け付けています。下記フォームよりお気軽にどうぞ。</p>
-      <form class="iform reveal">
-        <label class="iform__field"><span>お名前 / 会社名</span><input type="text" placeholder="例：〇〇株式会社 ご担当者様" /></label>
-        <label class="iform__field"><span>メールアドレス</span><input type="email" placeholder="you@example.com" /></label>
-        <label class="iform__field"><span>ご用件</span>
-          <select><option>コラボのご相談</option><option>企業案件・PR</option><option>取材・出演</option><option>その他</option></select>
-        </label>
-        <label class="iform__field"><span>内容</span><textarea rows="5" placeholder="ご相談内容をご記入ください"></textarea></label>
-        <button class="iform__send" type="button">送信する</button>
-        <p class="iform__note">※これは見た目のプレビューです。送信の繋ぎ（メール / Discord 等）は後で決めます。</p>
-      </form>
+      <div class="reveal"><ContactForm /></div>
     </div>
   </section>
 </Base>
@@ -931,22 +923,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
   .iguide__block p { margin: 0; color: var(--ink-soft); font-size: 0.95rem; line-height: 1.75; }
   .iguide__block a { color: var(--gold-strong); }
 
-  /* CONTACT（自作フォーム・黒×金） */
-  .iform { max-width: 560px; margin: 0 auto; display: grid; gap: 1rem; }
-  .iform__field { display: grid; gap: 0.35rem; }
-  .iform__field > span { font-size: 0.82rem; color: var(--muted); letter-spacing: 0.04em; }
-  .iform__field input, .iform__field select, .iform__field textarea {
-    width: 100%; font: inherit; font-size: 0.98rem; color: var(--ink);
-    background: rgba(255, 255, 255, 0.04); border: 1px solid var(--card-line); border-radius: 10px;
-    padding: 0.7rem 0.85rem; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-  }
-  .iform__field input::placeholder, .iform__field textarea::placeholder { color: rgba(184, 168, 136, 0.55); }
-  .iform__field input:focus, .iform__field select:focus, .iform__field textarea:focus { outline: none; border-color: var(--gold); }
-  .iform__field textarea { resize: vertical; }
-  .iform__field select option { color: #14100b; }
-  .iform__send { justify-self: start; padding: 0.85rem 2.1rem; border-radius: 999px; border: none; cursor: pointer; font: inherit; font-weight: 600; background: var(--gold-strong); color: var(--bg); transition: transform 0.18s ease; }
-  .iform__send:hover { transform: translateY(-2px); }
-  .iform__note { font-size: 0.78rem; color: var(--muted); margin: 0; }
+  /* CONTACT フォームは components/ContactForm.astro に集約（.iform* はそちらのスコープCSS） */
 
   /* ===== 奥行き演出（黒地に光のプール／立ち絵の浮かび上がり） ===== */
   .iprofile__art, .iabout__art { position: relative; }

@@ -1,11 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
+import ContactForm from '../components/ContactForm.astro';
 import { site } from '../config/site';
 import { loadChannelStats } from '../lib/loadVideos';
-
-// Googleフォームの埋め込みURL。作成手順: docs/setup/07-contact-form.md
-// 形式: https://docs.google.com/forms/d/e/〇〇/viewform?embedded=true
-const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdV7Q2d-qkEJYaD11tSFmCIget_amkYShhPh44HAhBd4rU1ew/viewform?embedded=true';
 
 // YouTube登録者数を自動取得（最新値）。取得失敗・非公開時は行を出さない＝お仕事ページは落とさない。
 let subscriberCount: number | null = null;
@@ -75,25 +72,7 @@ const subscribersText = subscriberCount != null ? `${subscriberCount.toLocaleStr
   </div>
 
   <h2>お問い合わせ</h2>
-  {FORM_URL ? (
-    <div class="form-wrap">
-      <iframe
-        src={FORM_URL}
-        width="100%"
-        height="1397"
-        frameborder="0"
-        marginheight="0"
-        marginwidth="0"
-        title="お問い合わせフォーム"
-        loading="lazy"
-      >読み込んでいます…</iframe>
-    </div>
-  ) : (
-    <div class="form-placeholder">
-      <p>現在フォームを準備中です。</p>
-      <p>お急ぎの場合は <a href={site.links.x} rel="me noopener" target="_blank">X の DM</a> にてご連絡ください。</p>
-    </div>
-  )}
+  <div class="contact-wrap"><ContactForm /></div>
 
   <aside class="work-note">
     <p>
@@ -188,32 +167,8 @@ const subscribersText = subscriberCount != null ? `${subscriberCount.toLocaleStr
     color: var(--muted);
   }
 
-  /* フォーム：白い外部フォーム(Googleフォーム)を黒地で浮かせない＝ダークのマット＋金枠＋角丸で額装する */
-  .form-wrap {
-    margin-top: 1.25rem;
-    padding: 10px;
-    background: var(--bg-2);
-    border: 1px solid var(--card-line);
-    border-radius: 16px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-  }
-  .form-wrap iframe {
-    display: block;
-    width: 100%;
-    border-radius: 10px;
-    border: none;
-  }
-  .form-placeholder {
-    margin-top: 1.25rem;
-    padding: 1.75rem 1.5rem;
-    background: var(--card);
-    border: 1px dashed var(--line);
-    border-radius: 8px;
-    text-align: center;
-    color: var(--muted);
-    line-height: 2;
-  }
-  .form-placeholder p { margin: 0.25rem 0; }
+  /* フォームは components/ContactForm.astro（独自・黒×金）。見出し直後に少し余白を取る */
+  .contact-wrap { margin-top: 1.25rem; }
 
   /* 注記 */
   .work-note {
