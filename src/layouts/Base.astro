@@ -146,7 +146,10 @@ const nav = [
     </div>
     <header class="site-header">
       <a class="brand" href="/">{site.name}</a>
-      <nav aria-label="メインメニュー">
+      <button class="nav-burger" type="button" aria-label="メニューを開閉" aria-expanded="false" aria-controls="site-nav">
+        <span></span><span></span><span></span>
+      </button>
+      <nav aria-label="メインメニュー" id="site-nav">
         <ul>
           {nav.map((item) => (
             <li>
@@ -368,7 +371,6 @@ const nav = [
     top: 0;
     z-index: 60;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: 0.25rem 1rem;
     padding: 0.7rem clamp(1rem, 4vw, 2.2rem);
@@ -377,6 +379,8 @@ const nav = [
     -webkit-backdrop-filter: blur(16px) saturate(1.2);
     backdrop-filter: blur(16px) saturate(1.2);
   }
+  .site-header nav { margin-left: auto; } /* ナビを右寄せ（PC） */
+  .nav-burger { display: none; } /* ハンバーガーはPCでは隠す */
   .site-header .brand {
     font-family: var(--font-serif);
     font-size: 1.15rem;
@@ -422,12 +426,67 @@ const nav = [
   @media (prefers-reduced-motion: reduce) {
     .site-header nav a::after { transition: none; }
   }
-  /* スマホはタップ領域を最低44px相当まで広げる（誤タップ防止・WCAG 2.5.5） */
   @media (max-width: 640px) {
     /* モバイルは blur を軽め（GPU負荷を抑える） */
     .site-header { -webkit-backdrop-filter: blur(8px) saturate(1.2); backdrop-filter: blur(8px) saturate(1.2); }
-    .site-header nav a { padding-block: 0.62rem; }
-    .site-header nav a::after { bottom: 0.42rem; }
+  }
+  /* ===== ハンバーガーメニュー（スマホ：≤720px でナビを畳んでタップ開閉に） ===== */
+  @media (max-width: 720px) {
+    .nav-burger {
+      display: inline-grid;
+      gap: 4px;
+      place-content: center;
+      width: 42px;
+      height: 36px;
+      margin-left: auto;
+      padding: 0 9px;
+      background: transparent;
+      border: 1px solid var(--nav-line);
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .nav-burger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--accent-strong);
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.2s ease;
+    }
+    .site-header.nav-open .nav-burger span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .site-header.nav-open .nav-burger span:nth-child(2) { opacity: 0; }
+    .site-header.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    /* ナビはドロップダウン化（閉じ時は隠す） */
+    .site-header nav {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-left: 0;
+      background: var(--nav-bg);
+      -webkit-backdrop-filter: blur(10px) saturate(1.2);
+      backdrop-filter: blur(10px) saturate(1.2);
+      border-bottom: 1px solid var(--nav-line);
+      display: none;
+    }
+    .site-header.nav-open nav { display: block; }
+    .site-header nav ul {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      padding: 0.2rem clamp(1rem, 4vw, 2.2rem) 0.7rem;
+    }
+    .site-header nav a {
+      display: block;
+      padding: 0.85rem 0.15rem;
+      font-size: 1rem;
+      border-top: 1px solid var(--nav-line);
+    }
+    .site-header nav li:first-child a { border-top: 0; }
+    .site-header nav a::after { display: none; } /* ドロップダウンでは下線リビール不要 */
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-burger span { transition: none; }
   }
 
   .site-footer {
@@ -591,4 +650,33 @@ const nav = [
     { threshold: 0.1 }
   );
   document.querySelectorAll('.stagger-list').forEach((el) => staggerObs.observe(el));
+
+  // ハンバーガーメニュー（スマホ）：開閉・リンクで閉じる・外側/Escで閉じる
+  (function () {
+    const header = document.querySelector<HTMLElement>('.site-header');
+    const burger = header?.querySelector<HTMLElement>('.nav-burger');
+    const nav = header?.querySelector<HTMLElement>('nav');
+    if (!header || !burger || !nav) return;
+    const setOpen = (open: boolean) => {
+      header.classList.toggle('nav-open', open);
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+    burger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setOpen(!header.classList.contains('nav-open'));
+    });
+    nav.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest('a')) setOpen(false);
+    });
+    document.addEventListener('click', (e) => {
+      if (header.classList.contains('nav-open') && !header.contains(e.target as Node)) setOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && header.classList.contains('nav-open')) {
+        setOpen(false);
+        burger.focus();
+      }
+    });
+  })();
 </script>
