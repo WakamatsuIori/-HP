@@ -109,7 +109,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
   <section class="isec isec--alt" id="profile">
     <div class="isec__inner">
       <div class="ihead reveal">
-        <p class="ihead__kicker">PROFILE</p>
+        <h2 class="ihead__kicker">PROFILE</h2>
         <span class="ihead__rule" aria-hidden="true"></span>
       </div>
       <div class="iprofile reveal">
@@ -170,7 +170,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
   <section class="isec" id="schedule">
     <div class="isec__inner">
       <div class="ihead reveal">
-        <p class="ihead__kicker">SCHEDULE</p>
+        <h2 class="ihead__kicker">SCHEDULE</h2>
         <p class="ihead__title">今週の品書き</p>
         <span class="ihead__rule" aria-hidden="true"></span>
       </div>
@@ -206,7 +206,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
     pickList.length > 0 && (
       <section class="isec isec--alt" id="pickup">
         <div class="isec__inner">
-          <div class="ihead reveal"><p class="ihead__kicker">PICK UP</p><p class="ihead__title">おすすめ</p><span class="ihead__rule" aria-hidden="true"></span></div>
+          <div class="ihead reveal"><h2 class="ihead__kicker">PICK UP</h2><p class="ihead__title">おすすめ</p><span class="ihead__rule" aria-hidden="true"></span></div>
           <p class="isec__lead reveal">いま観てほしい配信をピックアップ。</p>
           <div class="ipick reveal">
             {pickList.map((v, i) => (
@@ -231,7 +231,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
   {/* ===== VIDEO（最新動画）：オートスクロールのフィルムリール ===== */}
   <section class="isec" id="videos">
     <div class="isec__inner">
-      <div class="ihead reveal"><p class="ihead__kicker">VIDEO</p><p class="ihead__title">最新動画</p><span class="ihead__rule" aria-hidden="true"></span></div>
+      <div class="ihead reveal"><h2 class="ihead__kicker">VIDEO</h2><p class="ihead__title">最新動画</p><span class="ihead__rule" aria-hidden="true"></span></div>
       <p class="isec__lead reveal">最新の配信アーカイブはこちら。公開後はここに自動で並びます。</p>
       {
         reelList.length > 0 ? (
@@ -271,7 +271,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
   {/* ===== INFORMATION（お知らせ） ===== */}
   <section class="isec isec--alt" id="information">
     <div class="isec__inner">
-      <div class="ihead reveal"><p class="ihead__kicker">INFORMATION</p><span class="ihead__rule" aria-hidden="true"></span></div>
+      <div class="ihead reveal"><h2 class="ihead__kicker">INFORMATION</h2><span class="ihead__rule" aria-hidden="true"></span></div>
       <div class="inews reveal">
         {
           information.slice(0, 3).map((item) => {
@@ -296,7 +296,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
   {/* ===== GALLERY（準備中） ===== */}
   <section class="isec" id="gallery">
     <div class="isec__inner">
-      <div class="ihead reveal"><p class="ihead__kicker">GALLERY</p><p class="ihead__title">ギャラリー</p><span class="ihead__rule" aria-hidden="true"></span></div>
+      <div class="ihead reveal"><h2 class="ihead__kicker">GALLERY</h2><p class="ihead__title">ギャラリー</p><span class="ihead__rule" aria-hidden="true"></span></div>
       <p class="isec__lead reveal">わたしの色んな姿や、みんなが描いてくれたファンアートをご紹介！</p>
       <div class="igallery-soon reveal">Coming soon …</div>
     </div>
@@ -305,7 +305,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
   {/* ===== STORE（カーソル追従スポットライト付き） ===== */}
   <section class="isec isec--alt" id="goods">
     <div class="isec__inner">
-      <div class="ihead reveal"><p class="ihead__kicker">STORE</p><span class="ihead__rule" aria-hidden="true"></span></div>
+      <div class="ihead reveal"><h2 class="ihead__kicker">STORE</h2><span class="ihead__rule" aria-hidden="true"></span></div>
       <p class="isec__lead reveal"><span class="nb">配信に使える自作の OBS ウィジェットなどを BOOTH で販売中。</span><wbr /><span class="nb">オリジナルグッズも順次追加していきます。</span></p>
       <div class="ispot reveal" data-spot>
         <a class="istore" href={site.links.booth} target="_blank" rel="me noopener" aria-label="BOOTHストアを見る">
@@ -320,7 +320,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
   {/* ===== FOLLOW（アイコン入りカード） ===== */}
   <section class="isec" id="follow">
     <div class="isec__inner">
-      <div class="ihead reveal"><p class="ihead__kicker">FOLLOW</p><span class="ihead__rule" aria-hidden="true"></span></div>
+      <div class="ihead reveal"><h2 class="ihead__kicker">FOLLOW</h2><span class="ihead__rule" aria-hidden="true"></span></div>
       <p class="isec__lead reveal"><span class="nb">配信のお知らせや日常は各SNSで。</span><wbr /><span class="nb">フォロー・チャンネル登録で応援よろしくお願いします。</span></p>
       <div class="ifollow reveal">
         <a class="ifollow__card ifollow--yt" href={site.links.youtube} target="_blank" rel="me noopener"><span class="ifollow__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></span><span class="ifollow__label">YouTube</span><span class="ifollow__sub">配信・アーカイブ</span></a>
@@ -333,7 +333,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
   {/* ===== GUIDELINE ===== */}
   <section class="isec isec--alt" id="guideline">
     <div class="isec__inner">
-      <div class="ihead reveal"><p class="ihead__kicker">GUIDELINE</p><span class="ihead__rule" aria-hidden="true"></span></div>
+      <div class="ihead reveal"><h2 class="ihead__kicker">GUIDELINE</h2><span class="ihead__rule" aria-hidden="true"></span></div>
       <div class="iguide reveal">
         <div class="iguide__block">
           <h3>切り抜き動画</h3>
@@ -358,7 +358,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
   {/* ===== CONTACT（自作ダークフォーム） ===== */}
   <section class="isec" id="work">
     <div class="isec__inner isec__inner--narrow">
-      <div class="ihead reveal"><p class="ihead__kicker">CONTACT</p><span class="ihead__rule" aria-hidden="true"></span></div>
+      <div class="ihead reveal"><h2 class="ihead__kicker">CONTACT</h2><span class="ihead__rule" aria-hidden="true"></span></div>
       <p class="isec__lead reveal">コラボ・企業案件などのご相談を受け付けています。下記フォームよりお気軽にどうぞ。</p>
       <div class="reveal"><ContactForm /></div>
     </div>
