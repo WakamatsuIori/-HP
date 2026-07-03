@@ -533,15 +533,16 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.85rem 1.8rem;
+    padding: 0.6rem 1.5rem;
     border-radius: 999px;
-    font-size: 0.98rem;
+    font-size: 0.85rem;
     font-weight: 500;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.08em;
     text-decoration: none;
     cursor: pointer;
     transition: transform 0.18s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
   }
+  .ibtn--solid, .ibtn--ghost { min-width: 168px; justify-content: center; }
   .ibtn--solid { background: var(--gold-strong); color: var(--bg); border: 1px solid var(--gold-strong); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32); }
   /* ホバーで金の光がふわっと灯る（押したくなる質感） */
   .ibtn--solid:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(232, 207, 149, 0.45); }
@@ -555,7 +556,7 @@ const reelList: Video[] = latestTop.length ? latestTop : useSample ? sampleLates
   .ibtn--roll:hover .ibtn__rollinner, .ibtn--roll:focus-visible .ibtn__rollinner { transform: translateY(-50%); }
   .ibtn__arrow { display: inline-block; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); transform: rotate(-45deg); }
   .ibtn--roll:hover .ibtn__arrow, .ibtn--roll:focus-visible .ibtn__arrow { transform: rotate(0deg); }
-  .ibtn__yt { width: 1.15em; height: 1.15em; flex-shrink: 0; fill: #ff4d4d; }
+  .ibtn__yt { width: 1rem; height: 1rem; flex-shrink: 0; fill: #ff4d4d; }
   .ibtn--yt:hover { border-color: #ff6a6a; }
   @media (prefers-reduced-motion: reduce) {
     .ibtn__rollinner, .ibtn__arrow { transition: none; }
