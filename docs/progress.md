@@ -1,7 +1,32 @@
 # 進捗メモ（フェーズ間の引き継ぎ用）
 
-> 最終棚卸し: 2026-06-17。本番: **https://wakamatsu-iori.com**（Cloudflare Pages / push＋15分ごと自動デプロイ）。
+> 最終棚卸し: **2026-07-01**。本番: **https://wakamatsu-iori.com**（Cloudflare Pages / push＋毎時cron 自動デプロイ）。**トップ〜全ページ 黒×金 没入デザインで公開中**。
 > 詳細な決定ログ（DEC-番号・リファクタPhase番号）は **`refactor-instructions.md`** と各コミットを参照。
+
+## 【最新 2026-07-01】黒×金 没入デザインを本番全面公開＋独自お問い合わせフォーム稼働
+保留していた「黒×金 没入デザイン」を**本番へ全面昇格・公開**し、**お問い合わせフォームを独自実装で稼働**させた。ブランチ `design/top-fullwidth-brushup` → 検証後 **main へマージ済み（本番反映）**。
+
+### A. 黒×金 没入デザインを全ページ本番公開（旧「明クリーム×金」から転換・確定）
+- **Base.astro の :root を黒×金トークンに一元化**（--bg #14100b／--text #f3e7cf／金スケール）→ 全サブページが一括で黒金化。ヘッダー＝ガラス質ダーク・スティッキー＋**モバイルはハンバーガー**（≤720px・×アイコン化ドロップダウン）。フッター暗色。
+- **トップ(index.astro)を preview-immersive の“形そのもの”に本移植**（当初は色だけ塗替え→本人指摘で全面移植）：Base共通シェル(SEO/ヘッダ/フッタ/スプラッシュ)＋没入ヒーロー(全画面KV＋暗スクリム＋金グロー＋ライブバッジ＋ロールCTA)／金縁お知らせピル／光プールProfile／金箔ABOUT／**スケジュール=A(日別簡易カード。※週間ボード WeeklyBoard は残置しB復帰可)**／おすすめ吹き出し／**自動スクロールのフィルムリール動画**／ネオモーフィズムお知らせ／スポットライトのストア／**アイコン入りFOLLOWカード**／ガイドライン／自作フォーム。見出し＝金箔グラデ＋◆区切り(SectionHead)。
+- **足場撤去**：使い捨て `preview-immersive.astro` 削除・`?fx`/dramatic 残骸を全撤去（Base/index/WeeklyBoard/SectionHead）。→ **前回の静/動(refined/dramatic)は役目終了・撤去済み**。
+- **ブランドトーン＝黒×金・耽美を正式確定**（2026-06-19の明クリーム×金から転換）。→ 母艦 CLAUDE.md §2・記憶を更新（本セッションで対応）。
+- 検証：npm test 緑・本番デプロイ成功(build-and-deploy)・全ページ200・横スクロール無し・reduced-motion/モバイル軽量維持。/code-review→配色残骸/SNSバナー/コントラスト/モバイルblur を修正。
+
+### B. #9 お仕事依頼フォーム＝独自実装で稼働（Googleフォーム廃止）✅
+- 旧Googleフォーム埋め込み(高さ固定1397px＝下部に空白/黒地で浮く)を撤去し、**黒×金の自作フォーム `components/ContactForm.astro`** をトップ#workと`/work`で共用。
+- **受け口 `functions/contact/submit.ts`（Pages Function・POST /contact/submit）**：Origin判定→ハニーポット→(任意)Turnstile検証→入力検証→**Discord webhook通知**＋(任意)**Google Sheets追記**。純ロジック `functions/_lib/contact.ts`（検証/無害化/sheetSafe＝数式インジェクション対策）＋ tests/contact.test.ts。`functions/_lib/google.ts` に scope引数＋appendSheetRow 追加（既存Calendar呼び出しは無改修）。
+- **届け先**：Discord通知（本人がwebhook作成）＋**Google Sheets記録**＋**Cloudflare Turnstile**、**すべて本番稼働中（2026-07-01夜）**。
+- **秘密値経路**：GitHub Secrets → `.github/workflows/sync-pages-secrets.yml`（手動起動）で `wrangler pages secret put` により Cloudflare Pages 実行時へ同期。`CONTACT_WEBHOOK_URL`／`CONTACT_SHEET_ID`／`TURNSTILE_SECRET_KEY` 投入済み。`PUBLIC_TURNSTILE_SITE_KEY` はGitHub Secretsのみ（build.yml でビルド時にHTMLへ焼き込み）。
+- **Sheets記録**：本人が新規スプレッドシート作成→サービスアカウント（`hp-calendar-writer@phonic-jetty-498410-g2.iam.gserviceaccount.com`／カレンダー連携と同一SA）に編集共有→スプレッドシートID取得→登録。本番テスト送信で行追記を確認。
+- **Turnstile**：本人がCloudflareダッシュボードでウィジェット作成（ドメイン`wakamatsu-iori.com`・Managed）→サイトキー／シークレットキー取得→登録。本番ページに `data-sitekey` 焼き込み確認、トークン無し送信が正しく弾かれる（検証有効）ことを確認。
+- 手順書 `docs/setup/10-contact-form.md` を独自フォーム版に全面刷新。`.env.example`／`build.yml`(PUBLIC_TURNSTILE_SITE_KEY) 更新。レビュー修正済：秘密鍵`\n`→実改行(無いとSheets常時失敗)・数式インジェクション・失敗ログ。
+- **残タスクなし**（お問い合わせ機能は3点セット全て本番稼働）。実ブラウザでの最終目視確認（本人）のみ任意で依頼中。
+
+### C. GSC（Search Console）インデックス対応（2026-07-04）✅
+- GSC「リダイレクトあり(2)/代替ページ(1)/未登録(3)」を実測調査。原因＝①内部リンクが末尾スラッシュ無しで308転送を挟む ②/news/がsitemap未掲載。www/pages.devの重複はcanonicalが正しく処理済みで対応不要と判断。
+- 修正（commit 19660ef＋f5351c1・本番反映確認済）：内部リンク5箇所を`/xxx/`形式に統一（Base.astro/index.astro/information.ts）＋sitemap.xmlに`/news/`追加。本番grepでスラッシュ無しリンク0件を確認。
+- 残り＝Googleの再クロール待ち（数日〜2週間）。急ぐならGSCの「URL検査→インデックス登録をリクエスト」を主要ページで実行。任意でCloudflareのwww→本体Redirect Rule（docs/setup/09-custom-domain.md）。
 
 ## 公開・インフラ
 - 独自ドメイン **wakamatsu-iori.com** に切替済み（`astro.config.mjs` の site／robots.txt／llms.txt／sitemap.xml に反映）。旧 pages.dev も有効。
@@ -27,7 +52,7 @@
 - **#8 フォールバック（最終更新時刻）＋冪等性 … ✅**
 
 ### Phase 3 HPの存在意義 … 🔶 一部
-- **#9 お仕事依頼ページ … ⬜** `work.astro` はプレースホルダ（**フォーム未設置**・X DM誘導のみ）。←案件導線＝最優先
+- **#9 お仕事依頼ページ … ✅（2026-07-01）** 独自の黒×金お問い合わせフォーム稼働（送信→Discord通知。Sheets/Turnstileは任意で後付け）。詳細は冒頭【最新 2026-07-01】B。メディアキット(登録者数自動)・X DM誘導も掲載。
 - **#10 ガイドライン/プロフィール/プライバシー … 🔶** ガイドラインはトップに集約（独立ページ廃止）／`privacy.astro` は仮文言／プロフィールは `config/profile.ts` に構造化済（文言は仮）／**/about の空「世界観・設定」仮置きブロックを削除**（張り紙状態の解消・2026-06-19、commit 1171d6f）。※本人の世界観文が確定したら同セクションを本文付きで再追加すること（/about はメニュー非掲載の検索/AI向けページ）
 - **#11 SEO … 🔶** JSON-LD(Person+WebSite)・`llms.txt`・`sitemap.xml` は実装済（`Base.astro`／`pages/*.ts`）／GA4・Search Console 設置済／**トップ`<title>`を集客向けに強化**（`site.ts`の`homeTitle`・2026-06-19）／**404ページ追加**（`src/pages/404.astro`＝`noindex`・Cloudflareが存在しないURLにHTTP404を返す＝ソフト404解消・2026-06-19）／VideoObject・Event は据え置き
 
@@ -47,15 +72,15 @@
 ## 並行リファクタ（完了・別系統の Phase/DEC 番号）
 安全網テスト追加・重複集約・境界型付け・定数一元化・`SectionHead.astro` 抽出・profile/information/featured の config 化・sharp 直接依存化・loader層のfetcher注入テスト 等。**詳細は `refactor-instructions.md` と該当コミット**。
 
-## いま公開前（未コミット/未push）
-- main は origin より先行（未pushコミットあり）＝反映待ちが出ることがある。デザイン調整中（Cinzelフォント・favicon・Prettier設定・フォント再サブセット）。
+## 経緯ログ（※以下は 2026-07-01 に本番反映済み。当時「未push/未昇格」だった作業の履歴として残置）
+- ~~main は origin より先行（未push）~~ → **2026-07-01 push・マージ済み（main = origin/main）**。以下の静/動・preview-immersive は本文冒頭【最新 2026-07-01】に統合・本番化。
 - **トップ ブラッシュアップ（作業中・ブランチ `design/top-fullwidth-brushup`・未push・2026-06-28）**：本文720px→幅トークン化で全画面寄せ（`--content`1180/`--content-wide`1320/`--content-prose`720。`Base.astro`・`index.astro`）。演出は **静(refined)／動(dramatic)** の2版を実装し `?fx=dramatic` で切替（`Base.astro` の is:inline＋全 dramatic CSS を `html[data-fx='dramatic']` でガード）。動＝ヒーロー金の靄/金粉/一閃・見出し一字ずつ立つ・区切り金スイープ・帯背景の金漂い・予定盤の金スイープ。reduced-motion／モバイルは自動で軽量化。**本人が静/動を未決定（保留中）**。決定後＝敗者CSS・`?fx` 配線を削除→`/code-review`→push で反映。テスト94件パス。ローカル全ビルドは従来どおり `/videos` の YouTube キー未設定で停止（CI は通る）。計画書＝`C:\Users\wakam\.claude\plans\temporal-swinging-clock.md`。
 - **【最新・方針転換 2026-06-29】トップを「全く新しい形」へ全面リデザイン中（黒×金 没入シネマ×グロー・同ブランチ `design/top-fullwidth-brushup`・未push）**：本人が上記の静/動（明クリーム×金の延長）を見て「テイストごと変えた全く新しい形に」と方針転換。見本帳から「C 没入シネマ×グロー」採用、トーンは **黒×金・耽美**（＝2026-06-19の明クリーム×金からのブランド転換。**採用確定時に母艦CLAUDE.md§2・記憶[[lp-design-direction]]を更新**）。**現行トップ(index.astro)・静/動には触れず、独立プレビュー `src/pages/preview-immersive.astro`（noindex・使い捨て）で全面構築**。内容：ガラス質固定ナビ／全画面没入ヒーロー(KV＋シネマ的スクリム＋ラジアル金グロー＋カーソル光)／PROFILE(立ち絵＋表)／ABOUT／SCHEDULE(ガラスカード)／VIDEO／INFORMATION(config)／STORE(BOOTH)／FOLLOW(各色グローカード blur45+グラデ枠)／GUIDELINE／**CONTACT=自作フォーム(黒×金・Googleフォーム埋め込みは廃止・送信繋ぎは後で本人確認済)**。＋**LPエディタ風 調整パネル**（スライダー:立ち絵/光プール/カーソル/縁/グロー/トーン＋ドラッグ移動・ホイール拡縮で hero/profile/about を個別配置、localStorage保存、「設定をコピー」で確定値→焼き込み）。見本帳演出4種:ロード画面(Type Motion RISE「和香松庵/Official Site」)・フロストガラス丸アイコンCTA・グローカード・floatSlow浮遊。本人調整値を既定化済(form=dark, spotlight0.4/cursor120/vignette0.2/glow0=OFF, 各要素配置)。テスト94パス・preview-immersiveビルドOK(/videosのみキー未設定で停止＝既知)。**実機=`http://localhost:4321/preview-immersive`（ロード画面はタブ1回のみ＝再表示は新タブ）**。⏭ **本人「もう少しプレビューで調整」＝本番未昇格(保留)**。昇格時＝preview→本番index化(専用レイアウト抽出・調整パネル/?form配線除去・現行トップと静/動を置換・ヘッダ/フッタ整理・ブランド記述更新・/code-review)。これで前回の静/動は役目終了見込み。計画書＝`~/.claude/plans/temporal-swinging-clock.md`。 **【追記 6/29・2回目】**演出を多数更新：重い覗き穴スポットを撤去→**入場を「ラベル→見出し→説明文 0.2秒刻み」の基本入場**にしロード明け後に起動(`intro-go`)／YouTube CTA=**フロスト59**／ストア=**SpotlightBorder**／お知らせ=**ネオモーフィズム**／プロフィール項目=**リスト段差出現**／**YouTubeライブ検知バッジ**(heroReveal入場・本番`/api/live`同契約・`?live=1`確認・左上固定)／最下部に**浮遊アイコン帯**(Lucide・floatSlow)。**本番HP差分も反映**＝動画を **PICK UP(おすすめ・横並び＋吹き出し)** ＋ **VIDEO(最新動画＝オートスクロールのリール/フィルムロール)** に2分割(旧3Dシリンダーは未使用化)・**newsbar**・**GALLERY**・**すべて見る導線**(/schedule・/videos・/news)。画質=立ち絵srcset拡大(〜1280/1320w)＋**quality90**(KVは元1920が上限)、**ふわふわ(artFloat)は重く保留=停止**。**未対応=カウントダウン/来週ボード(本人見送り)・上部ナビlinkは仮(#)・実データ未接続・デッドコード掃除は昇格時**。ポート=4321。テスト94パス。**本番未昇格のまま**。
 - `docs/research/`：フォント/エフェクト/和あしらいの研究カタログ（選定資料）。
 
 ## 次にやるべき優先（ロードマップ順）
-1. **#9 お仕事依頼フォーム**（Googleフォーム埋め込み＋ハニーポット＋実績/メディアキット）＝HP最大の価値
-2. **#11 GA4 / Search Console**（効果測定が現状ゼロ）
+1. **（任意）お問い合わせフォーム強化**：Turnstile 本設定・Sheets 記録（本人が値を用意→`sync-pages-secrets` で有効化）
+2. **#11 GA4 / Search Console の活用**（設置済・計測データの確認）
 3. **#6 カレンダー書き戻し＋確定枠埋め込み**（Discordの書き込み基盤に相乗り可）
 4. **#13 緊急キルスイッチ**
 5. **#10 プライバシーポリシー正式版**（GA4/フォーム導入と同時）

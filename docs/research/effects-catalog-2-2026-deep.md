@@ -1,5 +1,7 @@
 # エフェクト深掘り調査（2025–2026）＋ 再提案
 
+> ⭐ **位置づけ＝実戦の第1波（最も実用）**。まずここ＋[早見表](effects-quick-reference-2026.md)。
+
 > 既存 [effects-catalog.md](effects-catalog.md)（約100件・収集版）の続編。専門リサーチ4方向（最新CSS技術／高級・耽美サイトのティアダウン／Astro静的での実装／性能・アクセシビリティ）で深掘りし、**和香松庵に今すぐ効く“次の一手”**へ落とし込んだもの。
 > 前提：オフホワイト×くすみ金(#9c8f6b)×明朝(Zen Old Mincho)／Astro `output:'static'`→Cloudflare Pages／純CSS優先・依存最小／リッチ演出はトップ1箇所／モバイル軽量／`prefers-reduced-motion` 必須／WCAG配慮。
 > **既に実装済み**（重複しない）：Ken Burns背景・CSSスパークル・フェードアップ出現(IO)・ナビ下線リビール・カードリフト・金CTAシャイン一閃・帯セクション灯りボケ漂い・`:focus-visible`金リング・`::selection`金トーン・金ヘアライン罫・大英字ウォーターマーク見出し。
