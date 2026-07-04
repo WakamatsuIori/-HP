@@ -30,11 +30,11 @@ export interface LivePage {
 export const livePages: LivePage[] = [
   // 新しい配信を告知するときは、この行の下にエントリを追記する。
   {
-    slug: '2026-07-04-card-test',
-    title: '【テスト】配信告知カードの表示確認',
-    description: 'Xカード表示のテスト用ページです。実際の配信告知はこの仕組みで発行します。',
-    youtubeUrl: 'https://www.youtube.com/@Wakamatsu-Iori/streams',
-    when: '（テストページ・実配信ではありません）',
+    slug: '2026-07-06-schedule',
+    title: '6月第4週の週間スケジュール！！',
+    description: '和香松庵の配信枠です。YouTubeでお待ちしております。',
+    youtubeUrl: 'https://www.youtube.com/watch?v=371v3_c8yWA',
+    when: '7/6(月) 1:00〜',
   },
 ];
 
