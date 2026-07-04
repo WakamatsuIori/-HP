@@ -5,13 +5,15 @@ import LastUpdated from '../components/LastUpdated.astro';
 interface Props {
   title?: string;
   description?: string;
+  /** ページ個別のSNSカード画像（絶対URL or サイト内パス）。省略時は共通の /og.jpg */
+  ogImage?: string;
 }
-const { title, description = site.description } = Astro.props;
+const { title, description = site.description, ogImage } = Astro.props;
 const pageTitle = title ? `${title} | ${site.name}` : site.homeTitle;
 
 // OGP/正規URL用の絶対URL（Astro.site = astro.config.mjs の site から生成）
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImageURL = new URL('/og.jpg', Astro.site); // SNSシェアカードの画像（横長キービジュアル）
+const ogImageURL = new URL(ogImage ?? '/og.jpg', Astro.site); // SNSシェアカードの画像（既定は横長キービジュアル）
 
 // GA4 計測ID。GA4の測定IDはクライアントHTMLに必ず露出する「公開ID」（秘密ではない）。
 // このサイトは GitHub Actions でビルドするが、CIでは env が import.meta.env に載らず

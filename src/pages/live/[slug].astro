@@ -1,0 +1,91 @@
+---
+/**
+ * 配信告知ページ（X投稿用のカード付きページ）。
+ * データは src/config/live-pages.ts。1エントリ = 1URL（/live/<slug>/）。
+ * 短命な告知ページなので検索には載せない（noindex・sitemap非掲載）。
+ * リダイレクトはせず、視聴リンクを本文に置く（Xカード審査とユーザー確認のため）。
+ */
+import Base from '../../layouts/Base.astro';
+import { livePages, livePageImage } from '../../config/live-pages';
+
+export function getStaticPaths() {
+  return livePages.map((p) => ({ params: { slug: p.slug }, props: { page: p } }));
+}
+
+const { page } = Astro.props;
+const image = livePageImage(page);
+---
+
+<Base title={page.title} description={page.description} ogImage={image}>
+  <meta name="robots" content="noindex, follow" slot="head" />
+  <section class="live">
+    <p class="live__when">{page.when}</p>
+    <h1 class="live__title">{page.title}</h1>
+    <p class="live__desc">{page.description}</p>
+    <a class="live__btn" href={page.youtubeUrl} rel="noopener">▶ YouTubeで視聴する</a>
+    <p class="live__url"><a href={page.youtubeUrl} rel="noopener">{page.youtubeUrl}</a></p>
+    <p class="live__back"><a href="/">和香松庵 公式サイトへ →</a></p>
+  </section>
+</Base>
+
+<style>
+  .live {
+    min-height: 60vh;
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 4.5rem 1.25rem 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 1rem;
+  }
+  .live__when {
+    color: var(--gold-strong);
+    letter-spacing: 0.08em;
+    font-size: 0.95rem;
+  }
+  .live__title {
+    font-family: var(--serif, serif);
+    font-size: clamp(1.4rem, 4.5vw, 2rem);
+    line-height: 1.4;
+    color: var(--text);
+  }
+  .live__desc {
+    color: var(--text);
+    opacity: 0.85;
+    line-height: 1.9;
+  }
+  .live__btn {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.9rem 2.2rem;
+    border: 1px solid var(--gold);
+    border-radius: 999px;
+    color: var(--gold-bright, var(--gold-strong));
+    background: linear-gradient(180deg, rgba(201, 168, 106, 0.16), rgba(201, 168, 106, 0.05));
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+  .live__btn:hover {
+    background: linear-gradient(180deg, rgba(201, 168, 106, 0.28), rgba(201, 168, 106, 0.1));
+    transform: translateY(-1px);
+  }
+  .live__url {
+    font-size: 0.8rem;
+    word-break: break-all;
+  }
+  .live__url a {
+    color: var(--gold);
+  }
+  .live__back {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+  }
+  .live__back a {
+    color: var(--text);
+    opacity: 0.7;
+  }
+</style>
