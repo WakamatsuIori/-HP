@@ -8,7 +8,7 @@ export interface InfoItem {
   /** 自由なラベル（例 info / goods / stream / song） */
   category: string;
   title: string;
-  /** リンク先（外部URL or サイト内パス /schedule など）。省略すると「表示だけ（リンク無し）」になる。 */
+  /** リンク先（外部URL or サイト内パス /schedule/ など。サイト内は末尾スラッシュ付きで）。省略すると「表示だけ（リンク無し）」になる。 */
   url?: string;
   /** バナー画像URL（任意）。public/配下のパスや外部URL。無ければ既定デザイン */
   image?: string;
@@ -20,7 +20,7 @@ export const information: InfoItem[] = [
     date: '2026.06.18',
     category: 'goods',
     title: 'グッズ制作！？ 6/19(金)の配信でいっしょに考えよう！',
-    url: '/schedule',
+    url: '/schedule/',
     image: '/info/goods.png',
   },
   {
