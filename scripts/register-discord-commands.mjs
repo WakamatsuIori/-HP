@@ -33,18 +33,30 @@ const commands = [
       { name: 'タイトル', description: '配信枠の名前（例：雑談配信）', type: 3, required: true, max_length: 100 }, // embed.title 256字上限より十分短く
 
       {
-        name: '時間',
-        description: '開始時刻（省略すると21:00）。お休みの日は「休業」を選ぶ',
-        type: 3, // STRING
+        name: '時',
+        description: '開始時刻の「時」（0〜23の24時間表記。省略すると21時）',
+        type: 4, // INTEGER
+        required: false,
+        // 0〜23の24択（Discordのchoicesは最大25個。24個なので収まる）。
+        choices: Array.from({ length: 24 }, (_, h) => ({ name: `${h}時`, value: h })),
+      },
+      {
+        name: '分',
+        description: '開始時刻の「分」（省略すると0分）',
+        type: 4, // INTEGER
         required: false,
         choices: [
-          { name: '19:00', value: '19:00' },
-          { name: '20:00', value: '20:00' },
-          { name: '21:00', value: '21:00' },
-          { name: '21:30', value: '21:30' },
-          { name: '22:00', value: '22:00' },
-          { name: '休業（お休み）', value: '休業' }, // ← functions/_lib/datetime.ts の REST_VALUE と一致させること
+          { name: '00分', value: 0 },
+          { name: '15分', value: 15 },
+          { name: '30分', value: 30 },
+          { name: '45分', value: 45 },
         ],
+      },
+      {
+        name: '休業',
+        description: 'オンにするとその日は「お休み（終日）」で登録します',
+        type: 5, // BOOLEAN
+        required: false,
       },
       {
         name: 'プラットフォーム',

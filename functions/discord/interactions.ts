@@ -20,6 +20,7 @@ import {
 import { getAccessToken, insertEvent, listEvents, deleteEvent } from '../_lib/google';
 import {
   buildWhenFromParts,
+  composeTimeChoice,
   dayRange,
   encodePendingId,
   decodePendingId,
@@ -131,7 +132,11 @@ export async function onRequestPost(ctx: {
       const month = Number(opts['月']);
       const day = Number(opts['日']);
       const title = String(opts['タイトル'] ?? '').trim();
-      const timeChoice = opts['時間'] != null ? String(opts['時間']) : undefined;
+      // 時刻は「時(0〜23)」＋「分(0/15/30/45)」の選択、または「休業」チェックから組み立てる。
+      const hour = opts['時'] != null ? Number(opts['時']) : undefined;
+      const minute = opts['分'] != null ? Number(opts['分']) : undefined;
+      const rest = Boolean(opts['休業']);
+      const timeChoice = composeTimeChoice(hour, minute, rest);
       const platform = opts['プラットフォーム'] != null ? String(opts['プラットフォーム']) : DEFAULT_PLATFORM;
       const featured = Boolean(opts['おすすめ']);
 

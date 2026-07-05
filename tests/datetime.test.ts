@@ -6,6 +6,7 @@ import {
   buildWhen,
   dayRange,
   buildWhenFromParts,
+  composeTimeChoice,
   encodePendingId,
   decodePendingId,
   REST_VALUE,
@@ -145,6 +146,32 @@ describe('buildWhenFromParts（選択式・年自動）', () => {
   it('範囲外の月・日は error', () => {
     expect(buildWhenFromParts(13, 1, '21:00', NOW)).toHaveProperty('error');
     expect(buildWhenFromParts(6, 0, '21:00', NOW)).toHaveProperty('error');
+  });
+});
+
+describe('composeTimeChoice（時・分・休業→時刻文字列）', () => {
+  it('時＋分から "H:MM" を作る', () => {
+    expect(composeTimeChoice(23, 30, false)).toBe('23:30');
+    expect(composeTimeChoice(9, 0, false)).toBe('9:00');
+    expect(composeTimeChoice(0, 15, false)).toBe('0:15');
+  });
+  it('分を省略すると 0 分', () => {
+    expect(composeTimeChoice(7, undefined, false)).toBe('7:00');
+  });
+  it('時を省略すると undefined（＝既定21:00になる）', () => {
+    expect(composeTimeChoice(undefined, 30, false)).toBeUndefined();
+    expect(composeTimeChoice(undefined, undefined, false)).toBeUndefined();
+  });
+  it('休業オンは時分より優先で REST_VALUE', () => {
+    expect(composeTimeChoice(23, 30, true)).toBe(REST_VALUE);
+    expect(composeTimeChoice(undefined, undefined, true)).toBe(REST_VALUE);
+  });
+  it('24時間どこでも buildWhenFromParts と組み合わせて有効な時刻になる', () => {
+    for (const h of [0, 1, 13, 23]) {
+      const t = composeTimeChoice(h, 45, false);
+      const r = buildWhenFromParts(7, 1, t, NOW) as { startDateTime: string };
+      expect(r.startDateTime).toBe(`2026-07-01T${String(h).padStart(2, '0')}:45:00+09:00`);
+    }
   });
 });
 

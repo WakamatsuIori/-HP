@@ -136,6 +136,23 @@ export function buildWhenFromParts(
   return composeWhen(year, month, day, timeStr);
 }
 
+/**
+ * 選択式 /予定 の「時」「分」「休業」から、buildWhenFromParts に渡す時刻文字列を作る。
+ * ・休業オン → REST_VALUE（終日）
+ * ・時あり  → "H:MM"（分が未選択なら 0 分）
+ * ・時なし  → undefined（＝DEFAULT_TIME 21:00。分だけ選ばれても時が無ければ既定）
+ */
+export function composeTimeChoice(
+  hour: number | undefined,
+  minute: number | undefined,
+  rest: boolean,
+): string | undefined {
+  if (rest) return REST_VALUE;
+  if (hour == null || !Number.isInteger(hour)) return undefined;
+  const mm = Number.isInteger(minute) ? (minute as number) : 0;
+  return `${hour}:${pad(mm)}`;
+}
+
 /** 確認ボタンの custom_id 接頭辞（confirm）。decode 側と一致させる。 */
 const CONFIRM_PREFIX = 'yt:c';
 
