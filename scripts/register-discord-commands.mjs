@@ -104,19 +104,28 @@ const commands = [
   },
 ];
 
-const url = GUILD
-  ? `https://discord.com/api/v10/applications/${APP_ID}/guilds/${GUILD}/commands`
-  : `https://discord.com/api/v10/applications/${APP_ID}/commands`;
+const globalUrl = `https://discord.com/api/v10/applications/${APP_ID}/commands`;
+const guildUrl = (g) => `https://discord.com/api/v10/applications/${APP_ID}/guilds/${g}/commands`;
 
-const res = await fetch(url, {
-  method: 'PUT',
-  headers: { authorization: `Bot ${TOKEN}`, 'content-type': 'application/json' },
-  body: JSON.stringify(commands),
-});
-
-if (!res.ok) {
-  console.error('登録に失敗:', res.status, await res.text());
-  process.exit(1);
+// 指定URLへコマンド一覧をまるごと上書き（PUT）する。cmds を [] にすればその範囲を空に＝掃除できる。
+async function putCommands(url, cmds, label) {
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: { authorization: `Bot ${TOKEN}`, 'content-type': 'application/json' },
+    body: JSON.stringify(cmds),
+  });
+  if (!res.ok) {
+    console.error(`${label} に失敗:`, res.status, await res.text());
+    process.exit(1);
+  }
+  console.log(`✅ ${label}`);
 }
 
-console.log(`✅ コマンドを登録しました（${GUILD ? 'guild: ' + GUILD : 'global'}）`);
+if (GUILD) {
+  // サーバー（ギルド）に即時登録。加えて、グローバル側を空にして「二重表示」を掃除する。
+  // （このBotは本人のサーバー専用運用。グローバルとギルドの両方にコマンドがあると重複して見える）
+  await putCommands(guildUrl(GUILD), commands, `サーバー(${GUILD})にコマンドを登録しました（即時反映）`);
+  await putCommands(globalUrl, [], 'グローバル側のコマンドを空にしました（重複を掃除）');
+} else {
+  await putCommands(globalUrl, commands, 'グローバルにコマンドを登録しました（反映まで最大1時間）');
+}
