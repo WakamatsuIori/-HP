@@ -16,7 +16,12 @@ export const site = {
   links: {
     youtube: 'https://www.youtube.com/@Wakamatsu-Iori',
     x: 'https://x.com/WakamatsuIori',
+    /** BOOTHショップ本体（全商品）。フッター・about・構造化データ・llms.txt から参照 */
     booth: 'https://wakamatsu-iori.booth.pm/',
+    /** BOOTHの「グッズ」グループ（item_lists）。ストアの2ボタン導線で使用 */
+    boothGoods: 'https://wakamatsu-iori.booth.pm/item_lists/mLdTVeoE',
+    /** BOOTHの「配信ツール（配信者向けウィジット）」グループ（item_lists）。ストアの2ボタン導線で使用 */
+    boothTools: 'https://wakamatsu-iori.booth.pm/item_lists/m7YTowaX',
     /** マシュマロ（匿名で質問・メッセージを受け取る） */
     marshmallow: 'https://marshmallow-qa.com/wakamatsu_vt',
   },

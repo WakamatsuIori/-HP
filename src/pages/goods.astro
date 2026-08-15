@@ -8,21 +8,29 @@ import { site } from '../config/site';
 // ※旧BOOTH取得コード（booth.ts/loadGoods.ts/GoodsList.astro 等）は方針確定に伴い削除済み（必要時はgit履歴から復活可）。
 ---
 
-<Base title="ストア" description="BOOTHストアでは、配信に使える自作のOBSウィジェットなどを販売中。オリジナルグッズも順次追加予定です。">
+<Base title="ストア" description="BOOTHストアで、和香松庵のオリジナルグッズと、配信に使える自作のOBSウィジェットを販売中。">
   <h1>ストア</h1>
   <p>
-    BOOTHストアで、配信に使える自作のOBSウィジェットなどを販売しています。オリジナルグッズも順次追加していく予定です。
-    最新のラインナップの確認・購入は下記からどうぞ。（当サイトでの直接販売は行っていません）
+    BOOTHストアで、和香松庵のオリジナルグッズと、配信に使える自作のOBSウィジェットを販売しています。
+    ラインナップは「グッズ」「配信ツール」の2つに分かれています。最新の内容の確認・購入は下記からどうぞ。
+    （当サイトでの直接販売は行っていません）
   </p>
-  <p class="booth-cta">
-    <a class="booth-btn" href={site.links.booth} rel="me noopener" target="_blank">BOOTHショップを見る →</a>
+  <div class="booth-cta">
+    <a class="booth-btn" href={site.links.boothGoods} rel="me noopener" target="_blank">グッズを見る ▸</a>
+    <a class="booth-btn" href={site.links.boothTools} rel="me noopener" target="_blank">配信ツールを見る ▸</a>
+  </div>
+  <p class="booth-all">
+    <a href={site.links.booth} rel="me noopener" target="_blank">すべての商品（BOOTHショップ）を見る →</a>
   </p>
 </Base>
 
 <style>
   .booth-cta {
     margin-top: 1.75rem;
-    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    justify-content: center;
   }
   .booth-btn {
     display: inline-block;
@@ -37,5 +45,14 @@ import { site } from '../config/site';
   }
   .booth-btn:hover {
     background: var(--bg);
+  }
+  .booth-all {
+    margin-top: 1.1rem;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+  .booth-all a {
+    color: var(--muted, var(--text));
+    opacity: 0.85;
   }
 </style>
